@@ -514,16 +514,32 @@ elif st.session_state.valanti_page >= 1 and not st.session_state.valanti_submitt
                 st.session_state[a_key] = st.session_state.valanti_responses[i]
                 st.session_state[b_key] = 3 - st.session_state.valanti_responses[i]
 
-        st.markdown("---")
-        st.markdown(f"#### Pregunta {i + 1}")
-
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(f"**A)** {par[0]}")
-        with col_b:
-            st.markdown(f"**B)** {par[1]}")
-
-        st.markdown("**Distribuye 3 puntos entre las dos opciones (la suma debe ser 3):**")
+        # Tarjeta visual para cada pregunta
+        st.markdown(
+            f"""
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                        border-radius: 12px; padding: 20px; margin: 15px 0;
+                        border-left: 4px solid #3b82f6;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="background: #3b82f6; color: white; padding: 4px 12px;
+                                border-radius: 20px; font-size: 0.85em; font-weight: bold;">
+                        Pregunta {i + 1}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <div style="flex: 1; background: rgba(59,130,246,0.1); border-radius: 8px; padding: 12px;">
+                        <span style="color: #60a5fa; font-weight: bold; font-size: 1.1em;">A)</span>
+                        <span style="color: #e2e8f0; font-size: 1.05em;"> {par[0]}</span>
+                    </div>
+                    <div style="flex: 1; background: rgba(245,158,11,0.1); border-radius: 8px; padding: 12px;">
+                        <span style="color: #fbbf24; font-weight: bold; font-size: 1.1em;">B)</span>
+                        <span style="color: #e2e8f0; font-size: 1.05em;"> {par[1]}</span>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         col_sa, col_sb, col_icon = st.columns([3, 3, 1])
         with col_sa:
