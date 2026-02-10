@@ -22,9 +22,10 @@ echo [OK] Conexion SSH establecida
 
 echo.
 echo [2/5] Copiando archivos al servidor...
-scp app.py database.py requirements.txt Dockerfile .dockerignore ^
+scp app.py valanti_app.py disc_style.py database.py requirements.txt Dockerfile .dockerignore ^
     questions_es.json questions.json ^
     disc_descriptions_es.json disc_descriptions.json ^
+    streangths.json ^
     docker-compose.prod.yml ^
     %SERVIDOR%:%DIRECTORIO%/
 

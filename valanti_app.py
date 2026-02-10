@@ -395,6 +395,17 @@ if "valanti_form_data" not in st.session_state:
 
 # ---- PANTALLA DE INICIO ----
 if not st.session_state.valanti_started:
+    # Forzar reinicio de estado
+    st.session_state.valanti_submitted = False
+    st.session_state.valanti_responses = [None] * len(preguntas)
+    st.session_state.valanti_page = 1
+    st.session_state.valanti_form_data = {
+        "name": "",
+        "age": "",
+        "sex": "",
+        "education": "",
+        "position": "",
+    }
     st.markdown("""
     ### Bienvenido al Cuestionario VALANTI
     
@@ -456,101 +467,123 @@ elif st.session_state.valanti_started and st.session_state.valanti_page == 0 and
 
 # ---- CUESTIONARIO ----
 elif st.session_state.valanti_page >= 1 and not st.session_state.valanti_submitted:
-    
+
     # Configuración de preguntas por página
-    questions_per_page = 3
+    questions_per_page = 5
     total_questions = len(preguntas)
-    
-    # La página 1 corresponde a la primera página de preguntas
     current_q_start = (st.session_state.valanti_page - 1) * questions_per_page
     current_q_end = min(current_q_start + questions_per_page, total_questions)
-    
     total_pages = math.ceil(total_questions / questions_per_page)
-    
+
     # Progreso
-    progress = current_q_start / total_questions
+    progress = current_q_end / total_questions
     st.progress(progress)
     st.markdown(f"**Preguntas {current_q_start + 1} - {current_q_end} de {total_questions}**")
-    
-    # Mostrar instrucciones de la parte
+
+    # Instrucciones según la parte
     if current_q_start < 9:
-        st.info("**Primera Parte:** Distribuye 3 puntos entre las dos frases según la importancia que le das a cada una en tu vida personal. El puntaje más alto para la frase más importante.")
-    elif current_q_start == 9 or (current_q_start < 9 and current_q_end > 9):
-        st.warning("**Segunda Parte:** Distribuye 3 puntos entre las dos frases. El puntaje más alto será para la frase que indique **lo peor** según tu juicio.")
+        st.info("**Primera Parte:** Distribuye 3 puntos entre las dos frases según la importancia que le das a cada una en tu vida personal.")
     else:
         st.warning("**Segunda Parte:** Distribuye 3 puntos entre las dos frases. El puntaje más alto será para la frase que indique **lo peor** según tu juicio.")
-    
-    with st.form(key=f"valanti_form_{st.session_state.valanti_page}"):
-        responses_page = []
-        valid = True
-        
-        for i in range(current_q_start, current_q_end):
-            par = preguntas[i]
-            st.markdown(f"---")
-            st.markdown(f"#### Pregunta {i + 1}")
-            
-            col_a, col_input, col_b = st.columns([4, 2, 4])
-            
-            with col_a:
-                st.markdown(f"**A)** {par[0]}")
-            
-            with col_input:
-                # Usar el valor guardado si existe
-                default_val = st.session_state.valanti_responses[i] if st.session_state.valanti_responses[i] is not None else None
-                a_val = st.selectbox(
-                    f"Puntos para A (Preg. {i+1})",
-                    options=["Selecciona", 0, 1, 2, 3],
-                    index=0 if default_val is None else [0, 1, 2, 3, 4][[None, 0, 1, 2, 3].index(default_val)],
-                    key=f"q_{i}_a"
-                )
-            
-            with col_b:
-                if a_val != "Selecciona":
-                    b_val = 3 - int(a_val)
-                    st.markdown(f"**B)** {par[1]}")
-                    st.markdown(f"**Puntos B: {b_val}**")
-                else:
-                    st.markdown(f"**B)** {par[1]}")
-                    st.markdown(f"*Puntos B: --*")
-            
-            responses_page.append((i, a_val))
-        
-        col_prev, col_next = st.columns(2)
-        
-        if st.session_state.valanti_page <= total_pages:
+
+    # Callbacks de auto-completado: al cambiar A se calcula B y viceversa
+    def make_callback_a(idx):
+        def _cb():
+            val = st.session_state.get(f"sel_a_{idx}", "--")
+            if val != "--":
+                st.session_state[f"sel_b_{idx}"] = 3 - int(val)
+        return _cb
+
+    def make_callback_b(idx):
+        def _cb():
+            val = st.session_state.get(f"sel_b_{idx}", "--")
+            if val != "--":
+                st.session_state[f"sel_a_{idx}"] = 3 - int(val)
+        return _cb
+
+    all_valid = True
+
+    for i in range(current_q_start, current_q_end):
+        par = preguntas[i]
+        a_key = f"sel_a_{i}"
+        b_key = f"sel_b_{i}"
+
+        # Inicializar desde respuestas guardadas si la clave no existe todavía
+        if a_key not in st.session_state:
+            if st.session_state.valanti_responses[i] is not None:
+                st.session_state[a_key] = st.session_state.valanti_responses[i]
+                st.session_state[b_key] = 3 - st.session_state.valanti_responses[i]
+
+        st.markdown("---")
+        st.markdown(f"#### Pregunta {i + 1}")
+
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.markdown(f"**A)** {par[0]}")
+        with col_b:
+            st.markdown(f"**B)** {par[1]}")
+
+        st.markdown("**Distribuye 3 puntos entre las dos opciones (la suma debe ser 3):**")
+
+        col_sa, col_sb, col_icon = st.columns([3, 3, 1])
+        with col_sa:
+            st.selectbox(
+                f"Puntos para A (P{i+1})",
+                options=["--", 0, 1, 2, 3],
+                key=a_key,
+                on_change=make_callback_a(i),
+            )
+        with col_sb:
+            st.selectbox(
+                f"Puntos para B (P{i+1})",
+                options=["--", 0, 1, 2, 3],
+                key=b_key,
+                on_change=make_callback_b(i),
+            )
+
+        a_val = st.session_state.get(a_key, "--")
+        b_val = st.session_state.get(b_key, "--")
+
+        with col_icon:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if a_val != "--" and b_val != "--" and int(a_val) + int(b_val) == 3:
+                st.success("✅")
+            else:
+                st.warning("⚠️")
+                all_valid = False
+
+    # Navegación
+    st.markdown("---")
+    col_prev, col_space, col_next = st.columns([1, 4, 1])
+
+    with col_prev:
+        if st.session_state.valanti_page > 1:
+            if st.button("⬅️ Anterior"):
+                for j in range(current_q_start, current_q_end):
+                    a = st.session_state.get(f"sel_a_{j}", "--")
+                    if a != "--":
+                        st.session_state.valanti_responses[j] = int(a)
+                st.session_state.valanti_page -= 1
+                st.rerun()
+
+    with col_next:
+        btn_label = "✅ Calcular Resultados" if current_q_end >= total_questions else "Siguiente ➡️"
+        if st.button(btn_label, disabled=not all_valid):
+            # Guardar respuestas de la página actual
+            for j in range(current_q_start, current_q_end):
+                a = st.session_state.get(f"sel_a_{j}", "--")
+                if a != "--":
+                    st.session_state.valanti_responses[j] = int(a)
+
             if current_q_end >= total_questions:
-                submit_btn = st.form_submit_button("✅ Calcular Resultados")
-            else:
-                submit_btn = st.form_submit_button("Siguiente ➡️")
-        
-        if submit_btn:
-            # Validar respuestas
-            all_valid = True
-            for i, (q_idx, a_val) in enumerate(responses_page):
-                if a_val == "Selecciona":
-                    all_valid = False
-                    break
-                st.session_state.valanti_responses[q_idx] = int(a_val)
-            
-            if not all_valid:
-                st.warning("⚠️ Por favor responde todas las preguntas antes de continuar.")
-            else:
-                if current_q_end >= total_questions:
-                    # Verificar que todas las preguntas estén respondidas
-                    if None in st.session_state.valanti_responses:
-                        st.warning("⚠️ Hay preguntas sin responder. Por favor revisa el cuestionario completo.")
-                    else:
-                        st.session_state.valanti_submitted = True
-                        st.rerun()
+                if None in st.session_state.valanti_responses:
+                    st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
                 else:
-                    st.session_state.valanti_page += 1
+                    st.session_state.valanti_submitted = True
                     st.rerun()
-    
-    # Botón de retroceder (fuera del form)
-    if st.session_state.valanti_page > 1:
-        if st.button("⬅️ Anterior"):
-            st.session_state.valanti_page -= 1
-            st.rerun()
+            else:
+                st.session_state.valanti_page += 1
+                st.rerun()
 
 # ---- RESULTADOS ----
 elif st.session_state.valanti_submitted:

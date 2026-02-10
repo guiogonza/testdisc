@@ -565,6 +565,28 @@ def page_admin_dashboard():
                         else:
                             st.warning("Resultados no disponibles.")
 
+                    # Solo superadmin puede eliminar pruebas
+                    if admin.get("role") == "superadmin":
+                        st.markdown("---")
+                        col_del, col_spacer = st.columns([1, 3])
+                        with col_del:
+                            if st.button(f"🗑️ Eliminar prueba", key=f"del_{sess['id']}"):
+                                st.session_state[f"confirm_del_{sess['id']}"] = True
+                        
+                        if st.session_state.get(f"confirm_del_{sess['id']}", False):
+                            st.warning(f"⚠️ ¿Estás seguro de eliminar la prueba **{sess['id']}** de **{sess['candidate_name']}**? Esta acción es irreversible.")
+                            col_yes, col_no, _ = st.columns([1, 1, 2])
+                            with col_yes:
+                                if st.button("✅ Sí, eliminar", key=f"confirm_yes_{sess['id']}"):
+                                    db.delete_test_session(sess['id'])
+                                    st.session_state.pop(f"confirm_del_{sess['id']}", None)
+                                    st.success("Prueba eliminada.")
+                                    st.rerun()
+                            with col_no:
+                                if st.button("❌ Cancelar", key=f"confirm_no_{sess['id']}"):
+                                    st.session_state.pop(f"confirm_del_{sess['id']}", None)
+                                    st.rerun()
+
     # ----- TAB 3: Candidatos -----
     with tab3:
         st.markdown("### Candidatos Registrados")
@@ -937,21 +959,51 @@ def page_valanti_test():
             par = VALANTI_PREGUNTAS[i]
             st.markdown(f"---")
             st.markdown(f"#### Pregunta {i + 1}")
-            ca, ci, cb = st.columns([4, 2, 4])
-            with ca:
+            
+            # Mostrar las dos frases
+            col_a, col_b = st.columns(2)
+            with col_a:
                 st.markdown(f"**A)** {par[0]}")
-            with ci:
+            with col_b:
+                st.markdown(f"**B)** {par[1]}")
+            
+            st.markdown("**Distribuye 3 puntos entre las dos opciones** (la suma debe ser 3):")
+            
+            # Mostrar los selectboxes
+            ca, cb, cv = st.columns([4, 4, 2])
+            with ca:
                 default_val = st.session_state.valanti_responses[i]
                 a_val = st.selectbox(
-                    f"Puntos A (P{i+1})",
+                    f"Puntos para A (P{i+1})",
                     options=["--", 0, 1, 2, 3],
                     index=0 if default_val is None else [0, 1, 2, 3, 4][[None, 0, 1, 2, 3].index(default_val)],
                     key=f"vq_{i}_a",
                 )
             with cb:
-                st.markdown(f"**B)** {par[1]}")
                 if a_val != "--":
-                    st.markdown(f"**Puntos B: {3 - int(a_val)}**")
+                    b_val = 3 - int(a_val)
+                    st.selectbox(
+                        f"Puntos para B (P{i+1})",
+                        options=[b_val],
+                        index=0,
+                        key=f"vq_{i}_b",
+                        disabled=True,
+                        help="Automático: 3 - Puntos A"
+                    )
+                else:
+                    st.selectbox(
+                        f"Puntos para B (P{i+1})",
+                        options=["--"],
+                        index=0,
+                        key=f"vq_{i}_b_empty",
+                        disabled=True,
+                    )
+            with cv:
+                if a_val != "--":
+                    st.markdown(f"<div style='padding-top:8px; text-align:center; font-size:24px; color:green; font-weight:bold;'>✓ Σ=3</div>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"<div style='padding-top:8px; text-align:center; font-size:20px; color:gray;'>⚠</div>", unsafe_allow_html=True)
+            
             page_responses.append((i, a_val))
 
         is_last = q_end >= total

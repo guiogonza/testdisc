@@ -19,7 +19,6 @@ evaluaciones_rh.db
 *.db-journal
 data/
 *.pdf
-*.json
 
 # IDEs
 .vscode/

@@ -1,0 +1,1192 @@
+[
+    {
+        "style": "D",
+        "question": "Prospero en entornos dinámicos donde puedo tomar el control y tomar decisiones rápidamente.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Disfruto genuinamente colaborar con otros y construir relaciones sólidas dentro de un equipo.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Encuentro gran satisfacción en la planificación meticulosa y asegurarme de que cada detalle esté considerado.",
+        "mapping": {
+            "D": 0,
+            "I": 0,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "S",
+        "question": "Priorizo mantener la armonía y creo en encontrar puntos en común para resolver conflictos pacíficamente.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Naturalmente gravito hacia roles de liderazgo y me siento cómodo tomando la iniciativa en grupos.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Tengo un talento para inspirar a otros y disfruto compartir mi entusiasmo para emocionar a las personas con mis ideas.",
+        "mapping": {
+            "D": 1,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Aprecio la comodidad de las rutinas y prefiero una estructura predecible en mis actividades diarias.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Soy muy orientado a los detalles y me enorgullezco de producir trabajo preciso y exacto.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me siento más cómodo cuando tengo una comprensión clara de mis responsabilidades y puedo mantener el control sobre mis tareas.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Disfruto ser el alma de la fiesta y conecto fácilmente con otros en situaciones sociales.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Valoro la estabilidad y prefiero entornos que sean tranquilos y predecibles.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me siento cómodo analizando datos y usando lógica para resolver problemas complejos.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me energizan los desafíos y disfruto pensar rápidamente en situaciones de alta presión.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Soy una persona sociable y me resulta fácil establecer rapport con personas de todos los ámbitos.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "S",
+        "question": "Tiendo a ser cauteloso y prefiero considerar cuidadosamente mis opciones antes de tomar riesgos.",
+        "mapping": {
+            "D": -2,
+            "I": -1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Tengo altos estándares para mí y para los demás y me esfuerzo por la excelencia en todo lo que hago.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Valoro la honestidad y la franqueza en la comunicación, incluso si significa tener conversaciones difíciles.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "S",
+        "question": "Creo en el poder de la colaboración y prefiero trabajar en equipos donde se escuche la voz de todos.",
+        "mapping": {
+            "D": 0,
+            "I": 1,
+            "S": 2,
+            "C": 0
+        }
+    },
+    {
+        "style": "C",
+        "question": "Disfruto profundizar en información compleja y encontrar patrones o insights que otros podrían pasar por alto.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 0,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Constantemente busco nuevas oportunidades para aprender y crecer, tanto personal como profesionalmente.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me esfuerzo por mantener relaciones positivas y evitar conflictos innecesarios siempre que sea posible.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me enorgullezco de mi capacidad para crear planes bien estructurados y ejecutarlos impecablemente.",
+        "mapping": {
+            "D": 0,
+            "I": 0,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Estoy dispuesto a tomar decisiones difíciles y mantener mi posición, incluso si significa enfrentar oposición o desacuerdo.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me encanta compartir mi pasión con otros y puedo emocionar fácilmente a las personas con mis ideas.",
+        "mapping": {
+            "D": 1,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me enorgullezco de ser confiable y consistente en todo lo que hago.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Reviso mi trabajo meticulosamente para asegurar precisión y evitar errores.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prospero en entornos que me permiten tomar decisiones rápidas y avanzar sin deliberación innecesaria.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me siento confiado tomando el control en situaciones donde otros pueden dudar o sentirse inciertos.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Disfruto establecer metas audaces y presionarme para alcanzarlas, incluso cuando las probabilidades están en mi contra.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "A menudo me encuentro motivando a otros con mi entusiasmo y actitud positiva.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me siento energizado cuando estoy rodeado de personas y disfruto interactuar con ellas regularmente.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Tiendo a evitar confrontaciones y prefiero resolver desacuerdos a través del entendimiento y el compromiso.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Encuentro satisfacción en mantener relaciones a largo plazo y ayudar a otros a sentirse cómodos.",
+        "mapping": {
+            "D": -1,
+            "I": 1,
+            "S": 2,
+            "C": 0
+        }
+    },
+    {
+        "style": "C",
+        "question": "Disfruto trabajar en entornos estructurados donde las tareas están bien definidas y las expectativas son claras.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Soy muy metódico en mi enfoque y me aseguro de que cada paso de un proceso se siga con precisión.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prefiero tomar decisiones rápida y decididamente en lugar de pensar demasiado en cada detalle.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me emociona la idea de conocer gente nueva y formar conexiones con quienes me rodean.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero un entorno tranquilo y estable, donde los cambios repentinos son raros y las cosas van según lo planeado.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Tiendo a enfocarme en la precisión de los detalles y siempre reviso mi trabajo en busca de errores.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prospero en entornos competitivos y disfruto esforzarme por ser el mejor en lo que hago.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero tomar un rol de apoyo, ayudando a otros a lograr sus objetivos en lugar de estar en el centro de atención.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "A menudo disfruto contar historias o experiencias para entretener o inspirar a quienes me rodean.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me motiva la necesidad de consistencia y precisión, y me disgusta cuando las cosas quedan incompletas o desordenadas.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "No disfruto situaciones donde tengo que esperar a que otros tomen decisiones.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "No disfruto pasar largos períodos de tiempo trabajando solo sin ninguna interacción con otros.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "No disfruto entornos que están constantemente cambiando e impredecibles.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "No disfruto tomar decisiones basadas en información incompleta o conjeturas.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "No disfruto estar en situaciones donde tengo poco o ningún control sobre el resultado.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "No disfruto trabajar en aislamiento sin ningún feedback o reconocimiento de otros.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "No disfruto situaciones que involucran conflicto o desacuerdo.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "No disfruto abordar tareas que requieren creatividad sobre precisión y exactitud.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "No disfruto seguir indicaciones de otros sin poder dar mi opinión o sugerencias.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "No disfruto tareas rutinarias que no involucran interactuar con otros.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "No disfruto trabajar en entornos acelerados con presión constante.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "No disfruto situaciones donde las reglas no son claras o cambian frecuentemente.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "No disfruto situaciones donde no soy yo quien lidera el esfuerzo o toma las decisiones.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "No disfruto trabajar en entornos donde no puedo socializar y colaborar.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "No disfruto ser forzado a tomar decisiones rápidamente sin suficiente tiempo para pensar las cosas.",
+        "mapping": {
+            "D": -1,
+            "I": -1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "C",
+        "question": "No disfruto trabajar en entornos donde hay poco énfasis en la precisión o atención al detalle.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "I",
+        "question": "Disfruto participar en actividades grupales donde puedo conectar con una amplia variedad de personas.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me resulta fácil motivar y energizar a otros en entornos de equipo.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me siento cómodo hablando frente a grandes audiencias y disfruto compartir mis ideas.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Prospero en entornos donde puedo interactuar con otros regularmente y construir rapport.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Prefiero sesiones de lluvia de ideas donde pueda colaborar en ideas con otros.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Encuentro satisfacción en ayudar a otros a ver el panorama general e inspirarlos hacia un objetivo común.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Soy hábil para construir consenso entre grupos diversos.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Disfruto tomar el liderazgo en reuniones sociales y fomentar un sentido de comunidad.",
+        "mapping": {
+            "D": 1,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Soy conocido por ser persuasivo y puedo influir fácilmente en otros para que apoyen mis ideas.",
+        "mapping": {
+            "D": 1,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Prospero en entornos donde se fomenta la creatividad y la colaboración.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "A menudo tomo la iniciativa de acercarme a otros y establecer conexiones.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Disfruto celebrar los logros de otros y fomentar una cultura de equipo positiva.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me energiza trabajar en proyectos que me permiten colaborar con múltiples departamentos o equipos.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": -1
+        }
+    },
+    {
+        "style": "I",
+        "question": "Sobresalgo en networking y disfruto construir relaciones profesionales a largo plazo.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "I",
+        "question": "Me motiva el reconocimiento de otros y disfruto recibir feedback sobre mis contribuciones.",
+        "mapping": {
+            "D": 0,
+            "I": 2,
+            "S": 1,
+            "C": 0
+        }
+    },
+    {
+        "style": "C",
+        "question": "Disfruto desarrollar planes detallados y seguirlos con precisión para alcanzar mis objetivos.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me enorgullezco de mi capacidad para mantener altos estándares de precisión y calidad en mi trabajo.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Prefiero entornos donde las tareas estén claramente definidas y haya una forma estructurada de completarlas.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Soy meticuloso para asegurarme de que todos los detalles sean correctos antes de avanzar con una tarea.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me siento cómodo analizando datos complejos y asegurándome de que todo esté considerado antes de tomar una decisión.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Prospero en roles donde la atención al detalle y la precisión son críticas.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Soy muy organizado y prefiero planificar mis tareas con anticipación para asegurar eficiencia.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Valoro la precisión y me disgustan situaciones donde hay ambigüedad o incertidumbre.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Prefiero trabajar en entornos donde hay reglas y directrices claras que todos siguen.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Disfruto proyectos donde puedo seguir pasos metódicamente para asegurar que todo se haga correctamente.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "A menudo reviso mi trabajo dos veces para asegurarme de que no haya errores antes de enviarlo.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me motiva la necesidad de crear procesos bien organizados y estructurados que otros puedan seguir.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me motiva el deseo de producir trabajo libre de errores y cumplir con altas expectativas.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me siento más cómodo cuando tengo responsabilidades claras y definidas y puedo enfocarme en los detalles.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "C",
+        "question": "Me disgustan situaciones donde hay poco control sobre la calidad y precisión.",
+        "mapping": {
+            "D": 0,
+            "I": -1,
+            "S": 1,
+            "C": 2
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prospero cuando puedo tomar el control de situaciones y dirigir a otros hacia el logro de objetivos.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prefiero establecer metas ambiciosas y presionarme a mí y a otros para alcanzarlas.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Disfruto tomar decisiones rápidamente y no dudo en actuar cuando surgen oportunidades.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me siento cómodo tomando riesgos si eso significa lograr una recompensa mayor.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "No tengo miedo de desafiar el status quo si eso significa impulsar el progreso.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me siento confiado en mi capacidad para liderar equipos y tomar decisiones difíciles.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prefiero entornos acelerados donde puedo generar impactos significativos rápidamente.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Disfruto trabajar en entornos donde soy yo el responsable de los resultados.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prospero con la competencia y estoy motivado para superar a otros.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me siento cómodo responsabilizando a otros por su desempeño para cumplir con altos estándares.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Disfruto enfrentar desafíos difíciles que ponen a prueba mis habilidades y resistencia.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": 0,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Prefiero liderar proyectos en lugar de seguir instrucciones de otros.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Estoy dispuesto a tomar decisiones impopulares si eso conduce al éxito a largo plazo.",
+        "mapping": {
+            "D": 2,
+            "I": 0,
+            "S": -1,
+            "C": 0
+        }
+    },
+    {
+        "style": "D",
+        "question": "Disfruto situaciones donde puedo demostrar mi experiencia y tomar el control.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "D",
+        "question": "Me energizan oportunidades que me permiten ejercer autoridad e influencia.",
+        "mapping": {
+            "D": 2,
+            "I": 1,
+            "S": 0,
+            "C": -1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prospero en entornos donde las tareas y expectativas están claramente definidas y rara vez cambian.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me siento más cómodo cuando puedo seguir una rutina consistente y evitar cambios inesperados.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero trabajar en un entorno estructurado donde hay procesos claros y mínimas interrupciones.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Valoro las relaciones a largo plazo y disfruto trabajar con el mismo equipo durante períodos prolongados.",
+        "mapping": {
+            "D": -1,
+            "I": 1,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Estoy en mi mejor momento cuando puedo enfocarme en una tarea a la vez, sin interrupciones frecuentes.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero flujos de trabajo predecibles donde sé qué esperar cada día.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me siento más productivo en entornos donde se prioriza la estabilidad y la confiabilidad sobre el cambio rápido.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me siento más cómodo con mejoras incrementales en lugar de cambios grandes y repentinos.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Valoro un enfoque tranquilo y constante para resolver problemas en lugar de apresurarse a soluciones rápidas.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero proyectos a largo plazo que me permitan trabajar metódicamente hacia un objetivo definido.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Disfruto entornos donde el cambio se planifica y gestiona cuidadosamente en lugar de ocurrir inesperadamente.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me siento más seguro cuando conozco los resultados o consecuencias exactas de mis acciones.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Aprecio entornos donde se prioriza la estabilidad y los cambios repentinos se mantienen al mínimo.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Me siento cómodo cuando puedo confiar en procesos establecidos y sé que las cosas seguirán un patrón predecible.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    },
+    {
+        "style": "S",
+        "question": "Prefiero trabajar en entornos donde los cambios repentinos o incertidumbres son raros y las decisiones están bien consideradas.",
+        "mapping": {
+            "D": -1,
+            "I": 0,
+            "S": 2,
+            "C": 1
+        }
+    }
+]

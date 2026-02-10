@@ -32,7 +32,8 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            name TEXT NOT NULL
+            name TEXT NOT NULL,
+            role TEXT DEFAULT 'admin'
         );
 
         CREATE TABLE IF NOT EXISTS candidates (
@@ -79,12 +80,32 @@ def init_db():
         );
     """)
 
+    # Migrar: agregar columna role si no existe
+    try:
+        c.execute("ALTER TABLE admins ADD COLUMN role TEXT DEFAULT 'admin'")
+    except sqlite3.OperationalError:
+        pass  # La columna ya existe
+
     # Default admin
     existing = c.execute("SELECT id FROM admins WHERE username = 'admin'").fetchone()
     if not existing:
         c.execute(
-            "INSERT INTO admins (username, password_hash, name) VALUES (?, ?, ?)",
-            ("admin", hash_password("admin123"), "Administrador RH"),
+            "INSERT INTO admins (username, password_hash, name, role) VALUES (?, ?, ?, ?)",
+            ("admin", hash_password("admin123"), "Administrador RH", "admin"),
+        )
+
+    # Superadmin
+    existing_super = c.execute("SELECT id FROM admins WHERE username = 'superadmin'").fetchone()
+    if not existing_super:
+        c.execute(
+            "INSERT INTO admins (username, password_hash, name, role) VALUES (?, ?, ?, ?)",
+            ("superadmin", hash_password("admin123"), "Super Administrador", "superadmin"),
+        )
+    else:
+        # Si ya existe, actualizar contraseña a admin123 por seguridad
+        c.execute(
+            "UPDATE admins SET password_hash = ? WHERE username = 'superadmin'",
+            (hash_password("admin123"),)
         )
 
     conn.commit()
@@ -352,6 +373,16 @@ def get_results(session_id):
     if result:
         return json.loads(result["results_json"])
     return None
+
+
+def delete_test_session(session_id):
+    """Delete a test session and all its related answers and results."""
+    conn = get_connection()
+    conn.execute("DELETE FROM test_answers WHERE session_id = ?", (session_id,))
+    conn.execute("DELETE FROM test_results WHERE session_id = ?", (session_id,))
+    conn.execute("DELETE FROM test_sessions WHERE id = ?", (session_id,))
+    conn.commit()
+    conn.close()
 
 
 # Initialize DB on import

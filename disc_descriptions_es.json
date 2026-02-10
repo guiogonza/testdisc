@@ -1,0 +1,76 @@
+{
+    "single": {
+        "D": {
+            "title": "### Personalidad Dominancia (D)",
+            "description": "Eres un líder natural, impulsado por resultados y el deseo de hacer que las cosas sucedan. Eres decidido, asertivo y confiado en tus habilidades. Prosperas en entornos desafiantes y no temes tomar riesgos o decisiones difíciles. Prefieres la acción sobre el análisis, y otros  a menudo recurren a ti cuando se necesitan decisiones rápidas y audaces. En situaciones competitivas sobresales, encontrando motivación en alcanzar los objetivos más altos. Tu energía se dirige hacia obtener resultados, y es probable que te presiones a ti mismo y a quienes te rodean para rendir al máximo. Aunque tu enfoque directo a veces puede parecer exigente, tu enfoque en el panorama general a menudo te permite ver oportunidades donde otros podrían ver obstáculos.",
+            "strengths": "Decidido, orientado a resultados, resolvedor de problemas, auto-motivado, tomador de riesgos, visionario.",
+            "challenges": "Puedes ser visto como exigente, impaciente o insensible. Puede que necesites trabajar en escuchar las opiniones de otros, fomentar la colaboración y equilibrar tu impulso con empatía hacia aquellos que pueden tener un ritmo o enfoque diferente."
+        },
+        "I": {
+            "title": "### Personalidad Influencia (I)",
+            "description": "Eres un individuo entusiasta y optimista con un don natural para conectar con otros. Eres persuasivo, atractivo y prosperas en entornos sociales donde puedes compartir ideas e inspirar a quienes te rodean. Las personas se sienten atraídas por tu energía y calidez, lo que te hace natural en networking y construcción de equipos. Ves el potencial en otros y los alientas a perseguir sus objetivos. Debido a que disfrutas estar rodeado de otros, tiendes a sobresalir en entornos donde se fomenta el trabajo en equipo, la colaboración y la creatividad. Sin embargo, tu amor por la espontaneidad a veces puede hacer que cambies de enfoque o pierdas el rastro de detalles importantes. Sin embargo, tu capacidad para reunir a las personas detrás de una causa o idea es un activo poderoso en cualquier equipo o proyecto.",
+            "strengths": "Persuasivo, optimista, entusiasta, constructor de relaciones, excelente comunicador, inspirador.",
+            "challenges": "Puedes ser visto como demasiado hablador o fácilmente distraído. Puede que necesites trabajar en enfocarte en los detalles, cumplir con los compromisos y asegurarte de que tu entusiasmo no eclipse los pasos prácticos necesarios para lograr tus objetivos."
+        },
+        "S": {
+            "title": "### Personalidad Estabilidad (S)",
+            "description": "Eres un jugador de equipo confiable y de apoyo que valora la estabilidad, la armonía y las relaciones duraderas. Aportas calma y consistencia a cualquier situación, ofreciendo paciencia y comprensión a quienes te rodean. Tiendes a evitar el conflicto, prefiriendo entornos donde se prioriza la cooperación y la paz. Tu lealtad hacia amigos, familia y colegas es inquebrantable, y sobresales en roles donde puedes ayudar a otros sin sentirte apurado. Eres un gran oyente, a menudo proporcionando una influencia estabilizadora en tu equipo o grupo. Si bien puedes evitar el cambio y la impredecibilidad, cuando se te proporciona un plan claro, lo cumples con determinación. Eres el tipo de persona en la que otros saben que pueden contar, incluso en tiempos difíciles.",
+            "strengths": "Paciente, leal, de apoyo, buen oyente, orientado al equipo, confiable.",
+            "challenges": "Puede evitar el conflicto o el cambio, y puede necesitar trabajar en la asertividad y expresar tus propias necesidades. A veces puedes dudar cuando se requieren decisiones rápidas o cuando se trata de entornos altamente competitivos."
+        },
+        "C": {
+            "title": "### Personalidad Minuciosidad (C)",
+            "description": "Eres detallista y analítico, con un profundo enfoque en la precisión, la estructura y la exactitud. Te enorgulleces de producir trabajo de alta calidad y a menudo eres la persona a la que otros recurren cuando se requiere un análisis cuidadoso o pensamiento metódico. Eres minucioso en tu enfoque, sin dejar piedra sin remover, lo que te convierte en un excelente resolvedor de problemas en situaciones complejas. Tus estándares son altos, y te exiges a ti mismo y a los demás cumplirlos. Si bien tu enfoque en hacer las cosas 'correctamente' puede ser una fortaleza, también puede hacerte sentir menos cómodo con la ambigüedad o el cambio R rápido. Sin embargo, tu compromiso con la excelencia asegura que tu trabajo siempre esté bien pensado y sea confiable.",
+            "strengths": "Analítico, detallista, organizado, concienzudo, resolvedor de problemas, altos estándares.",
+            "challenges": "Puedes ser visto como demasiado crítico o perfeccionista. Puede que necesites trabajar en adaptarte al cambio, dejar ir el control en situaciones colaborativas y entender que no todo requiere una solución perfecta."
+        },
+        "DI": {
+            "title": "### Personalidad Dominancia (D) + Influencia (I)",
+            "description": "Eres un líder carismático y persuasivo que prospera en entornos dinámicos. Eres naturalmente asertivo y disfrutas tomar el control, mientras también eres entusiasta e inspirador para quienes te rodean. Tu confianza te permite influir en otros con facilidad, y a menudo estás en el centro de la acción, impulsando a los equipos hacia objetivos ambiciosos. Tu optimismo y energía son contagiosos, y las personas se sienten atraídas por tu estilo de liderazgo, especialmente cuando la presión está alta. Sin embargo, puedes tener dificultades con los detalles o delegar tareas, prefiriendo tomar el control de las situaciones tú mismo. Si bien esta combinación te hace altamente efectivo para motivar a otros, es importante equilibrar tu impulso acelerado con consideración para estrategias y planes a largo plazo.",
+            "strengths": "Decidido, confiado, visionario, inspirador, persuasivo, enérgico.",
+            "challenges": "Puedes ser percibido como impaciente o demasiado asertivo, puede que tengas dificultades para delegar tareas y puedes distraerte fácilmente con nuevas oportunidades o desafíos sin completar completamente los actuales."
+        },
+        "DC": {
+            "title": "### Personalidad Dominancia (D) + Minuciosidad (C)",
+            "description": "Eres un líder estratégico y analítico que valora la precisión y la exactitud. Estás impulsado a tener éxito y establecer metas ambiciosas, pero también priorizas la planificación cuidadosa y la ejecución minuciosa. Esta combinación de asertividad y atención al detalle te permite tomar decisiones informadas y basadas en datos. Tu capacidad para pensar críticamente y actuar decisivamente te convierte en una fuerza formidable en entornos donde se requieren tanto lógica como liderazgo. Sin embargo, tus altos estándares a veces pueden hacerte crítico con otros, especialmente cuando no cumplen con tus expectativas. Es importante que encuentres un equilibrio entre esforzarte por la perfección y permitir a otros el espacio para contribuir sin sentirse micro-gestionados.",
+            "strengths": "Estratégico, decidido, analítico, organizado, orientado a resultados, enfocado en detalles.",
+            "challenges": "Puedes ser percibido como crítico o perfeccionista. Puede que tengas dificultades para delegar tareas o adaptarte a situaciones donde se necesita acción rápida sin la capacidad de analizar cada detalle."
+        },
+        "IS": {
+            "title": "### Personalidad Influencia (I) + Estabilidad (S)",
+            "description": "Eres un jugador de equipo cálido y de apoyo que fomenta la colaboración y la armonía. Eres naturalmente empático y disfrutas conectar con otros a nivel personal. Tu combinación de sociabilidad y estabilidad te convierte en un amigo y colega de confianza, ya que eres tanto accesible como confiable. Las personas se sienten atraídas por tu capacidad para hacerlas sentir valoradas, y sobresales en entornos que enfatizan el trabajo en equipo y el apoyo mutuo. Sin embargo, tu preferencia por la armonía puede llevarte a evitar el conflicto o conversaciones difíciles. Aprender a afirmarte cuando sea necesario asegurará que tu voz sea escuchada, incluso en situaciones que requieren decisiones difíciles.",
+            "strengths": "Empático, de apoyo, colaborativo, paciente, buen oyente, constructor de equipos.",
+            "challenges": "Puede evitar el conflicto, puede ser demasiado complaciente y puede tener dificultades con la asertividad, particularmente cuando se trata de personalidades más dominantes."
+        },
+        "SC": {
+            "title": "### Personalidad Estabilidad (S) + Minuciosidad (C)",
+            "description": "Eres un individuo confiable y metódico que valora la precisión, la consistencia y la estabilidad. Abordas las tareas con paciencia y una fuerte atención al detalle, asegurándote de que todo se haga correctamente y minuciosamente. Otros aprecian tu comportamiento tranquilo y compuesto, ya que proporcionas una mano firme incluso en situaciones difíciles. Tus habilidades organizacionales y enfoque metódico te hacen particularmente efectivo en roles que requieren planificación a largo plazo y consistencia. Sin embargo, puedes resistirte al cambio y ser reacio a tomar decisiones rápidas. Es importante reconocer cuándo se necesita flexibilidad y adaptabilidad para avanzar, incluso si eso significa salir de tu zona de confort.",
+            "strengths": "Confiable, consistente, detallista, organizado, paciente, metódico.",
+            "challenges": "Puede ser resistente al cambio, puede tener dificultades con la toma de decisiones rápidas y puede ser percibido como inflexible o demasiado cauteloso en entornos de rápido movimiento."
+        },
+        "CD": {
+            "title": "### Personalidad Minuciosidad (C) + Dominancia (D)",
+            "description": "Combinas una mente analítica aguda con un poderoso impulso para lograr. Te aseguras de que las decisiones estén respaldadas por lógica y datos, pero una vez decidido, persigues objetivos con determinación y asertividad. Esta mezcla de rasgos te convierte tanto en un pensador crítico como en un tomador de acción, que es una combinación valiosa en posiciones de liderazgo. Sobresales en entornos donde la precisión y los resultados son igualmente importantes. Sin embargo, tus altos estándares y atención al detalle a veces pueden ralentizar la toma de decisiones o hacerte demasiado crítico del trabajo de otros. Aprender a equilibrar tu necesidad de control con la capacidad de confiar y delegar mejorará tu efectividad como líder.",
+            "strengths": "Estratégico, decidido, analítico, organizado, orientado a resultados, lógico.",
+            "challenges": "Puedes ser percibido como crítico o perfeccionista, puede tener dificultades para delegar tareas y puede enfocarte demasiado en los detalles, lo que lleva a retrasos en la implementación."
+        },
+        "ID": {
+            "title": "### Personalidad Influencia (I) + Dominancia (D)",
+            "description": "Posees una combinación única de carisma y decisión, lo que te convierte en un líder dinámico tanto en entornos sociales como laborales. Eres naturalmente persuasivo, y tu asertividad te permite tomar el control en situaciones que requieren pensamiento rápido y acción. Tu entusiasmo y energía son contagiosos, ayudándote a influir en otros para que se alineen con tu visión. Sin embargo, ocasionalmente puedes pasar por alto detalles importantes o moverte demasiado rápido, lo que puede llevar a errores. Encontrar un equilibrio entre tu sociabilidad y la necesidad de hacer pausas para reflexionar te permitirá tomar mejores decisiones a largo plazo mientras aún capitalizas tu capacidad para inspirar acción en otros.",
+            "strengths": "Confiado, enérgico, inspirador, decidido, persuasivo, orientado a la acción.",
+            "challenges": "Puede tener dificultades para desacelerar o enfocarse en los detalles, puede parecer demasiado dominante y puede avanzar sin considerar minuciosamente todos los factores."
+        },
+        "SI": {
+            "title": "### Personalidad Estabilidad (S) + Influencia (I)",
+            "description": "Eres una persona compasiva y sociable que sobresale en construir relaciones armoniosas. Disfrutas trabajando con otros de manera colaborativa y de apoyo, y te esfuerzas por mantener el equilibrio y la estabilidad en tu entorno. Tu combinación de empatía y entusiasmo te convierte en un gran jugador de equipo, ya que puedes conectar con las personas a nivel personal mientras mantienes un comportamiento constante y tranquilo. Sin embargo, puedes evitar conflictos o situaciones desafiantes que requieren que te afirmes con más fuerza. Desarrollar la capacidad de mantener tu posición, incluso cuando se siente incómodo, te ayudará a convertirte en un líder más fuerte mientras mantienes tu calidez y accesibilidad natural.",
+            "strengths": "Empático, sociable, colaborativo, de apoyo, cálido, paciente.",
+            "challenges": "Puede evitar el conflicto, puede ser demasiado complaciente o vacilante al tomar decisiones audaces, y puede necesitar trabajar en ser más asertivo en situaciones difíciles."
+        },
+        "CS": {
+            "title": "### Personalidad Minuciosidad (C) + Estabilidad (S)",
+            "description": "Tienes una mezcla única de minuciosidad y estabilidad, lo que te convierte en un individuo altamente confiable y metódico. Sobresales en roles donde se requiere atención al detalle y consistencia. Tu enfoque organizado y sistemático asegura que los proyectos se completen con cuidado y precisión, y tu naturaleza tranquila y constante proporciona un sentido de estabilidad para quienes te rodean. No eres de los que se apresuran en decisiones y prefieres tomarte tu tiempo para analizar los hechos antes de actuar. Sin embargo, esta combinación a veces puede hacerte resistente al cambio o demasiado cauteloso cuando se necesita una acción más rápida. Aprender a adaptarte a nuevas situaciones y sentirte más cómodo con la incertidumbre te ayudará a crecer.",
+            "strengths": "Detallista, consistente, organizado, confiable, paciente, metódico.",
+            "challenges": "Puede ser resistente al cambio o a la toma de decisiones rápidas, puede ser demasiado cauteloso o vacilante en entornos inciertos y puede necesitar trabajar en ser más flexible cuando las situaciones requieren adaptación rápida."
+        }
+    }
+}
