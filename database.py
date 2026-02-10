@@ -1,0 +1,358 @@
+import sqlite3
+import hashlib
+import uuid
+import os
+import json
+from datetime import datetime, timedelta
+
+# Ruta de la base de datos - usa /app/data en Docker, directorio local en desarrollo
+if os.path.exists('/app/data'):
+    DB_PATH = "/app/data/evaluaciones_rh.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "evaluaciones_rh.db")
+
+
+def get_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def init_db():
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.executescript("""
+        CREATE TABLE IF NOT EXISTS admins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            name TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS candidates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cedula TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            age INTEGER,
+            sex TEXT,
+            education TEXT,
+            position TEXT,
+            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+        );
+
+        CREATE TABLE IF NOT EXISTS test_sessions (
+            id TEXT PRIMARY KEY,
+            candidate_id INTEGER NOT NULL,
+            test_type TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            time_limit_minutes INTEGER DEFAULT 30,
+            questions_data TEXT,
+            started_at TEXT,
+            completed_at TEXT,
+            created_by INTEGER,
+            created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id),
+            FOREIGN KEY (created_by) REFERENCES admins(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS test_answers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            question_index INTEGER NOT NULL,
+            question_text TEXT,
+            answer_value INTEGER,
+            answer_b_value INTEGER,
+            FOREIGN KEY (session_id) REFERENCES test_sessions(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS test_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL UNIQUE,
+            results_json TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES test_sessions(id)
+        );
+    """)
+
+    # Default admin
+    existing = c.execute("SELECT id FROM admins WHERE username = 'admin'").fetchone()
+    if not existing:
+        c.execute(
+            "INSERT INTO admins (username, password_hash, name) VALUES (?, ?, ?)",
+            ("admin", hash_password("admin123"), "Administrador RH"),
+        )
+
+    conn.commit()
+    conn.close()
+
+
+# =========================================================================
+# ADMIN OPERATIONS
+# =========================================================================
+
+def verify_admin(username, password):
+    conn = get_connection()
+    admin = conn.execute(
+        "SELECT * FROM admins WHERE username = ? AND password_hash = ?",
+        (username, hash_password(password)),
+    ).fetchone()
+    conn.close()
+    return dict(admin) if admin else None
+
+
+def change_admin_password(admin_id, new_password):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE admins SET password_hash = ? WHERE id = ?",
+        (hash_password(new_password), admin_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+# =========================================================================
+# CANDIDATE OPERATIONS
+# =========================================================================
+
+def create_candidate(cedula, name, age, sex, education, position):
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO candidates (cedula, name, age, sex, education, position) VALUES (?, ?, ?, ?, ?, ?)",
+            (cedula, name, age, sex, education, position),
+        )
+        conn.commit()
+        candidate = conn.execute("SELECT * FROM candidates WHERE cedula = ?", (cedula,)).fetchone()
+        conn.close()
+        return dict(candidate)
+    except sqlite3.IntegrityError:
+        conn.close()
+        return None  # Duplicate cédula
+
+
+def get_candidate_by_cedula(cedula):
+    conn = get_connection()
+    candidate = conn.execute("SELECT * FROM candidates WHERE cedula = ?", (cedula,)).fetchone()
+    conn.close()
+    return dict(candidate) if candidate else None
+
+
+def get_all_candidates():
+    conn = get_connection()
+    candidates = conn.execute("SELECT * FROM candidates ORDER BY created_at DESC").fetchall()
+    conn.close()
+    return [dict(c) for c in candidates]
+
+
+def update_candidate(candidate_id, name, age, sex, education, position):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE candidates SET name=?, age=?, sex=?, education=?, position=? WHERE id=?",
+        (name, age, sex, education, position, candidate_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+# =========================================================================
+# TEST SESSION OPERATIONS
+# =========================================================================
+
+def create_test_session(candidate_id, test_type, time_limit_minutes, created_by, questions_data=None):
+    conn = get_connection()
+
+    # Check if candidate already has an ACTIVE session for this test type (pending or in progress)
+    # Allow new sessions if previous ones are completed
+    existing = conn.execute(
+        "SELECT id, status FROM test_sessions WHERE candidate_id = ? AND test_type = ? AND status IN ('pending', 'in_progress')",
+        (candidate_id, test_type),
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return None, f"El candidato ya tiene una evaluación {test_type.upper()} activa con estado '{existing['status']}'. Complete o cancele la evaluación activa antes de crear una nueva."
+
+    session_id = str(uuid.uuid4())[:8].upper()
+    questions_json = json.dumps(questions_data, ensure_ascii=False) if questions_data else None
+
+    conn.execute(
+        "INSERT INTO test_sessions (id, candidate_id, test_type, status, time_limit_minutes, questions_data, created_by) VALUES (?, ?, ?, 'pending', ?, ?, ?)",
+        (session_id, candidate_id, test_type, time_limit_minutes, questions_json, created_by),
+    )
+    conn.commit()
+    conn.close()
+    return session_id, None
+
+
+def get_pending_sessions_for_candidate(candidate_id):
+    conn = get_connection()
+    sessions = conn.execute(
+        "SELECT * FROM test_sessions WHERE candidate_id = ? AND status IN ('pending', 'in_progress') ORDER BY created_at",
+        (candidate_id,),
+    ).fetchall()
+    conn.close()
+    return [dict(s) for s in sessions]
+
+
+def get_session_by_id(session_id):
+    conn = get_connection()
+    session = conn.execute("SELECT * FROM test_sessions WHERE id = ?", (session_id,)).fetchone()
+    conn.close()
+    return dict(session) if session else None
+
+
+def start_test_session(session_id):
+    conn = get_connection()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute(
+        "UPDATE test_sessions SET status = 'in_progress', started_at = ? WHERE id = ?",
+        (now, session_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def complete_test_session(session_id):
+    conn = get_connection()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute(
+        "UPDATE test_sessions SET status = 'completed', completed_at = ? WHERE id = ?",
+        (now, session_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def expire_test_session(session_id):
+    conn = get_connection()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute(
+        "UPDATE test_sessions SET status = 'expired', completed_at = ? WHERE id = ?",
+        (now, session_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_session_questions(session_id, questions_data):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE test_sessions SET questions_data = ? WHERE id = ?",
+        (json.dumps(questions_data, ensure_ascii=False), session_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_sessions(test_type=None, status=None):
+    conn = get_connection()
+    query = """
+        SELECT ts.*, c.cedula, c.name as candidate_name 
+        FROM test_sessions ts 
+        JOIN candidates c ON ts.candidate_id = c.id
+    """
+    conditions = []
+    params = []
+    if test_type:
+        conditions.append("ts.test_type = ?")
+        params.append(test_type)
+    if status:
+        conditions.append("ts.status = ?")
+        params.append(status)
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    query += " ORDER BY ts.created_at DESC"
+
+    sessions = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(s) for s in sessions]
+
+
+def check_session_time(session):
+    """Check if a session has expired based on time limit. Returns remaining seconds or -1 if expired."""
+    if session["status"] != "in_progress" or not session["started_at"]:
+        return None
+
+    started = datetime.strptime(session["started_at"], "%Y-%m-%d %H:%M:%S")
+    deadline = started + timedelta(minutes=session["time_limit_minutes"])
+    remaining = (deadline - datetime.now()).total_seconds()
+
+    if remaining <= 0:
+        expire_test_session(session["id"])
+        return -1
+    return remaining
+
+
+def get_session_deadline_timestamp(session):
+    """Return deadline as Unix timestamp for JS timer."""
+    if not session["started_at"]:
+        return None
+    started = datetime.strptime(session["started_at"], "%Y-%m-%d %H:%M:%S")
+    deadline = started + timedelta(minutes=session["time_limit_minutes"])
+    return deadline.timestamp()
+
+
+# =========================================================================
+# ANSWERS & RESULTS
+# =========================================================================
+
+def save_answers(session_id, answers):
+    """
+    Save test answers.
+    answers: list of dicts with keys: question_index, question_text, answer_value, answer_b_value (optional)
+    """
+    conn = get_connection()
+    for a in answers:
+        conn.execute(
+            "INSERT INTO test_answers (session_id, question_index, question_text, answer_value, answer_b_value) VALUES (?, ?, ?, ?, ?)",
+            (session_id, a["question_index"], a.get("question_text", ""), a["answer_value"], a.get("answer_b_value")),
+        )
+    conn.commit()
+    conn.close()
+
+
+def get_answers(session_id):
+    conn = get_connection()
+    answers = conn.execute(
+        "SELECT * FROM test_answers WHERE session_id = ? ORDER BY question_index",
+        (session_id,),
+    ).fetchall()
+    conn.close()
+    return [dict(a) for a in answers]
+
+
+def save_results(session_id, results_dict):
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO test_results (session_id, results_json) VALUES (?, ?)",
+            (session_id, json.dumps(results_dict, ensure_ascii=False)),
+        )
+    except sqlite3.IntegrityError:
+        conn.execute(
+            "UPDATE test_results SET results_json = ? WHERE session_id = ?",
+            (json.dumps(results_dict, ensure_ascii=False), session_id),
+        )
+    conn.commit()
+    conn.close()
+
+
+def get_results(session_id):
+    conn = get_connection()
+    result = conn.execute(
+        "SELECT results_json FROM test_results WHERE session_id = ?",
+        (session_id,),
+    ).fetchone()
+    conn.close()
+    if result:
+        return json.loads(result["results_json"])
+    return None
+
+
+# Initialize DB on import
+init_db()

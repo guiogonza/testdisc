@@ -40,13 +40,97 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Language selector
+if "language" not in st.session_state:
+    st.session_state.language = "es"  # Default to Spanish
+
+# Language translations dictionary
+translations = {
+    "en": {
+        "title": "DISC Personality Assessment 👤",
+        "subtitle": "Discover your DISC personality style by answering the questions below.",
+        "welcome_title": "### Welcome to the DISC Personality Assessment",
+        "lets_begin": "Let's Begin",
+        "upload_results": "Upload Previous Results",
+        "completely_disagree": "1 - Completely Disagree",
+        "somewhat_disagree": "2 - Somewhat Disagree",
+        "neutral": "3 - Neutral",
+        "somewhat_agree": "4 - Somewhat Agree",
+        "completely_agree": "5 - Completely Agree",
+        "select_option": "Select an option",
+        "next": "Next",
+        "submit": "Submit",
+        "previous": "Previous",
+        "your_disc_style": "Your DISC Style Profile",
+        "disc_breakdown": "## Your DISC Style Breakdown",
+        "relative_percentages": "Relative Percentages",
+        "download_results": "## Download Your Results",
+        "download_json": "Download JSON Results",
+        "download_pdf": "Download PDF Report",
+        "restart" : "Restart",
+        "understanding_disc": "### Understanding All DISC Styles",
+        "dominance_desc": "**Dominance (D)**: You tend to be direct, results-oriented, and assertive.",
+        "influence_desc": "**Influence (I)**: You are typically outgoing, enthusiastic, and optimistic.",
+        "steadiness_desc": "**Steadiness (S)**: You are often patient, supportive, and team-oriented.",
+        "conscientiousness_desc": "**Conscientiousness (C)**: You tend to be analytical, precise, and detail-oriented.",
+        "unique_combination": "Remember, everyone has aspects of all four styles, but most people tend to gravitate towards one or two primary styles. Your unique combination of styles influences how you communicate, make decisions, and interact with others."
+    },
+    "es": {
+        "title": "Evaluación de Personalidad DISC 👤",
+        "subtitle": "Descubre tu estilo de personalidad DISC respondiendo las preguntas a continuación.",
+        "welcome_title": "### Bienvenido a la Evaluación de Personalidad DISC",
+        "lets_begin": "Comenzar",
+        "upload_results": "Cargar Resultados Previos",
+        "completely_disagree": "1 - Totalmente en desacuerdo",
+        "somewhat_disagree": "2 - Algo en desacuerdo",
+        "neutral": "3 - Neutral",
+        "somewhat_agree": "4 - Algo de acuerdo",
+        "completely_agree": "5 - Totalmente de acuerdo",
+        "select_option": "Selecciona una opción",
+        "next": "Siguiente",
+        "submit": "Enviar",
+        "previous": "Anterior",
+        "your_disc_style": "Tu Perfil de Estilo DISC",
+        "disc_breakdown": "## Tu Desglose de Estilo DISC",
+        "relative_percentages": "Porcentajes Relativos",
+        "download_results": "## Descarga Tus Resultados",
+        "download_json": "Descargar Resultados JSON",
+        "download_pdf": "Descargar Reporte PDF",
+        "restart": "Reiniciar",
+        "understanding_disc": "### Entendiendo Todos los Estilos DISC",
+        "dominance_desc": "**Dominancia (D)**: Tiendes a ser directo, orientado a resultados y asertivo.",
+        "influence_desc": "**Influencia (I)**: Típicamente eres extrovertido, entusiasta y optimista.",
+        "steadiness_desc": "**Estabilidad (S)**: A menudo eres paciente, solidario y orientado al equipo.",
+        "conscientiousness_desc": "**Minuciosidad (C)**: Tiendes a ser analítico, preciso y orientado a los detalles.",
+        "unique_combination": "Recuerda, todos tienen aspectos de los cuatro estilos, pero la mayoría de las personas tienden a gravitar hacia uno o dos estilos primarios. Tu combinación única de estilos influye en cómo te comunicas, tomas decisiones e interactúas con los demás."
+    }
+}
+
+t = translations[st.session_state.language]
+
+# Language selector in sidebar
+with st.sidebar:
+    selected_lang = st.radio(
+        "🌐 Language / Idioma",
+        options=["es", "en"],
+        format_func=lambda x: "🇪🇸 Español" if x == "es" else "🇬🇧 English",
+        index=0 if st.session_state.language == "es" else 1
+    )
+    if selected_lang != st.session_state.language:
+        st.session_state.language = selected_lang
+        # Reset the assessment if language changes
+        for key in ["started", "submitted", "show_results", "questions", "page_number", "answers", "score", "raw_score"]:
+            if key in st.session_state:
+                st.session_state.pop(key)
+        st.rerun()
+
 # App Title with custom styling
 st.markdown(
-    "<h1 style='text-align: center; color: #184b6a;'>DISC Personality Assessment 👤</h1>",
+    f"<h1 style='text-align: center; color: #184b6a;'>{t['title']}</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p style='text-align: center; font-style: italic;'>Discover your DISC personality style by answering the questions below.</p>",
+    f"<p style='text-align: center; font-style: italic;'>{t['subtitle']}</p>",
     unsafe_allow_html=True,
 )
 
@@ -71,34 +155,52 @@ if "score" not in st.session_state:
 
 # If the user hasn't started the assessment yet
 if not st.session_state.started:
-    st.markdown(
+    if st.session_state.language == "es":
+        st.markdown(
+            """
+        ### Bienvenido a la Evaluación de Personalidad DISC
+
+        La evaluación DISC es una herramienta que te ayuda a entender tus rasgos de personalidad a través de cuatro dimensiones principales: Dominancia (D), Influencia (I), Estabilidad (S) y Minuciosidad (C). Al responder una serie de preguntas, descubrirás tu estilo de personalidad y obtendrás información sobre cómo interactúas con los demás.
+
+        #### Instrucciones:
+        - Se te presentará una serie de afirmaciones.
+        - Para cada afirmación, indica cuánto estás de acuerdo o en desacuerdo usando las opciones proporcionadas.
+        - Un valor de **1** totalmente en desacuerdo, **2** algo en desacuerdo, **3** neutral, **4** algo de acuerdo, **5** totalmente de acuerdo
+        - Una vez que completes la evaluación, recibirás tu perfil de estilo DISC y un desglose detallado de tus resultados.
+        - Lee cuidadosamente las descripciones ya que algunas suenan similares pero tienen significados diferentes.
+
+        ¡Haz clic en "Comenzar" para iniciar la evaluación!
         """
-    ### Welcome to the DISC Personality Assessment
+        )
+    else:
+        st.markdown(
+            """
+        ### Welcome to the DISC Personality Assessment
 
-    The DISC assessment is a tool that helps you understand your personality traits across four major dimensions: Dominance (D), Influence (I), Steadiness (S), and Conscientiousness (C). By answering a series of questions, you'll discover your personality style and gain insights into how you interact with others.
+        The DISC assessment is a tool that helps you understand your personality traits across four major dimensions: Dominance (D), Influence (I), Steadiness (S), and Conscientiousness (C). By answering a series of questions, you'll discover your personality style and gain insights into how you interact with others.
 
-    #### Instructions:
-    - You will be presented with a series of statements.
-    - For each statement, indicate how much you agree or disagree using the options provided.
-    - A value of **1** completely disagree, **2** somewhat disagree, **3** neutral, **4** somewhat agree, **5** completely agree
-    - Once you complete the assessment, you'll receive your DISC style profile and a detailed breakdown of your results.
-    - Carefully read the descriptions as some of them sound similar but have different meanings.
+        #### Instructions:
+        - You will be presented with a series of statements.
+        - For each statement, indicate how much you agree or disagree using the options provided.
+        - A value of **1** completely disagree, **2** somewhat disagree, **3** neutral, **4** somewhat agree, **5** completely agree
+        - Once you complete the assessment, you'll receive your DISC style profile and a detailed breakdown of your results.
+        - Carefully read the descriptions as some of them sound similar but have different meanings.
 
-    Click "Let's Begin" to start the assessment!
-    """
-    )
+        Click "Let's Begin" to start the assessment!
+        """
+        )
 
     # Create layout for buttons
     c1, c2, c3 = st.columns([1, 2, 1])
 
     # Handle the "Let's Begin" button press
-    if c1.button("Let's Begin"):
+    if c1.button(t["lets_begin"]):
         st.session_state.started = True
         st.session_state.submitted = False
         st.rerun()  # Rerun the script to move to the next stage
 
     # File upload option, which is shown after clicking "Upload Previous Results"
-    if c3.checkbox("Upload Previous Results"):
+    if c3.checkbox(t["upload_results"]):
         # Display the file uploader when the button is clicked
         uploaded_file = st.file_uploader(
             "Upload your previous JSON results", type=["json"]
@@ -166,7 +268,8 @@ def create_disc_plot(resultant_angle, resultant_magnitude):
     ax.spines["polar"].set_visible(False)
     ax.set_facecolor("#f0f2f6")
 
-    plt.title("Your DISC Style Profile", fontsize=16, fontweight="bold", pad=20)
+    title_text = "Tu Perfil de Estilo DISC" if st.session_state.language == "es" else "Your DISC Style Profile"
+    plt.title(title_text, fontsize=16, fontweight="bold", pad=20)
 
     return fig
 
@@ -184,8 +287,9 @@ def get_json_download_button(normalized_score):
     json_str = json.dumps(normalized_score, indent=2)
 
     # Create a downloadable button using the JSON data
+    label_text = "Descargar Resultados JSON" if st.session_state.language == "es" else "Download JSON Results"
     st.download_button(
-        label="Download JSON Results",
+        label=label_text,
         data=json_str,
         file_name="disc_results.json",
         mime="application/json",
@@ -205,8 +309,9 @@ def get_pdf_download_button(pdf_buffer):
     b64 = base64.b64encode(pdf_buffer.getvalue()).decode()
 
     # Convert base64 PDF into a downloadable button
+    label_text = "Descargar Reporte PDF" if st.session_state.language == "es" else "Download PDF Report"
     st.download_button(
-        label="Download PDF Report",
+        label=label_text,
         data=pdf_buffer.getvalue(),
         file_name="disc_report.pdf",
         mime="application/pdf",
@@ -463,7 +568,8 @@ if st.session_state.started:
         st.session_state.submitted = False
 
     if "questions" not in st.session_state:
-        questions = json.load(open("questions.json", "r"))
+        questions_file = "questions_es.json" if st.session_state.language == "es" else "questions.json"
+        questions = json.load(open(questions_file, "r", encoding="utf-8"))
         random.shuffle(questions)
         st.session_state.questions = questions[:30]  # Use the first 30 questions
 
@@ -474,7 +580,8 @@ if st.session_state.started:
     ) // questions_per_page  # Ceiling division
 
     # Load DISC descriptions
-    disc_descriptions = json.load(open("disc_descriptions.json", "r"))
+    desc_file = "disc_descriptions_es.json" if st.session_state.language == "es" else "disc_descriptions.json"
+    disc_descriptions = json.load(open(desc_file, "r", encoding="utf-8"))
 
     if not st.session_state.show_results:
         start = st.session_state.page_number * questions_per_page
@@ -493,38 +600,41 @@ if st.session_state.started:
                 n = i + 1
                 st.markdown(f"#### {n}) {q['question']}")
                 options = [
-                    "Select an option",
-                    "1 - Completely Disagree",
-                    "2 - somewhat Disagree",
-                    "3 - Neutral",
-                    "4 - somewhat Agree",
-                    "5 - Completely Agree",
+                    t["select_option"],
+                    t["completely_disagree"],
+                    t["somewhat_disagree"],
+                    t["neutral"],
+                    t["somewhat_agree"],
+                    t["completely_agree"],
                 ]
                 selected_option = st.radio(
-                    "Choose your response",
+                    t["select_option"],
                     options=options,
                     index=0,
                     key=f"radio_{i}",
                     horizontal=True,
                 )
                 if st.session_state.page_number < total_pages - 1:
-                    submit_button = st.form_submit_button("Next")
+                    submit_button = st.form_submit_button(t["next"])
                 else:
-                    submit_button = st.form_submit_button("**Show My DISC Style**")
+                    show_style_text = "**Mostrar Mi Estilo DISC**" if st.session_state.language == "es" else "**Show My DISC Style**"
+                    submit_button = st.form_submit_button(show_style_text)
             else:
-                submit_button = st.form_submit_button("**Show My DISC Style**")
+                show_style_text = "**Mostrar Mi Estilo DISC**" if st.session_state.language == "es" else "**Show My DISC Style**"
+                submit_button = st.form_submit_button(show_style_text)
 
         if submit_button:
-            if selected_option == "Select an option":
-                st.warning("Please select a response to proceed.")
+            if selected_option == t["select_option"]:
+                warning_text = "Por favor selecciona una respuesta para continuar." if st.session_state.language == "es" else "Please select a response to proceed."
+                st.warning(warning_text)
             else:
                 # Map the selected option to a score
                 score_mapping = {
-                    "1 - Completely Disagree": 1,
-                    "2 - somewhat Disagree": 2,
-                    "3 - Neutral": 3,
-                    "4 - somewhat Agree": 4,
-                    "5 - Completely Agree": 5,
+                    t["completely_disagree"]: 1,
+                    t["somewhat_disagree"]: 2,
+                    t["neutral"]: 3,
+                    t["somewhat_agree"]: 4,
+                    t["completely_agree"]: 5,
                 }
                 st.session_state.answers[i] = score_mapping[selected_option]
                 if st.session_state.page_number < total_pages - 1:
@@ -613,7 +723,8 @@ if st.session_state.started:
             st.pyplot(fig)
 
         # Personalized Style Descriptions
-        st.markdown("## Your Personalized DISC Style")
+        personalized_title = "## Tu Estilo DISC Personalizado" if st.session_state.language == "es" else "## Your Personalized DISC Style"
+        st.markdown(personalized_title)
         style_description = describe_style(normalized_score, resultant_angle)
 
         # Display normalized scores with progress bars
@@ -640,8 +751,8 @@ if st.session_state.started:
             else:
                 relative_percentages[style] = (score / total_normalized) * 100
         
-        st.markdown("## Your DISC Style Breakdown")
-        st.write("Relative Percentages")
+        st.markdown(t["disc_breakdown"])
+        st.write(t["relative_percentages"])
         cols = st.columns(4)
         for idx, (style, score_value) in enumerate(relative_percentages.items()):
             with cols[idx]:
@@ -654,7 +765,7 @@ if st.session_state.started:
                 st.text(f"{score_value:.2f}%")
         
         # Download options
-        st.markdown("## Download Your Results")
+        st.markdown(t["download_results"])
         col1, col2 = st.columns(2)
         with col1:
             get_json_download_button(normalized_score)
@@ -669,21 +780,17 @@ if st.session_state.started:
 
         # Explanation about DISC styles
         st.markdown("""---""")
-        st.markdown(
-            """
-        ### Understanding All DISC Styles
+        st.markdown(t["understanding_disc"])
+        st.markdown(f"""
+        - {t["dominance_desc"]}
+        - {t["influence_desc"]}
+        - {t["steadiness_desc"]}
+        - {t["conscientiousness_desc"]}
 
-        - **Dominance (D)**: You tend to be direct, results-oriented, and assertive.
-        - **Influence (I)**: You are typically outgoing, enthusiastic, and optimistic.
-        - **Steadiness (S)**: You are often patient, supportive, and team-oriented.
-        - **Conscientiousness (C)**: You tend to be analytical, precise, and detail-oriented.
+        {t["unique_combination"]}
+        """)
 
-        Remember, everyone has aspects of all four styles, but most people tend to gravitate towards one or two primary styles. 
-        Your unique combination of styles influences how you communicate, make decisions, and interact with others.
-        """
-        )
-
-        if st.button("Restart"):
+        if st.button(t["restart"]):
             st.session_state.pop("page_number")
             st.session_state.pop("score")
             st.session_state.pop("answers")
