@@ -27,7 +27,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar archivos de la aplicación
-COPY app.py valanti_app.py disc_style.py database.py ./
+COPY app.py database.py ./
 COPY questions_es.json questions.json ./
 COPY disc_descriptions_es.json disc_descriptions.json ./
 COPY streangths.json ./

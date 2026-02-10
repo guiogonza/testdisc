@@ -847,10 +847,17 @@ def page_disc_test():
             st.markdown(f"#### {page + 1}) {q['question']}")
             selected = st.radio("Tu respuesta:", list(options_map.keys()), index=0, horizontal=True, key=f"disc_radio_{page}")
 
-            if page < total - 1:
-                btn = st.form_submit_button("Siguiente ➡️")
-            else:
-                btn = st.form_submit_button("✅ Finalizar Evaluación")
+            col_prev, col_space, col_next = st.columns([1, 4, 1])
+            with col_prev:
+                if page > 0:
+                    if st.form_submit_button("⬅️ Anterior"):
+                        st.session_state.disc_page -= 1
+                        st.rerun()
+            with col_next:
+                if page < total - 1:
+                    btn = st.form_submit_button("Siguiente ➡️")
+                else:
+                    btn = st.form_submit_button("✅ Finalizar")
 
         if btn:
             remaining = db.check_session_time(db.get_session_by_id(session["id"]))
@@ -887,11 +894,6 @@ def page_disc_test():
 
                     nav("candidate_done")
                     st.rerun()
-
-    if page > 0:
-        if st.button("⬅️ Anterior"):
-            st.session_state.disc_page -= 1
-            st.rerun()
 
 
 # -------------------------------------------------------------------------
