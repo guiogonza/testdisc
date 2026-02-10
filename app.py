@@ -939,12 +939,12 @@ def page_valanti_test():
         st.session_state.valanti_page = 0
 
     total = len(VALANTI_PREGUNTAS)
-    questions_per_page = 3
+    questions_per_page = 5
     page = st.session_state.valanti_page
     q_start = page * questions_per_page
     q_end = min(q_start + questions_per_page, total)
 
-    progress = q_start / total
+    progress = q_end / total
     st.progress(progress)
     st.markdown(f"**Preguntas {q_start + 1} - {q_end} de {total}**")
 
@@ -953,113 +953,144 @@ def page_valanti_test():
     else:
         st.warning("**Segunda Parte:** Distribuye 3 puntos entre las dos frases. El puntaje más alto para lo que consideres **peor**.")
 
-    with st.form(key=f"valanti_form_{page}"):
-        page_responses = []
-        for i in range(q_start, q_end):
-            par = VALANTI_PREGUNTAS[i]
-            st.markdown(f"---")
-            st.markdown(f"#### Pregunta {i + 1}")
-            
-            # Mostrar las dos frases
-            col_a, col_b = st.columns(2)
-            with col_a:
-                st.markdown(f"**A)** {par[0]}")
-            with col_b:
-                st.markdown(f"**B)** {par[1]}")
-            
-            st.markdown("**Distribuye 3 puntos entre las dos opciones** (la suma debe ser 3):")
-            
-            # Mostrar los selectboxes
-            ca, cb, cv = st.columns([4, 4, 2])
-            with ca:
-                default_val = st.session_state.valanti_responses[i]
-                a_val = st.selectbox(
-                    f"Puntos para A (P{i+1})",
-                    options=["--", 0, 1, 2, 3],
-                    index=0 if default_val is None else [0, 1, 2, 3, 4][[None, 0, 1, 2, 3].index(default_val)],
-                    key=f"vq_{i}_a",
-                )
-            with cb:
-                if a_val != "--":
-                    b_val = 3 - int(a_val)
-                    st.selectbox(
-                        f"Puntos para B (P{i+1})",
-                        options=[b_val],
-                        index=0,
-                        key=f"vq_{i}_b",
-                        disabled=True,
-                        help="Automático: 3 - Puntos A"
-                    )
-                else:
-                    st.selectbox(
-                        f"Puntos para B (P{i+1})",
-                        options=["--"],
-                        index=0,
-                        key=f"vq_{i}_b_empty",
-                        disabled=True,
-                    )
-            with cv:
-                if a_val != "--":
-                    st.markdown(f"<div style='padding-top:8px; text-align:center; font-size:24px; color:green; font-weight:bold;'>✓ Σ=3</div>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<div style='padding-top:8px; text-align:center; font-size:20px; color:gray;'>⚠</div>", unsafe_allow_html=True)
-            
-            page_responses.append((i, a_val))
+    # Callbacks de auto-completado
+    def make_cb_a(idx):
+        def _cb():
+            val = st.session_state.get(f"vq_{idx}_a", "--")
+            if val != "--":
+                st.session_state[f"vq_{idx}_b"] = 3 - int(val)
+        return _cb
 
-        is_last = q_end >= total
-        btn_text = "✅ Finalizar Evaluación" if is_last else "Siguiente ➡️"
-        submitted = st.form_submit_button(btn_text)
+    def make_cb_b(idx):
+        def _cb():
+            val = st.session_state.get(f"vq_{idx}_b", "--")
+            if val != "--":
+                st.session_state[f"vq_{idx}_a"] = 3 - int(val)
+        return _cb
 
-    if submitted:
-        remaining = db.check_session_time(db.get_session_by_id(session["id"]))
-        if remaining == -1:
-            st.error("⏰ El tiempo ha expirado.")
-            return
+    all_answered = True
 
-        all_valid = True
-        for idx, (q_idx, a_val) in enumerate(page_responses):
-            if a_val == "--":
-                all_valid = False
-                break
-            st.session_state.valanti_responses[q_idx] = int(a_val)
+    for i in range(q_start, q_end):
+        par = VALANTI_PREGUNTAS[i]
+        a_key = f"vq_{i}_a"
+        b_key = f"vq_{i}_b"
 
-        if not all_valid:
-            st.warning("⚠️ Por favor responde todas las preguntas.")
-        else:
-            if is_last:
-                if None in st.session_state.valanti_responses:
-                    st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
-                else:
-                    responses = st.session_state.valanti_responses
-                    direct, standard = calculate_valanti_results(responses)
+        # Inicializar desde respuestas guardadas
+        if a_key not in st.session_state:
+            if st.session_state.valanti_responses[i] is not None:
+                st.session_state[a_key] = st.session_state.valanti_responses[i]
+                st.session_state[b_key] = 3 - st.session_state.valanti_responses[i]
 
-                    answer_records = []
-                    for i in range(total):
-                        answer_records.append({
-                            "question_index": i,
-                            "question_text": f"A: {VALANTI_PREGUNTAS[i][0]} / B: {VALANTI_PREGUNTAS[i][1]}",
-                            "answer_value": responses[i],
-                            "answer_b_value": 3 - responses[i],
-                        })
-                    db.save_answers(session["id"], answer_records)
+        # Tarjeta visual
+        st.markdown(
+            f"""
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                        border-radius: 12px; padding: 20px; margin: 15px 0;
+                        border-left: 4px solid #3b82f6;">
+                <div style="margin-bottom: 8px;">
+                    <span style="background: #3b82f6; color: white; padding: 4px 12px;
+                                border-radius: 20px; font-size: 0.85em; font-weight: bold;">
+                        Pregunta {i + 1}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <div style="flex: 1; background: rgba(59,130,246,0.1); border-radius: 8px; padding: 12px;">
+                        <span style="color: #60a5fa; font-weight: bold; font-size: 1.1em;">A)</span>
+                        <span style="color: #e2e8f0; font-size: 1.05em;"> {par[0]}</span>
+                    </div>
+                    <div style="flex: 1; background: rgba(245,158,11,0.1); border-radius: 8px; padding: 12px;">
+                        <span style="color: #fbbf24; font-weight: bold; font-size: 1.1em;">B)</span>
+                        <span style="color: #e2e8f0; font-size: 1.05em;"> {par[1]}</span>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-                    results = {"direct": direct, "standard": standard}
-                    db.save_results(session["id"], results)
-                    db.complete_test_session(session["id"])
+        col_sa, col_sb, col_icon = st.columns([3, 3, 1])
+        with col_sa:
+            st.selectbox(
+                f"Puntos para A (P{i+1})",
+                options=["--", 0, 1, 2, 3],
+                key=a_key,
+                on_change=make_cb_a(i),
+            )
+        with col_sb:
+            st.selectbox(
+                f"Puntos para B (P{i+1})",
+                options=["--", 0, 1, 2, 3],
+                key=b_key,
+                on_change=make_cb_b(i),
+            )
 
-                    for key in ["valanti_responses", "valanti_page", "test_session"]:
-                        st.session_state.pop(key, None)
+        a_val = st.session_state.get(a_key, "--")
+        b_val = st.session_state.get(b_key, "--")
 
-                    nav("candidate_done")
-                    st.rerun()
+        with col_icon:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if a_val != "--" and b_val != "--" and int(a_val) + int(b_val) == 3:
+                st.success("✅")
             else:
-                st.session_state.valanti_page += 1
+                st.warning("⚠️")
+                all_answered = False
+
+    # Navegación
+    st.markdown("---")
+    col_prev, col_space, col_next = st.columns([1, 4, 1])
+
+    with col_prev:
+        if page > 0:
+            if st.button("⬅️ Anterior", key="valanti_prev"):
+                for j in range(q_start, q_end):
+                    a = st.session_state.get(f"vq_{j}_a", "--")
+                    if a != "--":
+                        st.session_state.valanti_responses[j] = int(a)
+                st.session_state.valanti_page -= 1
                 st.rerun()
 
-    if page > 0:
-        if st.button("⬅️ Anterior"):
-            st.session_state.valanti_page -= 1
-            st.rerun()
+    with col_next:
+        is_last = q_end >= total
+        btn_label = "✅ Finalizar Evaluación" if is_last else "Siguiente ➡️"
+        if st.button(btn_label, key="valanti_next", disabled=not all_answered):
+            remaining = db.check_session_time(db.get_session_by_id(session["id"]))
+            if remaining == -1:
+                st.error("⏰ El tiempo ha expirado.")
+            else:
+                for j in range(q_start, q_end):
+                    a = st.session_state.get(f"vq_{j}_a", "--")
+                    if a != "--":
+                        st.session_state.valanti_responses[j] = int(a)
+
+                if is_last:
+                    if None in st.session_state.valanti_responses:
+                        st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
+                    else:
+                        responses = st.session_state.valanti_responses
+                        direct, standard = calculate_valanti_results(responses)
+
+                        answer_records = []
+                        for i in range(total):
+                            answer_records.append({
+                                "question_index": i,
+                                "question_text": f"A: {VALANTI_PREGUNTAS[i][0]} / B: {VALANTI_PREGUNTAS[i][1]}",
+                                "answer_value": responses[i],
+                                "answer_b_value": 3 - responses[i],
+                            })
+                        db.save_answers(session["id"], answer_records)
+
+                        results = {"direct": direct, "standard": standard}
+                        db.save_results(session["id"], results)
+                        db.complete_test_session(session["id"])
+
+                        for key in ["valanti_responses", "valanti_page", "test_session"]:
+                            st.session_state.pop(key, None)
+
+                        nav("candidate_done")
+                        st.rerun()
+                else:
+                    st.session_state.valanti_page += 1
+                    st.rerun()
 
 
 # -------------------------------------------------------------------------
