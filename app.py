@@ -106,6 +106,320 @@ VALANTI_DESCRIPTIONS = {
 
 
 # =========================================================================
+# ANÁLISIS DE APTITUD Y RECOMENDACIONES
+# =========================================================================
+
+# --- Nombres legibles de cada estilo DISC ---
+DISC_STYLE_NAMES = {
+    "D": "Dominancia",
+    "I": "Influencia",
+    "S": "Estabilidad",
+    "C": "Cumplimiento/Minuciosidad"
+}
+
+# --- Recomendaciones por estilo DISC según nivel ---
+DISC_RECOMMENDATIONS = {
+    "D": {
+        "high": {
+            "fortalezas": ["Liderazgo natural y toma de decisiones rápida", "Orientación a resultados y metas", "Capacidad para asumir retos y resolver problemas", "Iniciativa y autonomía"],
+            "alertas": ["Puede ser percibido como autoritario o impaciente", "Riesgo de conflictos interpersonales por estilo directo", "Puede descuidar el bienestar emocional del equipo"],
+            "recomendaciones": ["Desarrollar la escucha activa y empatía con el equipo", "Practicar la delegación efectiva", "Equilibrar la exigencia con el reconocimiento positivo", "Trabajar la paciencia en procesos que requieren consenso"]
+        },
+        "low": {
+            "fortalezas": ["Colaborativo y receptivo a las ideas de otros", "Evita conflictos innecesarios", "Flexible y adaptable"],
+            "alertas": ["Puede tener dificultad para tomar decisiones bajo presión", "Riesgo de ser percibido como indeciso o pasivo", "Puede evitar confrontaciones necesarias"],
+            "recomendaciones": ["Fortalecer la asertividad y confianza en la toma de decisiones", "Practicar la comunicación directa en situaciones importantes", "Asumir gradualmente roles de mayor responsabilidad"]
+        }
+    },
+    "I": {
+        "high": {
+            "fortalezas": ["Excelente comunicador y motivador", "Crea ambientes positivos y entusiastas", "Habilidad natural para networking y relaciones", "Persuasivo e inspirador"],
+            "alertas": ["Puede perder el enfoque en los detalles", "Riesgo de comprometerse en exceso sin cumplir", "Puede priorizar popularidad sobre efectividad"],
+            "recomendaciones": ["Desarrollar disciplina en seguimiento de tareas", "Establecer sistemas de organización personal", "Practicar la gestión del tiempo y priorización", "Equilibrar sociabilidad con productividad"]
+        },
+        "low": {
+            "fortalezas": ["Enfocado y centrado en la tarea", "Trabaja bien de forma independiente", "Analítico y reservado"],
+            "alertas": ["Puede tener dificultad para trabajar en equipo", "Riesgo de aislamiento social en el entorno laboral", "Comunicación limitada puede generar malentendidos"],
+            "recomendaciones": ["Participar activamente en dinámicas de equipo", "Desarrollar habilidades de presentación y comunicación", "Practicar la colaboración y trabajo grupal"]
+        }
+    },
+    "S": {
+        "high": {
+            "fortalezas": ["Confiable, leal y consistente", "Excelente trabajo en equipo y colaboración", "Paciente y buen oyente", "Estabilizador del grupo"],
+            "alertas": ["Resistencia al cambio y nuevas situaciones", "Puede evitar conflictos necesarios", "Dificultad para expresar desacuerdos"],
+            "recomendaciones": ["Desarrollar flexibilidad ante cambios organizacionales", "Practicar la expresión asertiva de opiniones", "Asumir riesgos calculados gradualmente", "Trabajar la adaptabilidad en entornos cambiantes"]
+        },
+        "low": {
+            "fortalezas": ["Adaptable y flexible ante cambios", "Cómodo con la variedad y lo impredecible", "Dinámico y de ritmo rápido"],
+            "alertas": ["Puede ser percibido como impaciente o inquieto", "Riesgo de falta de constancia en proyectos largos", "Puede generar inestabilidad en equipos que necesitan estructura"],
+            "recomendaciones": ["Cultivar la paciencia en procesos a largo plazo", "Practicar la constancia y seguimiento de rutinas", "Desarrollar mayor empatía con compañeros de ritmo diferente"]
+        }
+    },
+    "C": {
+        "high": {
+            "fortalezas": ["Analítico y detallista", "Altos estándares de calidad", "Organizado y metódico", "Excelente para análisis de datos y procesos"],
+            "alertas": ["Perfeccionismo que puede retrasar entregas", "Puede ser excesivamente crítico consigo mismo y con otros", "Dificultad para tomar decisiones sin información completa"],
+            "recomendaciones": ["Aprender a aceptar 'suficientemente bueno' en ciertos contextos", "Practicar la toma de decisiones con información incompleta", "Desarrollar tolerancia a la ambigüedad", "Equilibrar calidad con agilidad"]
+        },
+        "low": {
+            "fortalezas": ["Flexible con las reglas y procedimientos", "Cómodo con la ambigüedad", "Rápido para actuar sin parálisis por análisis"],
+            "alertas": ["Puede descuidar detalles importantes", "Riesgo de errores por falta de verificación", "Puede resistir normas y procesos establecidos"],
+            "recomendaciones": ["Implementar listas de verificación para tareas críticas", "Desarrollar atención al detalle en áreas clave", "Respetar procedimientos y estándares de calidad"]
+        }
+    }
+}
+
+# --- Recomendaciones combinadas para perfiles DISC dominantes ---
+DISC_PROFILE_RECOMMENDATIONS = {
+    "DI": {
+        "perfil": "Líder Inspirador",
+        "ideal_para": ["Ventas y desarrollo de negocios", "Liderazgo de equipos comerciales", "Emprendimiento", "Roles que requieran persuasión y acción rápida"],
+        "cuidado_en": ["Roles muy analíticos o rutinarios", "Posiciones que requieran paciencia extrema", "Tareas con muchos detalles técnicos"]
+    },
+    "DS": {
+        "perfil": "Líder Estable",
+        "ideal_para": ["Gerencia intermedia", "Coordinación de proyectos", "Roles que combinen liderazgo con estabilidad"],
+        "cuidado_en": ["Ambientes muy dinámicos y cambiantes", "Roles que requieran sociabilidad constante"]
+    },
+    "DC": {
+        "perfil": "Estratega Analítico",
+        "ideal_para": ["Dirección de proyectos complejos", "Consultoría estratégica", "Ingeniería y tecnología", "Roles de auditoría y control"],
+        "cuidado_en": ["Roles con alta interacción social", "Posiciones que requieran alta flexibilidad"]
+    },
+    "ID": {
+        "perfil": "Comunicador Dinámico",
+        "ideal_para": ["Relaciones públicas", "Marketing y publicidad", "Capacitación y formación", "Roles creativos con liderazgo"],
+        "cuidado_en": ["Roles muy estructurados", "Posiciones con poco contacto humano"]
+    },
+    "IS": {
+        "perfil": "Facilitador Empático",
+        "ideal_para": ["Recursos Humanos", "Servicio al cliente premium", "Coaching y mentoría", "Roles de bienestar organizacional"],
+        "cuidado_en": ["Roles de alta presión competitiva", "Posiciones que requieran confrontación frecuente"]
+    },
+    "IC": {
+        "perfil": "Comunicador Preciso",
+        "ideal_para": ["Investigación de mercados", "Capacitación técnica", "Consultoría", "Roles analíticos con presentación"],
+        "cuidado_en": ["Roles puramente operativos", "Ambientes de alta tensión"]
+    },
+    "SD": {
+        "perfil": "Ejecutor Confiable",
+        "ideal_para": ["Operaciones y logística", "Supervisión de equipos operativos", "Administración", "Roles de implementación"],
+        "cuidado_en": ["Roles de venta agresiva", "Posiciones de cambio constante"]
+    },
+    "SI": {
+        "perfil": "Colaborador Armonioso",
+        "ideal_para": ["Trabajo social", "Atención al cliente", "Educación", "Roles de soporte y asistencia"],
+        "cuidado_en": ["Roles competitivos individuales", "Posiciones de toma de decisiones rápidas"]
+    },
+    "SC": {
+        "perfil": "Especialista Metódico",
+        "ideal_para": ["Contabilidad y finanzas", "Control de calidad", "Archivo y documentación", "Roles técnicos especializados"],
+        "cuidado_en": ["Roles de liderazgo de alta presión", "Posiciones con mucha improvisación"]
+    },
+    "CD": {
+        "perfil": "Analista Determinado",
+        "ideal_para": ["Ingeniería", "Análisis financiero", "Desarrollo de software", "Roles de investigación con impacto"],
+        "cuidado_en": ["Roles de ventas directas", "Posiciones muy sociales"]
+    },
+    "CI": {
+        "perfil": "Analista Comunicativo",
+        "ideal_para": ["Investigación y desarrollo", "Docencia universitaria", "Consultoría especializada", "Roles analíticos con interacción"],
+        "cuidado_en": ["Roles operativos repetitivos", "Posiciones de alta agresividad comercial"]
+    },
+    "CS": {
+        "perfil": "Ejecutor Preciso",
+        "ideal_para": ["Calidad y procesos", "Administración", "Soporte técnico", "Roles de cumplimiento normativo"],
+        "cuidado_en": ["Roles de innovación disruptiva", "Posiciones de alta presión social"]
+    }
+}
+
+
+def analyze_disc_aptitude(normalized, relative):
+    """Analiza los resultados DISC y genera recomendaciones, fortalezas, alertas y nivel de aptitud."""
+    
+    # Determinar estilos dominante y secundario
+    sorted_styles = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    dominant = sorted_styles[0]
+    secondary = sorted_styles[1]
+    weakest = sorted_styles[-1]
+    
+    dominant_style = dominant[0]
+    secondary_style = secondary[0]
+    dominant_score = dominant[1]
+    secondary_score = secondary[1]
+    weakest_score = weakest[1]
+    
+    # Determinar perfil combinado
+    profile_key = dominant_style + secondary_style
+    profile_info = DISC_PROFILE_RECOMMENDATIONS.get(profile_key, {})
+    
+    # Calcular nivel de aptitud general (0-100)
+    # Basado en: claridad del perfil (diferenciación entre estilos) y balance general
+    score_range = dominant_score - weakest_score
+    balance_score = 100 - abs(50 - (sum(normalized.values()) / 4))  # Qué tan centrado está
+    differentiation = min(score_range * 1.5, 100)  # Qué tan claro es el perfil
+    
+    # Un perfil claro (buena diferenciación) con al menos un estilo bien definido es positivo
+    aptitude_score = round((differentiation * 0.6 + balance_score * 0.4))
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    # Determinar nivel de aptitud
+    if aptitude_score >= 70:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"  # verde
+        aptitude_emoji = "✅"
+        aptitude_desc = "Perfil DISC claramente definido. El candidato muestra un patrón conductual coherente y diferenciado."
+    elif aptitude_score >= 45:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"  # amarillo
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil DISC con áreas que requieren atención. Se recomienda considerar las observaciones para el cargo."
+    else:
+        aptitude_level = "REQUIERE EVALUACIÓN ADICIONAL"
+        aptitude_color = "#EF4444"  # rojo
+        aptitude_emoji = "🔴"
+        aptitude_desc = "Perfil DISC poco diferenciado. Se sugiere complementar con entrevista por competencias u otra evaluación."
+    
+    # Obtener fortalezas y alertas del estilo dominante
+    dom_level = "high" if dominant_score >= 55 else "low"
+    sec_level = "high" if secondary_score >= 55 else "low"
+    
+    fortalezas = DISC_RECOMMENDATIONS[dominant_style][dom_level]["fortalezas"]
+    alertas = DISC_RECOMMENDATIONS[dominant_style][dom_level]["alertas"]
+    recomendaciones = DISC_RECOMMENDATIONS[dominant_style][dom_level]["recomendaciones"]
+    
+    # Agregar info del estilo secundario
+    sec_fortalezas = DISC_RECOMMENDATIONS[secondary_style][sec_level]["fortalezas"][:2]
+    sec_alertas = DISC_RECOMMENDATIONS[secondary_style][sec_level]["alertas"][:1]
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "dominant_style": dominant_style,
+        "dominant_name": DISC_STYLE_NAMES[dominant_style],
+        "dominant_score": dominant_score,
+        "secondary_style": secondary_style,
+        "secondary_name": DISC_STYLE_NAMES[secondary_style],
+        "secondary_score": secondary_score,
+        "profile_key": profile_key,
+        "profile_name": profile_info.get("perfil", f"{DISC_STYLE_NAMES[dominant_style]}-{DISC_STYLE_NAMES[secondary_style]}"),
+        "ideal_para": profile_info.get("ideal_para", []),
+        "cuidado_en": profile_info.get("cuidado_en", []),
+        "fortalezas": fortalezas + sec_fortalezas,
+        "alertas": alertas + sec_alertas,
+        "recomendaciones": recomendaciones,
+    }
+
+
+def analyze_valanti_aptitude(standard):
+    """Analiza los resultados VALANTI y genera recomendaciones, fortalezas, alertas y nivel de aptitud."""
+    
+    sorted_values = sorted(standard.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_values[0]
+    second = sorted_values[1]
+    weakest = sorted_values[-1]
+    second_weakest = sorted_values[-2]
+    
+    # Evaluar aptitud basada en valores
+    # Un candidato "apto" tiene al menos 2 valores en rango alto (>=55) y ninguno críticamente bajo (<35)
+    high_values = [v for v, s in standard.items() if s >= 55]
+    low_values = [v for v, s in standard.items() if s < 40]
+    critical_values = [v for v, s in standard.items() if s < 30]
+    avg_score = sum(standard.values()) / len(standard)
+    
+    # Calcular puntaje de aptitud
+    aptitude_score = round(avg_score + len(high_values) * 5 - len(low_values) * 8 - len(critical_values) * 15)
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    if len(critical_values) > 0:
+        aptitude_level = "REQUIERE EVALUACIÓN ADICIONAL"
+        aptitude_color = "#EF4444"
+        aptitude_emoji = "🔴"
+        aptitude_desc = f"Valores críticamente bajos detectados en: {', '.join(critical_values)}. Se recomienda entrevista profunda sobre ética y valores."
+    elif len(low_values) >= 2:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Valores por debajo del promedio en: {', '.join(low_values)}. Considerar programas de desarrollo en estas áreas."
+    elif avg_score >= 50 and len(high_values) >= 2:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✅"
+        aptitude_desc = "Perfil de valores sólido y equilibrado. El candidato demuestra una base ética consistente."
+    else:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil de valores en rango promedio. Se sugiere profundizar en entrevista sobre valores organizacionales."
+    
+    # Generar fortalezas
+    fortalezas = []
+    for value, score in sorted_values:
+        if score >= 55:
+            desc = VALANTI_DESCRIPTIONS[value]
+            fortalezas.append(f"{value} (T={score}): {desc['high']}")
+    
+    # Generar alertas
+    alertas = []
+    for value, score in sorted_values:
+        if score < 40:
+            desc = VALANTI_DESCRIPTIONS[value]
+            alertas.append(f"{value} (T={score}): {desc['low']}")
+    
+    # Generar recomendaciones según perfil
+    recomendaciones = []
+    
+    VALANTI_RECS = {
+        "Verdad": {
+            "high": "Aprovechar su capacidad analítica e intelectual asignando tareas de investigación y resolución de problemas complejos.",
+            "low": "Fomentar la curiosidad intelectual mediante capacitaciones, lecturas y exposición a nuevos conceptos.",
+        },
+        "Rectitud": {
+            "high": "Ideal para roles que requieran integridad, cumplimiento de normas y ética profesional.",
+            "low": "Reforzar el compromiso con normas y procesos. Incluir en programas de ética organizacional.",
+        },
+        "Paz": {
+            "high": "Eficaz en mediación de conflictos y roles que requieran calma bajo presión.",
+            "low": "Brindar herramientas de manejo de estrés y técnicas de relajación. Considerar carga laboral.",
+        },
+        "Amor": {
+            "high": "Excelente para trabajo en equipo, mentoría y roles de servicio al cliente.",
+            "low": "Desarrollar la empatía mediante dinámicas de grupo y ejercicios de inteligencia emocional.",
+        },
+        "No Violencia": {
+            "high": "Promotor natural de ambientes de trabajo respetuosos e inclusivos.",
+            "low": "Sensibilizar sobre el impacto de las acciones en otros. Incluir en programas de convivencia laboral.",
+        }
+    }
+    
+    for value, score in sorted_values:
+        level = "high" if score >= 55 else "low"
+        if score >= 55 or score < 45:
+            recomendaciones.append(f"**{value}:** {VALANTI_RECS[value][level]}")
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "strongest_value": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_value": weakest[0],
+        "weakest_score": weakest[1],
+        "high_values": high_values,
+        "low_values": low_values,
+        "critical_values": critical_values,
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+    }
+
+
+# =========================================================================
 # FUNCIONES DE SCORING
 # =========================================================================
 
@@ -161,27 +475,66 @@ def calculate_valanti_results(responses):
 
 def create_disc_plot(normalized_score):
     categories = ["D", "I", "S", "C"]
+    labels = ["D\nDominancia", "I\nInfluencia", "S\nEstabilidad", "C\nCumplimiento"]
+    disc_colors = {"D": "#EF4444", "I": "#F59E0B", "S": "#10B981", "C": "#3B82F6"}
+    
+    # Gráfico de barras horizontales + radar pequeño
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [3, 2]})
+    
+    # --- Barras horizontales ---
+    vals = [normalized_score.get(s, 0) for s in categories]
+    colors = [disc_colors[s] for s in categories]
+    bars = ax1.barh(labels, vals, color=colors, height=0.6, edgecolor='white', linewidth=1.5)
+    
+    for bar, val, cat in zip(bars, vals, categories):
+        ax1.text(bar.get_width() + 1.5, bar.get_y() + bar.get_height()/2, 
+                f"{val:.1f}%", va='center', fontweight='bold', fontsize=12, color=disc_colors[cat])
+    
+    ax1.set_xlim(0, 110)
+    ax1.axvline(x=50, color='#94A3B8', linestyle='--', alpha=0.6, label='Promedio')
+    ax1.set_title("Puntajes por Estilo DISC", fontsize=14, fontweight='bold', pad=15)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    ax1.spines['bottom'].set_color('#CBD5E1')
+    ax1.spines['left'].set_color('#CBD5E1')
+    ax1.tick_params(axis='y', labelsize=11)
+    ax1.set_facecolor('#FAFBFC')
+    ax1.legend(fontsize=9)
+    
+    # --- Radar ---
     angles = [7 * np.pi / 4, np.pi / 4, 3 * np.pi / 4, 5 * np.pi / 4]
     scaled = {s: v / 100 for s, v in normalized_score.items()}
+    
+    # Dibujar áreas por estilo
+    ax2 = fig.add_subplot(122, projection='polar')
+    ax2.set_theta_offset(np.pi / 2)
+    ax2.set_theta_direction(-1)
+    ax2.set_ylim(0, 1.01)
+    
+    for i, s in enumerate(categories):
+        ax2.bar(angles[i], scaled[s], width=np.pi/2.5, alpha=0.35, color=disc_colors[s], edgecolor=disc_colors[s], linewidth=2)
+    
+    # Punto central del perfil
     x = sum(scaled[s] * np.cos(angles[i]) for i, s in enumerate(categories))
     y = sum(scaled[s] * np.sin(angles[i]) for i, s in enumerate(categories))
     mag = np.sqrt(x**2 + y**2)
     ang = np.arctan2(y, x)
-
-    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={"projection": "polar"})
-    ax.set_theta_offset(np.pi / 2)
-    ax.set_theta_direction(-1)
-    ax.set_ylim(0, 1.01)
-    ax.plot(ang, mag, "o", markersize=24, color="#4CAF50", label="Estilo DISC")
-    ax.set_xticks(angles)
-    ax.set_xticklabels(categories, fontsize=14, fontweight="bold")
-    for a in [0, np.pi / 2, np.pi, 3 * np.pi / 2]:
-        ax.axvline(x=a, color="gray", linestyle="--", alpha=0.7)
-    ax.set_yticklabels([])
-    ax.grid(True, alpha=0.3)
-    ax.spines["polar"].set_visible(False)
-    ax.set_facecolor("#f0f2f6")
-    plt.title("Perfil de Estilo DISC", fontsize=14, fontweight="bold", pad=20)
+    ax2.plot(ang, mag, "o", markersize=16, color="#1E293B", zorder=5)
+    ax2.plot(ang, mag, "o", markersize=10, color="#FBBF24", zorder=6)
+    
+    ax2.set_xticks(angles)
+    ax2.set_xticklabels(categories, fontsize=13, fontweight="bold")
+    tick_colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6']
+    for label, color in zip(ax2.get_xticklabels(), tick_colors):
+        label.set_color(color)
+    ax2.set_yticklabels([])
+    ax2.grid(True, alpha=0.2)
+    ax2.spines["polar"].set_visible(False)
+    ax2.set_facecolor('#FAFBFC')
+    ax2.set_title("Perfil DISC", fontsize=13, fontweight='bold', pad=20)
+    
+    fig.patch.set_facecolor('white')
+    plt.tight_layout()
     return fig
 
 
@@ -189,41 +542,88 @@ def create_valanti_radar(standard_scores):
     cats = list(standard_scores.keys())
     vals = list(standard_scores.values()) + [list(standard_scores.values())[0]]
     angles = np.linspace(0, 2 * np.pi, len(cats), endpoint=False).tolist() + [0]
+    
+    valanti_radar_colors = ["#3B82F6", "#10B981", "#8B5CF6", "#EF4444", "#F59E0B"]
+    
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
-    ax.plot(angles, vals, "o-", linewidth=2, color="#1e40af", markersize=8)
-    ax.fill(angles, vals, alpha=0.25, color="#1e40af")
+    
+    # Línea principal con gradiente
+    ax.plot(angles, vals, "o-", linewidth=2.5, color="#6366F1", markersize=10, 
+            markerfacecolor="#818CF8", markeredgecolor="white", markeredgewidth=2, zorder=5)
+    ax.fill(angles, vals, alpha=0.15, color="#6366F1")
+    
+    # Colorear cada punto según su valor
+    for i, (angle, val) in enumerate(zip(angles[:-1], vals[:-1])):
+        color = valanti_radar_colors[i]
+        ax.plot(angle, val, "o", markersize=14, color=color, zorder=6, markeredgecolor='white', markeredgewidth=2)
+        ax.text(angle, val + 6, str(val), ha='center', va='center', fontsize=10, fontweight='bold', color=color)
+    
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(cats, fontsize=11, fontweight="bold")
+    ax.set_xticklabels(cats, fontsize=12, fontweight="bold",
+                       color='#1E293B')
     ax.set_ylim(0, 100)
     ax.set_yticks([20, 40, 50, 60, 80])
+    ax.set_yticklabels(['20', '40', '50', '60', '80'], fontsize=8, color='#94A3B8')
+    
+    # Línea de referencia promedio
     ref = [50] * (len(cats) + 1)
-    ax.plot(angles, ref, "--", linewidth=1, color="gray", alpha=0.5, label="Promedio (50)")
-    ax.grid(True, alpha=0.3)
+    ax.plot(angles, ref, "--", linewidth=1.5, color="#F59E0B", alpha=0.6, label="Promedio (50)")
+    
+    # Zonas de color
+    theta = np.linspace(0, 2*np.pi, 100)
+    ax.fill_between(theta, 0, 40, alpha=0.05, color='#EF4444')  # zona baja
+    ax.fill_between(theta, 55, 100, alpha=0.05, color='#10B981')  # zona alta
+    
+    ax.grid(True, alpha=0.2, color='#CBD5E1')
     ax.spines["polar"].set_visible(False)
-    ax.set_facecolor("#f0f2f6")
-    plt.title("Perfil Valoral - VALANTI", fontsize=14, fontweight="bold", pad=20)
-    plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
+    ax.set_facecolor('#FAFBFC')
+    fig.patch.set_facecolor('white')
+    plt.title("Perfil Valoral - VALANTI", fontsize=15, fontweight="bold", pad=25, color='#1E293B')
+    plt.legend(loc="upper right", bbox_to_anchor=(1.35, 1.1), fontsize=10)
     return fig
 
 
 def create_valanti_bars(direct_scores, standard_scores):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    fig.patch.set_facecolor('white')
     cats = list(direct_scores.keys())
     bar_colors = [VALANTI_COLORS[c] for c in cats]
+    
+    # --- Puntajes Directos ---
     dv = list(direct_scores.values())
-    bars1 = ax1.bar(cats, dv, color=bar_colors, alpha=0.8)
-    ax1.set_title("Puntajes Directos", fontsize=13, fontweight="bold")
-    for b, v in zip(bars1, dv):
-        ax1.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.3, str(v), ha="center", fontweight="bold")
-    ax1.set_ylim(0, max(dv) * 1.2 if max(dv) > 0 else 15)
+    bars1 = ax1.bar(cats, dv, color=bar_colors, alpha=0.85, edgecolor='white', linewidth=1.5, width=0.6)
+    ax1.set_title("Puntajes Directos", fontsize=13, fontweight="bold", color='#1E293B', pad=15)
+    for b, v, c in zip(bars1, dv, bar_colors):
+        ax1.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.5, str(v), 
+                ha="center", fontweight="bold", fontsize=12, color=c)
+    ax1.set_ylim(0, max(dv) * 1.3 if max(dv) > 0 else 15)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    ax1.spines['bottom'].set_color('#CBD5E1')
+    ax1.spines['left'].set_color('#CBD5E1')
+    ax1.set_facecolor('#FAFBFC')
+    ax1.tick_params(axis='x', labelsize=10)
+    ax1.tick_params(axis='y', colors='#94A3B8')
+    
+    # --- Puntajes Estándar ---
     sv = list(standard_scores.values())
-    bars2 = ax2.bar(cats, sv, color=bar_colors, alpha=0.8)
-    ax2.axhline(y=50, color="gray", linestyle="--", alpha=0.5, label="Promedio (50)")
-    ax2.set_title("Puntajes Estándar (Escala T)", fontsize=13, fontweight="bold")
-    for b, v in zip(bars2, sv):
-        ax2.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.3, str(v), ha="center", fontweight="bold")
-    ax2.set_ylim(0, max(sv) * 1.2 if max(sv) > 0 else 100)
-    ax2.legend()
+    bars2 = ax2.bar(cats, sv, color=bar_colors, alpha=0.85, edgecolor='white', linewidth=1.5, width=0.6)
+    ax2.axhline(y=50, color="#F59E0B", linestyle="--", alpha=0.7, linewidth=1.5, label="Promedio (50)")
+    ax2.axhspan(0, 40, alpha=0.04, color='#EF4444')  # zona baja
+    ax2.axhspan(55, max(sv)*1.3 if max(sv) > 0 else 100, alpha=0.04, color='#10B981')  # zona alta
+    ax2.set_title("Puntajes Estándar (Escala T)", fontsize=13, fontweight="bold", color='#1E293B', pad=15)
+    for b, v, c in zip(bars2, sv, bar_colors):
+        ax2.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.5, str(v), 
+                ha="center", fontweight="bold", fontsize=12, color=c)
+    ax2.set_ylim(0, max(sv) * 1.3 if max(sv) > 0 else 100)
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['bottom'].set_color('#CBD5E1')
+    ax2.spines['left'].set_color('#CBD5E1')
+    ax2.set_facecolor('#FAFBFC')
+    ax2.tick_params(axis='x', labelsize=10)
+    ax2.tick_params(axis='y', colors='#94A3B8')
+    ax2.legend(fontsize=10, loc='upper right')
     plt.tight_layout()
     return fig
 
@@ -280,18 +680,44 @@ def render_timer(deadline_ts, session_id):
 # PDF GENERATION
 # =========================================================================
 
-def generate_disc_pdf(candidate, normalized, relative, fig, session_id):
+def generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at=None, analysis=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=12))
+    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=14))
+    styles.add(ParagraphStyle(name="SmallBold", parent=styles["Normal"], fontSize=9, leading=12, fontName="Helvetica-Bold"))
+    styles.add(ParagraphStyle(name="Small", parent=styles["Normal"], fontSize=9, leading=12))
     story = []
     story.append(Paragraph("Evaluación de Personalidad DISC - Reporte", styles["Title"]))
     story.append(Spacer(1, 12))
     story.append(Paragraph(f"<b>ID Evaluación:</b> {session_id}", styles["Normal"]))
     story.append(Paragraph(f"<b>Candidato:</b> {candidate['name']} (Cédula: {candidate['cedula']})", styles["Normal"]))
-    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position','N/A')} | <b>Fecha:</b> {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["Normal"]))
-    story.append(Spacer(1, 16))
+    
+    # Formatear la fecha de presentación
+    if completed_at:
+        try:
+            fecha_obj = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+            fecha_str = fecha_obj.strftime('%d/%m/%Y %H:%M')
+        except:
+            fecha_str = completed_at
+    else:
+        fecha_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position','N/A')} | <b>Fecha de Presentación:</b> {fecha_str}", styles["Normal"]))
+    
+    # Generar análisis si no se proporcionó
+    if analysis is None:
+        analysis = analyze_disc_aptitude(normalized, relative)
+    
+    # Sección de aptitud
+    story.append(Spacer(1, 12))
+    apt_color = analysis['aptitude_color']
+    story.append(Paragraph(f"<b>RESULTADO DE APTITUD: {analysis['aptitude_level']} ({analysis['aptitude_score']}/100)</b>", styles["Heading2"]))
+    story.append(Paragraph(f"{analysis['aptitude_desc']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Perfil:</b> {analysis['profile_name']} ({analysis['dominant_name']} + {analysis['secondary_name']})", styles["Normal"]))
+    story.append(Spacer(1, 12))
+    
+    # Tabla de puntajes
     data = [["Estilo", "Puntaje Normalizado", "Porcentaje Relativo"]]
     for s in "DISC":
         data.append([s, f"{normalized[s]:.1f}%", f"{relative[s]:.1f}%"])
@@ -312,24 +738,88 @@ def generate_disc_pdf(candidate, normalized, relative, fig, session_id):
         img_buf = BytesIO()
         fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
         img_buf.seek(0)
-        story.append(Image(img_buf, width=300, height=300))
+        story.append(Image(img_buf, width=280, height=280))
+    
+    # Página de recomendaciones
+    story.append(PageBreak())
+    story.append(Paragraph("Análisis y Recomendaciones", styles["Heading1"]))
+    story.append(Spacer(1, 10))
+    
+    # Fortalezas
+    story.append(Paragraph("FORTALEZAS DEL CANDIDATO", styles["Heading2"]))
+    for f in analysis.get('fortalezas', []):
+        story.append(Paragraph(f"• {f}", styles["Small"]))
+    story.append(Spacer(1, 10))
+    
+    # Alertas
+    story.append(Paragraph("ALERTAS Y ÁREAS DE ATENCIÓN", styles["Heading2"]))
+    for a in analysis.get('alertas', []):
+        story.append(Paragraph(f"• {a}", styles["Small"]))
+    story.append(Spacer(1, 10))
+    
+    # Recomendaciones
+    story.append(Paragraph("RECOMENDACIONES", styles["Heading2"]))
+    for r in analysis.get('recomendaciones', []):
+        story.append(Paragraph(f"• {r}", styles["Small"]))
+    story.append(Spacer(1, 10))
+    
+    # Roles ideales
+    if analysis.get('ideal_para'):
+        story.append(Paragraph("ROLES IDEALES", styles["Heading2"]))
+        for r in analysis['ideal_para']:
+            story.append(Paragraph(f"• {r}", styles["Small"]))
+        story.append(Spacer(1, 10))
+    
+    if analysis.get('cuidado_en'):
+        story.append(Paragraph("PRECAUCIÓN EN ROLES DE", styles["Heading2"]))
+        for r in analysis['cuidado_en']:
+            story.append(Paragraph(f"• {r}", styles["Small"]))
+    
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("<i>Este reporte es generado automáticamente como herramienta de apoyo para Recursos Humanos. Los resultados deben complementarse con entrevistas y otras evaluaciones.</i>", styles["Small"]))
+    
     doc.build(story)
     buffer.seek(0)
     return buffer
 
 
-def generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id):
+def generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id, completed_at=None, analysis=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=12))
+    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=14))
+    styles.add(ParagraphStyle(name="SmallBold", parent=styles["Normal"], fontSize=9, leading=12, fontName="Helvetica-Bold"))
+    styles.add(ParagraphStyle(name="Small", parent=styles["Normal"], fontSize=9, leading=12))
     story = []
     story.append(Paragraph("Cuestionario VALANTI - Reporte de Resultados", styles["Title"]))
     story.append(Spacer(1, 12))
     story.append(Paragraph(f"<b>ID Evaluación:</b> {session_id}", styles["Normal"]))
     story.append(Paragraph(f"<b>Candidato:</b> {candidate['name']} (Cédula: {candidate['cedula']})", styles["Normal"]))
-    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position','N/A')} | <b>Fecha:</b> {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["Normal"]))
-    story.append(Spacer(1, 16))
+    
+    # Formatear la fecha de presentación
+    if completed_at:
+        try:
+            fecha_obj = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+            fecha_str = fecha_obj.strftime('%d/%m/%Y %H:%M')
+        except:
+            fecha_str = completed_at
+    else:
+        fecha_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position','N/A')} | <b>Fecha de Presentación:</b> {fecha_str}", styles["Normal"]))
+    
+    # Generar análisis si no se proporcionó
+    if analysis is None:
+        analysis = analyze_valanti_aptitude(standard)
+    
+    # Sección de aptitud
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>RESULTADO DE APTITUD: {analysis['aptitude_level']} ({analysis['aptitude_score']}/100)</b>", styles["Heading2"]))
+    story.append(Paragraph(f"{analysis['aptitude_desc']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Valor más fuerte:</b> {analysis['strongest_value']} (T={analysis['strongest_score']}) | <b>Valor más bajo:</b> {analysis['weakest_value']} (T={analysis['weakest_score']})", styles["Normal"]))
+    story.append(Spacer(1, 12))
+    
+    # Tabla de puntajes
     data = [["Valor", "Puntaje Directo", "Puntaje Estándar (T)"]]
     for trait in VALANTI_TRAITS:
         data.append([trait, str(direct[trait]), str(standard[trait])])
@@ -350,7 +840,39 @@ def generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id):
         img_buf = BytesIO()
         radar_fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
         img_buf.seek(0)
-        story.append(Image(img_buf, width=320, height=320))
+        story.append(Image(img_buf, width=300, height=300))
+    
+    # Página de recomendaciones
+    story.append(PageBreak())
+    story.append(Paragraph("Análisis y Recomendaciones", styles["Heading1"]))
+    story.append(Spacer(1, 10))
+    
+    # Fortalezas
+    if analysis.get('fortalezas'):
+        story.append(Paragraph("FORTALEZAS VALORALES", styles["Heading2"]))
+        for f in analysis['fortalezas']:
+            story.append(Paragraph(f"• {f}", styles["Small"]))
+        story.append(Spacer(1, 10))
+    
+    # Alertas
+    if analysis.get('alertas'):
+        story.append(Paragraph("ALERTAS Y ÁREAS DE ATENCIÓN", styles["Heading2"]))
+        for a in analysis['alertas']:
+            story.append(Paragraph(f"• {a}", styles["Small"]))
+        story.append(Spacer(1, 10))
+    
+    # Recomendaciones
+    if analysis.get('recomendaciones'):
+        story.append(Paragraph("RECOMENDACIONES", styles["Heading2"]))
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown para PDF
+            r_clean = r.replace("**", "")
+            story.append(Paragraph(f"• {r_clean}", styles["Small"]))
+        story.append(Spacer(1, 10))
+    
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("<i>Este reporte es generado automáticamente como herramienta de apoyo para Recursos Humanos. Los resultados deben complementarse con entrevistas y otras evaluaciones.</i>", styles["Small"]))
+    
     doc.build(story)
     buffer.seek(0)
     return buffer
@@ -529,16 +1051,53 @@ def page_admin_dashboard():
     # ----- TAB 2: Resultados -----
     with tab2:
         st.markdown("### Resultados de Evaluaciones")
-        c1, c2 = st.columns(2)
+        
+        # Obtener todas las sesiones primero para construir lista de candidatos
+        all_sessions_raw = db.get_all_sessions()
+        candidate_names = sorted(set(s["candidate_name"] for s in all_sessions_raw)) if all_sessions_raw else []
+        
+        # Fila de filtros
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
-            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti"], key="filter_type")
+            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti"], key="filter_type",
+                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI"}.get(x, x))
         with c2:
             filter_status = st.selectbox("Filtrar por estado:", ["Todos", "pending", "in_progress", "completed", "expired"], key="filter_status",
-                                          format_func=lambda x: {"Todos": "Todos", "pending": "⏳ Pendiente", "in_progress": "▶️ En Progreso", "completed": "✅ Completado", "expired": "⏰ Expirado"}.get(x, x))
+                                          format_func=lambda x: {"Todos": "📋 Todos", "pending": "⏳ Pendiente", "in_progress": "▶️ En Progreso", "completed": "✅ Completado", "expired": "⏰ Expirado"}.get(x, x))
+        with c3:
+            filter_candidate = st.selectbox("Filtrar por candidato:", ["Todos"] + candidate_names, key="filter_candidate")
+        with c4:
+            sort_option = st.selectbox("Ordenar por:", ["Fecha (reciente)", "Fecha (antigua)", "Candidato A-Z", "Candidato Z-A", "Tipo prueba"], key="sort_option")
 
         ft = filter_type if filter_type != "Todos" else None
         fs = filter_status if filter_status != "Todos" else None
         sessions = db.get_all_sessions(test_type=ft, status=fs)
+        
+        # Filtrar por candidato
+        if filter_candidate != "Todos":
+            sessions = [s for s in sessions if s["candidate_name"] == filter_candidate]
+        
+        # Ordenar según selección
+        def get_sort_date(s):
+            date_str = s.get("completed_at") or s.get("started_at") or s.get("created_at") or ""
+            try:
+                return datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            except:
+                return datetime.min
+        
+        if sort_option == "Fecha (reciente)":
+            sessions.sort(key=get_sort_date, reverse=True)
+        elif sort_option == "Fecha (antigua)":
+            sessions.sort(key=get_sort_date, reverse=False)
+        elif sort_option == "Candidato A-Z":
+            sessions.sort(key=lambda s: s["candidate_name"].lower())
+        elif sort_option == "Candidato Z-A":
+            sessions.sort(key=lambda s: s["candidate_name"].lower(), reverse=True)
+        elif sort_option == "Tipo prueba":
+            sessions.sort(key=lambda s: s["test_type"])
+        
+        # Mostrar contador de resultados
+        st.caption(f"📊 {len(sessions)} evaluación(es) encontrada(s)")
 
         if not sessions:
             st.info("No hay evaluaciones que coincidan con los filtros.")
@@ -546,22 +1105,78 @@ def page_admin_dashboard():
             for sess in sessions:
                 status_emoji = {"pending": "⏳", "in_progress": "▶️", "completed": "✅", "expired": "⏰"}.get(sess["status"], "❓")
                 test_emoji = "🎯" if sess["test_type"] == "disc" else "🧭"
+                
+                # Agregar indicador de aptitud al título si está completada
+                aptitud_tag = ""
+                if sess["status"] == "completed":
+                    res = db.get_results(sess["id"])
+                    if res:
+                        if sess["test_type"] == "disc":
+                            norm = res.get("normalized", {})
+                            rel = res.get("relative", {})
+                            if norm:
+                                a = analyze_disc_aptitude(norm, rel)
+                                aptitud_tag = f" | {a['aptitude_emoji']} {a['aptitude_level']}"
+                        elif sess["test_type"] == "valanti":
+                            std = res.get("standard", {})
+                            if std:
+                                a = analyze_valanti_aptitude(std)
+                                aptitud_tag = f" | {a['aptitude_emoji']} {a['aptitude_level']}"
 
-                with st.expander(f"{status_emoji} {test_emoji} {sess['test_type'].upper()} | {sess['candidate_name']} (CC: {sess['cedula']}) | ID: {sess['id']}"):
+                # Formatear fecha para el título del expander
+                fecha_tag = ""
+                completed_at_val = sess.get("completed_at")
+                started_at_val = sess.get("started_at")
+                if completed_at_val:
+                    try:
+                        fecha_obj = datetime.strptime(completed_at_val, "%Y-%m-%d %H:%M:%S")
+                        fecha_tag = f" | 📅 {fecha_obj.strftime('%d/%m/%Y %H:%M')}"
+                    except:
+                        fecha_tag = f" | 📅 {completed_at_val}"
+                elif started_at_val:
+                    try:
+                        fecha_obj = datetime.strptime(started_at_val, "%Y-%m-%d %H:%M:%S")
+                        fecha_tag = f" | 📅 {fecha_obj.strftime('%d/%m/%Y %H:%M')}"
+                    except:
+                        fecha_tag = f" | 📅 {started_at_val}"
+
+                with st.expander(f"{status_emoji} {test_emoji} {sess['test_type'].upper()} | {sess['candidate_name']} (CC: {sess['cedula']}) | ID: {sess['id']}{fecha_tag}{aptitud_tag}"):
                     c1, c2, c3, c4 = st.columns(4)
                     c1.metric("Estado", sess["status"].upper())
                     c2.metric("Tiempo Límite", f"{sess['time_limit_minutes']} min")
-                    c3.metric("Iniciado", sess.get("started_at", "N/A") or "N/A")
-                    c4.metric("Completado", sess.get("completed_at", "N/A") or "N/A")
+                    
+                    # Formatear fechas para mejor legibilidad
+                    started_at = sess.get("started_at")
+                    if started_at:
+                        try:
+                            fecha_inicio = datetime.strptime(started_at, "%Y-%m-%d %H:%M:%S")
+                            started_str = fecha_inicio.strftime("%d/%m/%Y %H:%M")
+                        except:
+                            started_str = started_at
+                    else:
+                        started_str = "N/A"
+                    
+                    completed_at = sess.get("completed_at")
+                    if completed_at:
+                        try:
+                            fecha_fin = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+                            completed_str = fecha_fin.strftime("%d/%m/%Y %H:%M")
+                        except:
+                            completed_str = completed_at
+                    else:
+                        completed_str = "N/A"
+                    
+                    c3.metric("Iniciado", started_str)
+                    c4.metric("Completado", completed_str)
 
                     if sess["status"] == "completed":
                         results = db.get_results(sess["id"])
                         candidate = db.get_candidate_by_cedula(sess["cedula"])
                         if results:
                             if sess["test_type"] == "disc":
-                                show_disc_results_admin(results, candidate, sess["id"])
+                                show_disc_results_admin(results, candidate, sess)
                             else:
-                                show_valanti_results_admin(results, candidate, sess["id"])
+                                show_valanti_results_admin(results, candidate, sess)
                         else:
                             st.warning("Resultados no disponibles.")
 
@@ -603,7 +1218,62 @@ def page_admin_dashboard():
                     if cand_sessions:
                         for s in cand_sessions:
                             emoji = {"pending": "⏳", "in_progress": "▶️", "completed": "✅", "expired": "⏰"}.get(s["status"], "❓")
-                            st.markdown(f"  - {emoji} {s['test_type'].upper()} (ID: {s['id']}) — Estado: {s['status']}")
+                            # Formatear fecha de presentación
+                            fecha_presentacion = ""
+                            if s.get("completed_at"):
+                                try:
+                                    fecha_obj = datetime.strptime(s["completed_at"], "%Y-%m-%d %H:%M:%S")
+                                    fecha_presentacion = f" — Presentado: {fecha_obj.strftime('%d/%m/%Y %H:%M')}"
+                                except:
+                                    fecha_presentacion = f" — Presentado: {s['completed_at']}"
+                            elif s.get("started_at"):
+                                try:
+                                    fecha_obj = datetime.strptime(s["started_at"], "%Y-%m-%d %H:%M:%S")
+                                    fecha_presentacion = f" — Iniciado: {fecha_obj.strftime('%d/%m/%Y %H:%M')}"
+                                except:
+                                    fecha_presentacion = f" — Iniciado: {s['started_at']}"
+                            
+                            # Mostrar aptitud si la prueba está completada
+                            aptitud_info = ""
+                            if s["status"] == "completed":
+                                res = db.get_results(s["id"])
+                                if res:
+                                    if s["test_type"] == "disc":
+                                        norm = res.get("normalized", {})
+                                        rel = res.get("relative", {})
+                                        if norm:
+                                            analysis = analyze_disc_aptitude(norm, rel)
+                                            aptitud_info = f" | **{analysis['aptitude_emoji']} {analysis['aptitude_level']}** ({analysis['aptitude_score']}/100)"
+                                    elif s["test_type"] == "valanti":
+                                        std = res.get("standard", {})
+                                        if std:
+                                            analysis = analyze_valanti_aptitude(std)
+                                            aptitud_info = f" | **{analysis['aptitude_emoji']} {analysis['aptitude_level']}** ({analysis['aptitude_score']}/100)"
+                            
+                            st.markdown(f"  - {emoji} {s['test_type'].upper()} (ID: {s['id']}) — Estado: {s['status']}{fecha_presentacion}{aptitud_info}")
+                    
+                    # Solo superadmin puede eliminar candidatos
+                    if admin.get("role") == "superadmin":
+                        st.markdown("---")
+                        col_del_c, col_spacer_c = st.columns([1, 3])
+                        with col_del_c:
+                            if st.button(f"🗑️ Eliminar candidato", key=f"del_cand_{c['id']}"):
+                                st.session_state[f"confirm_del_cand_{c['id']}"] = True
+                        
+                        if st.session_state.get(f"confirm_del_cand_{c['id']}", False):
+                            n_sessions = len(cand_sessions) if cand_sessions else 0
+                            st.warning(f"⚠️ ¿Estás seguro de eliminar al candidato **{c['name']}** (CC: {c['cedula']})? Se eliminarán también **{n_sessions} evaluación(es)** asociadas. Esta acción es **irreversible**.")
+                            col_yes_c, col_no_c, _ = st.columns([1, 1, 2])
+                            with col_yes_c:
+                                if st.button("✅ Sí, eliminar", key=f"confirm_yes_cand_{c['id']}"):
+                                    db.delete_candidate(c['id'])
+                                    st.session_state.pop(f"confirm_del_cand_{c['id']}", None)
+                                    st.success(f"Candidato **{c['name']}** eliminado correctamente.")
+                                    st.rerun()
+                            with col_no_c:
+                                if st.button("❌ Cancelar", key=f"confirm_no_cand_{c['id']}"):
+                                    st.session_state.pop(f"confirm_del_cand_{c['id']}", None)
+                                    st.rerun()
 
     # ----- TAB 4: Configuración -----
     with tab4:
@@ -619,10 +1289,23 @@ def page_admin_dashboard():
                     st.error("Las contraseñas no coinciden o están vacías.")
 
 
-def show_disc_results_admin(results, candidate, session_id):
+def show_disc_results_admin(results, candidate, session):
     """Show DISC results in the admin panel."""
     normalized = results.get("normalized", {})
     relative = results.get("relative", {})
+
+    # Análisis de aptitud
+    analysis = analyze_disc_aptitude(normalized, relative)
+    
+    # Banner de aptitud
+    st.markdown(f"""
+    <div style="background: {analysis['aptitude_color']}22; border-left: 5px solid {analysis['aptitude_color']};
+                padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: {analysis['aptitude_color']};">{analysis['aptitude_emoji']} {analysis['aptitude_level']} — Puntaje: {analysis['aptitude_score']}/100</h3>
+        <p style="margin: 5px 0 0 0; color: #374151;">{analysis['aptitude_desc']}</p>
+        <p style="margin: 5px 0 0 0; color: #6B7280;"><b>Perfil:</b> {analysis['profile_name']} ({analysis['dominant_name']} + {analysis['secondary_name']})</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     cols = st.columns(4)
     for idx, style in enumerate("DISC"):
@@ -631,8 +1314,33 @@ def show_disc_results_admin(results, candidate, session_id):
 
     fig = create_disc_plot(normalized)
     st.pyplot(fig)
+    
+    # Fortalezas, alertas y recomendaciones
+    col_f, col_a = st.columns(2)
+    with col_f:
+        st.markdown("#### 💪 Fortalezas")
+        for f in analysis['fortalezas']:
+            st.markdown(f"- ✅ {f}")
+    with col_a:
+        st.markdown("#### ⚠️ Alertas")
+        for a in analysis['alertas']:
+            st.markdown(f"- 🔸 {a}")
+    
+    st.markdown("#### 📋 Recomendaciones para el Candidato")
+    for r in analysis['recomendaciones']:
+        st.markdown(f"- 💡 {r}")
+    
+    if analysis['ideal_para']:
+        st.markdown("#### 🎯 Ideal para roles de")
+        st.markdown(", ".join([f"**{r}**" for r in analysis['ideal_para']]))
+    
+    if analysis['cuidado_en']:
+        st.markdown("#### ⛔ Tener cuidado en")
+        st.markdown(", ".join([f"*{r}*" for r in analysis['cuidado_en']]))
 
-    pdf = generate_disc_pdf(candidate, normalized, relative, fig, session_id)
+    session_id = session if isinstance(session, str) else session.get("id")
+    completed_at = session.get("completed_at") if isinstance(session, dict) else None
+    pdf = generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at, analysis)
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📑 Descargar PDF", data=pdf.getvalue(), file_name=f"disc_{candidate['cedula']}.pdf", mime="application/pdf", key=f"pdf_disc_{session_id}")
@@ -640,10 +1348,23 @@ def show_disc_results_admin(results, candidate, session_id):
         st.download_button("📄 Descargar JSON", data=json.dumps(results, indent=2, ensure_ascii=False), file_name=f"disc_{candidate['cedula']}.json", mime="application/json", key=f"json_disc_{session_id}")
 
 
-def show_valanti_results_admin(results, candidate, session_id):
+def show_valanti_results_admin(results, candidate, session):
     """Show VALANTI results in the admin panel."""
     direct = results.get("direct", {})
     standard = results.get("standard", {})
+    
+    # Análisis de aptitud
+    analysis = analyze_valanti_aptitude(standard)
+    
+    # Banner de aptitud
+    st.markdown(f"""
+    <div style="background: {analysis['aptitude_color']}22; border-left: 5px solid {analysis['aptitude_color']};
+                padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: {analysis['aptitude_color']};">{analysis['aptitude_emoji']} {analysis['aptitude_level']} — Puntaje: {analysis['aptitude_score']}/100</h3>
+        <p style="margin: 5px 0 0 0; color: #374151;">{analysis['aptitude_desc']}</p>
+        <p style="margin: 5px 0 0 0; color: #6B7280;"><b>Valor más fuerte:</b> {analysis['strongest_value']} (T={analysis['strongest_score']}) | <b>Valor más bajo:</b> {analysis['weakest_value']} (T={analysis['weakest_score']})</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     cols = st.columns(5)
     for idx, trait in enumerate(VALANTI_TRAITS):
@@ -664,8 +1385,26 @@ def show_valanti_results_admin(results, candidate, session_id):
         level = "Alto" if score >= 55 else ("Bajo" if score <= 45 else "Promedio")
         text = desc["high"] if score >= 55 else (desc["low"] if score <= 45 else "Puntaje dentro del rango promedio.")
         st.markdown(f"**{desc['title']}** — {level} ({score}): {text}")
+    
+    # Fortalezas y alertas
+    if analysis['fortalezas']:
+        st.markdown("#### 💪 Fortalezas Valorales")
+        for f in analysis['fortalezas']:
+            st.markdown(f"- ✅ {f}")
+    
+    if analysis['alertas']:
+        st.markdown("#### ⚠️ Alertas")
+        for a in analysis['alertas']:
+            st.markdown(f"- 🔸 {a}")
+    
+    if analysis['recomendaciones']:
+        st.markdown("#### 📋 Recomendaciones")
+        for r in analysis['recomendaciones']:
+            st.markdown(f"- {r}")
 
-    pdf = generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id)
+    session_id = session if isinstance(session, str) else session.get("id")
+    completed_at = session.get("completed_at") if isinstance(session, dict) else None
+    pdf = generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id, completed_at, analysis)
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📑 Descargar PDF", data=pdf.getvalue(), file_name=f"valanti_{candidate['cedula']}.pdf", mime="application/pdf", key=f"pdf_val_{session_id}")

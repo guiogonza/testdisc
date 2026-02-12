@@ -385,5 +385,24 @@ def delete_test_session(session_id):
     conn.close()
 
 
+def delete_candidate(candidate_id):
+    """Delete a candidate and ALL related test sessions, answers, and results."""
+    conn = get_connection()
+    # Get all sessions for this candidate
+    sessions = conn.execute(
+        "SELECT id FROM test_sessions WHERE candidate_id = ?", (candidate_id,)
+    ).fetchall()
+    # Delete answers and results for each session
+    for s in sessions:
+        conn.execute("DELETE FROM test_answers WHERE session_id = ?", (s["id"],))
+        conn.execute("DELETE FROM test_results WHERE session_id = ?", (s["id"],))
+    # Delete all sessions for this candidate
+    conn.execute("DELETE FROM test_sessions WHERE candidate_id = ?", (candidate_id,))
+    # Delete the candidate
+    conn.execute("DELETE FROM candidates WHERE id = ?", (candidate_id,))
+    conn.commit()
+    conn.close()
+
+
 # Initialize DB on import
 init_db()
