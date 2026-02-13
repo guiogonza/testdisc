@@ -36,6 +36,14 @@ def init_db():
             role TEXT DEFAULT 'admin'
         );
 
+        CREATE TABLE IF NOT EXISTS empresas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigo TEXT UNIQUE NOT NULL,
+            nombre TEXT NOT NULL,
+            activa INTEGER DEFAULT 1,
+            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+        );
+
         CREATE TABLE IF NOT EXISTS candidates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cedula TEXT UNIQUE NOT NULL,
@@ -44,7 +52,14 @@ def init_db():
             sex TEXT,
             education TEXT,
             position TEXT,
-            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            empresa_id INTEGER,
+            regional TEXT,
+            correo TEXT,
+            jefe_inmediato TEXT,
+            nivel_cargo TEXT,
+            invitar TEXT DEFAULT 'SI',
+            created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            FOREIGN KEY (empresa_id) REFERENCES empresas(id)
         );
 
         CREATE TABLE IF NOT EXISTS test_sessions (
@@ -85,6 +100,20 @@ def init_db():
         c.execute("ALTER TABLE admins ADD COLUMN role TEXT DEFAULT 'admin'")
     except sqlite3.OperationalError:
         pass  # La columna ya existe
+
+    # Migrar: agregar columnas de empresa a candidates
+    for column_def in [
+        "empresa_id INTEGER",
+        "regional TEXT",
+        "correo TEXT",
+        "jefe_inmediato TEXT",
+        "nivel_cargo TEXT",
+        "invitar TEXT DEFAULT 'SI'"
+    ]:
+        try:
+            c.execute(f"ALTER TABLE candidates ADD COLUMN {column_def}")
+        except sqlite3.OperationalError:
+            pass  # La columna ya existe
 
     # Default admin
     existing = c.execute("SELECT id FROM admins WHERE username = 'admin'").fetchone()
@@ -402,6 +431,107 @@ def delete_candidate(candidate_id):
     conn.execute("DELETE FROM candidates WHERE id = ?", (candidate_id,))
     conn.commit()
     conn.close()
+
+
+# =========================================================================
+# EMPRESA OPERATIONS
+# =========================================================================
+
+def create_empresa(codigo, nombre, activa=1):
+    """Crear o actualizar una empresa."""
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO empresas (codigo, nombre, activa) VALUES (?, ?, ?)",
+            (codigo, nombre, activa),
+        )
+        conn.commit()
+        empresa = conn.execute("SELECT * FROM empresas WHERE codigo = ?", (codigo,)).fetchone()
+        conn.close()
+        return dict(empresa)
+    except sqlite3.IntegrityError:
+        # Ya existe, actualizar
+        conn.execute(
+            "UPDATE empresas SET nombre = ?, activa = ? WHERE codigo = ?",
+            (nombre, activa, codigo),
+        )
+        conn.commit()
+        empresa = conn.execute("SELECT * FROM empresas WHERE codigo = ?", (codigo,)).fetchone()
+        conn.close()
+        return dict(empresa)
+
+
+def get_all_empresas():
+    """Obtener todas las empresas."""
+    conn = get_connection()
+    empresas = conn.execute("SELECT * FROM empresas ORDER BY nombre").fetchall()
+    conn.close()
+    return [dict(e) for e in empresas]
+
+
+def get_empresa_by_codigo(codigo):
+    """Obtener empresa por código."""
+    conn = get_connection()
+    empresa = conn.execute("SELECT * FROM empresas WHERE codigo = ?", (codigo,)).fetchone()
+    conn.close()
+    return dict(empresa) if empresa else None
+
+
+def get_empresa_by_id(empresa_id):
+    """Obtener empresa por ID."""
+    conn = get_connection()
+    empresa = conn.execute("SELECT * FROM empresas WHERE id = ?", (empresa_id,)).fetchone()
+    conn.close()
+    return dict(empresa) if empresa else None
+
+
+def create_empleado(cedula, name, empresa_codigo, regional, correo, position, 
+                   jefe_inmediato, nivel_cargo, invitar="SI", age=None, sex=None, education=None):
+    """Crear un empleado con todos los datos del Excel."""
+    conn = get_connection()
+    
+    # Obtener empresa_id
+    empresa = conn.execute("SELECT id FROM empresas WHERE codigo = ?", (empresa_codigo,)).fetchone()
+    empresa_id = empresa["id"] if empresa else None
+    
+    try:
+        conn.execute(
+            """INSERT INTO candidates (cedula, name, age, sex, education, position, 
+               empresa_id, regional, correo, jefe_inmediato, nivel_cargo, invitar) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (cedula, name, age, sex, education, position, 
+             empresa_id, regional, correo, jefe_inmediato, nivel_cargo, invitar),
+        )
+        conn.commit()
+        empleado = conn.execute("SELECT * FROM candidates WHERE cedula = ?", (cedula,)).fetchone()
+        conn.close()
+        return dict(empleado)
+    except sqlite3.IntegrityError:
+        conn.close()
+        return None  # Duplicate cédula
+
+
+def get_empleados_by_empresa(empresa_id=None):
+    """Obtener empleados filtrados por empresa."""
+    conn = get_connection()
+    if empresa_id:
+        empleados = conn.execute(
+            """SELECT c.*, e.codigo as empresa_codigo, e.nombre as empresa_nombre 
+               FROM candidates c 
+               LEFT JOIN empresas e ON c.empresa_id = e.id 
+               WHERE c.empresa_id = ? 
+               ORDER BY c.name""",
+            (empresa_id,)
+        ).fetchall()
+    else:
+        empleados = conn.execute(
+            """SELECT c.*, e.codigo as empresa_codigo, e.nombre as empresa_nombre 
+               FROM candidates c 
+               LEFT JOIN empresas e ON c.empresa_id = e.id 
+               ORDER BY c.name"""
+        ).fetchall()
+    conn.close()
+    return [dict(emp) for emp in empleados]
 
 
 # Initialize DB on import

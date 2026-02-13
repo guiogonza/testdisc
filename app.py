@@ -637,6 +637,131 @@ TALENT_MAP_COMPETENCY_RECOMMENDATIONS = {
 
 
 # =========================================================================
+# EVALUACIÓN DE DESEMPEÑO
+# =========================================================================
+
+# 6 Objetivos de Rendimiento (Escala 1-5)
+DESEMPENO_OBJETIVOS = [
+    {
+        "id": 1,
+        "titulo": "Conocimiento y Proactividad",
+        "descripcion": "Conoce sus deberes y es proactivo al momento de realizar su trabajo. Conoce a cabalidad los procedimientos de la operación y los aplica en el trabajo diario, realizando las tareas de manera proactiva y autónoma dentro de sus responsabilidades."
+    },
+    {
+        "id": 2,
+        "titulo": "Puntualidad",
+        "descripcion": "Es puntual con el cumplimiento de Horarios y Jornada Laboral asignados."
+    },
+    {
+        "id": 3,
+        "titulo": "Cumplimiento de Responsabilidades",
+        "descripcion": "Cumple con las solicitudes, requerimientos, obligaciones, funciones y responsabilidades respondiendo de manera inmediata en el tiempo estimado."
+    },
+    {
+        "id": 4,
+        "titulo": "Trabajo en Equipo",
+        "descripcion": "Es cordial y respetuoso con sus compañeros, demostrando empatía, colaboración y actitud positiva dentro del equipo. Ayuda a los demás y demuestra buenas relaciones interpersonales."
+    },
+    {
+        "id": 5,
+        "titulo": "Orientación al Cliente",
+        "descripcion": "Demuestra buena actitud, disponibilidad y preocupación para responder a las necesidades e inquietudes de los usuarios. Tiene una buena postura, actitud, simpatía y proactividad en el contacto establecido con el usuario en su trabajo diario."
+    },
+    {
+        "id": 6,
+        "titulo": "Calificación Global",
+        "descripcion": "Teniendo en cuenta el resultado de la evaluación y los comportamientos evidenciados durante el periodo. Otorgue una calificación global al colaborador dentro de este periodo de acuerdo a lo observado."
+    }
+]
+
+# Escala de Rendimiento (1-5)
+DESEMPENO_ESCALA_RENDIMIENTO = {
+    5: {"label": "Sobresaliente", "descripcion": "Resultado claramente sobre lo esperado", "color": "#10B981"},
+    4: {"label": "Supera las expectativas", "descripcion": "Resultado que satisface plenamente las expectativas", "color": "#3B82F6"},
+    3: {"label": "Cumple las expectativas", "descripcion": "Nivel de resultado aceptable, pero podría mejorar", "color": "#F59E0B"},
+    2: {"label": "Debajo de las expectativas", "descripcion": "Resultado elemental, poco satisfactorio", "color": "#EF4444"},
+    1: {"label": "Insatisfactorio", "descripcion": "Resultado deficiente. No alcanzó los requerimientos mínimos", "color": "#991B1B"}
+}
+
+# 5 Dimensiones de Potencial (Escala 0-3)
+DESEMPENO_DIMENSIONES = [
+    {
+        "id": 1,
+        "nombre": "Motivaciones Personales",
+        "descripcion": "Capacidad para asumir nuevas responsabilidades y retos",
+        "niveles": {
+            3: "Es capaz de asumir con entereza y entusiasmo nuevas responsabilidades, así como nuevos retos y desafíos. Demuestra tener gran potencial de desarrollo en la Organización.",
+            2: "Demuestra el potencial para asumir en un mediano plazo nuevos retos y mayores responsabilidades. Es capaz de consolidarse en su posición actual.",
+            1: "No se encuentra consolidado en su posición actual y requiere de mayor tiempo y fortalecimiento para poder asumir mayores responsabilidades a futuro.",
+            0: "No se evidencia motivación en el colaborador para asumir nuevos retos o asumir responsabilidades adicionales."
+        }
+    },
+    {
+        "id": 2,
+        "nombre": "Visión",
+        "descripcion": "Habilidad para analizar situaciones y configurar perspectivas",
+        "niveles": {
+            3: "Cuenta con facilidad y destreza para analizar situaciones complejas desde una perspectiva general y amplia, con el fin de configurar cada circunstancia o decisión dentro de un contexto más amplio.",
+            2: "Es capaz de analizar diversas situaciones y contextos con la intención de establecer criterios de decisión o acción acertados.",
+            1: "Requiere que se le brinde la información completa sobre alguna situación, problema o circunstancia para poder actuar o tomar decisiones al respecto.",
+            0: "No se evidencia habilidad para integrar temas ni información diversa para analizar desde múltiples perspectivas y tomar decisiones."
+        }
+    },
+    {
+        "id": 3,
+        "nombre": "Disposición para Sobresalir",
+        "descripcion": "Compromiso con objetivos y metas organizacionales",
+        "niveles": {
+            3: "Se compromete a lograr los objetivos y metas que se le asignen, incluso cuando no tiene definidas o claras las condiciones o parámetros para hacerlo. Busca activamente la forma de hacerlo.",
+            2: "Tiene claro cuáles son sus objetivos y qué se espera de él, y se esfuerza por cumplirlos. Cuando se le asigna una tarea adicional, responde positivamente y hace lo que corresponde.",
+            1: "Requiere de motivación externa y constante para lograr sus objetivos, así como de supervisión cercana de su jefe directo.",
+            0: "No se evidencia disposición para lograr sus objetivos ni para entregar resultados. No se compromete con el cumplimiento de sus responsabilidades."
+        }
+    },
+    {
+        "id": 4,
+        "nombre": "Compromiso",
+        "descripcion": "Capacidad para mantener relaciones positivas con clientes",
+        "niveles": {
+            3: "Se preocupa por lograr y mantener relaciones positivas con sus clientes internos y externos, de tal manera que realiza esfuerzos adicionales para lograrlo.",
+            2: "Establece relaciones adecuadas con sus clientes internos y externos, considerando que logra comprender sus necesidades y actuar en consecuencia.",
+            1: "Se relaciona con sus clientes internos y externos solo con la finalidad de atender sus necesidades y requerimientos más básicos.",
+            0: "No se evidencia en el colaborador voluntad ni capacidad para relacionarse adecuadamente con sus clientes internos o externos."
+        }
+    },
+    {
+        "id": 5,
+        "nombre": "Capacidad de Aprendizaje",
+        "descripcion": "Interés por adquirir nuevos conocimientos y habilidades",
+        "niveles": {
+            3: "Le motiva y demuestra gran interés por buscar y adquirir nuevos conocimientos y habilidades. Invierte tiempo y esfuerzo con tal de seguir  aprendiendo y capacitándose.",
+            2: "Muestra disposición para recibir e interiorizar nuevos conocimientos e información, con el fin de continuar su proceso de aprendizaje.",
+            1: "No evidencia conductas de interés por continuar aprendiendo y/o capacitándose para mejorar en su desempeño.",
+            0: "No se evidencia en el colaborador actitud o voluntad de aprender y capacitarse."
+        }
+    }
+]
+
+# Clasificación de desempeño
+DESEMPENO_CLASIFICACION = {
+    "sobresaliente": {"min": 4.5, "label": "🌟 Sobresaliente", "color": "#10B981", "descripcion": "Desempeño excepcional que supera ampliamente las expectativas"},
+    "supera": {"min": 3.5, "label": "⭐ Supera las Expectativas", "color": "#3B82F6", "descripcion": "Desempeño destacado que supera lo esperado"},
+    "cumple": {"min": 2.5, "label": "✅ Cumple las Expectativas", "color": "#F59E0B", "descripcion": "Desempeño satisfactorio que cumple lo esperado"},
+    "debajo": {"min": 1.5, "label": "⚠️ Debajo de las Expectativas", "color": "#EF4444", "descripcion": "Desempeño insuficiente que requiere mejora"},
+    "insatisfactorio": {"min": 0, "label": "❌ Insatisfactorio", "color": "#991B1B", "descripcion": "Desempeño deficiente que requiere plan de acción inmediato"}
+}
+
+# Colores para dimensiones de potencial
+DESEMPENO_COLORES_DIMENSIONES = {
+    "Motivaciones Personales": "#8B5CF6",
+    "Visión": "#3B82F6",
+    "Disposición para Sobresalir": "#10B981",
+    "Compromiso": "#F59E0B",
+    "Capacidad de Aprendizaje": "#EF4444"
+}
+
+
+# =========================================================================
 # ANÁLISIS DE APTITUD Y RECOMENDACIONES
 # =========================================================================
 
@@ -1671,6 +1796,126 @@ def analyze_talent_map_match(normalized_scores, selected_job_profile=None):
     }
 
 
+def calculate_desempeno_results(rendimiento_scores, potencial_scores, iniciativas=None):
+    """
+    Calcula resultados de evaluación de desempeño.
+    
+    rendimiento_scores: dict con calificaciones 1-5 de los 6 objetivos {1: 5, 2: 4, ...}
+    potencial_scores: dict con calificaciones 0-3 de las 5 dimensiones {1: 3, 2: 2, ...}
+    iniciativas: list de 3 textos con iniciativas de mejora (opcional)
+    
+    Returns: dict con análisis completo
+    """
+    # Calcular promedios
+    promedio_rendimiento = sum(rendimiento_scores.values()) / len(rendimiento_scores)
+    promedio_potencial = sum(potencial_scores.values()) / len(potencial_scores)
+    
+    # Puntaje global ponderado (60% rendimiento + 40% potencial normalizado)
+    # Normalizar potencial de escala 0-3 a escala 0-5
+    potencial_normalizado = (promedio_potencial / 3) * 5
+    puntaje_global = (promedio_rendimiento * 0.6) + (potencial_normalizado * 0.4)
+    
+    # Determinar clasificación
+    clasificacion = None
+    for nivel, info in sorted(DESEMPENO_CLASIFICACION.items(), key=lambda x: x[1]["min"], reverse=True):
+        if puntaje_global >= info["min"]:
+            clasificacion = {
+                "nivel": nivel,
+                "label": info["label"],
+                "color": info["color"],
+                "descripcion": info["descripcion"]
+            }
+            break
+    
+    # Identificar fortalezas (objetivos con 4 o 5)
+    fortalezas_rendimiento = []
+    for obj_id, score in rendimiento_scores.items():
+        if score >= 4:
+            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+            fortalezas_rendimiento.append({
+                "titulo": objetivo["titulo"],
+                "score": score,
+                "label": DESEMPENO_ESCALA_RENDIMIENTO[score]["label"]
+            })
+    
+    # Identificar áreas de mejora (objetivos con 1, 2 o 3)
+    areas_mejora_rendimiento = []
+    for obj_id, score in rendimiento_scores.items():
+        if score <= 3:
+            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+            areas_mejora_rendimiento.append({
+                "titulo": objetivo["titulo"],
+                "score": score,
+                "label": DESEMPENO_ESCALA_RENDIMIENTO[score]["label"]
+            })
+    
+    # Identificar fortalezas de potencial (nivel 3 o 2)
+    fortalezas_potencial = []
+    for dim_id, score in potencial_scores.items():
+        if score >= 2:
+            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            fortalezas_potencial.append({
+                "nombre": dimension["nombre"],
+                "score": score,
+                "nivel": f"Nivel {score}"
+            })
+    
+    # Identificar áreas de desarrollo de potencial (nivel 0 o 1)
+    areas_desarrollo_potencial = []
+    for dim_id, score in potencial_scores.items():
+        if score <= 1:
+            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            areas_desarrollo_potencial.append({
+                "nombre": dimension["nombre"],
+                "score": score,
+                "nivel": f"Nivel {score}"
+            })
+    
+    # Generar recomendaciones generales
+    recomendaciones = []
+    if puntaje_global >= 4.5:
+        recomendaciones.append("Empleado con desempeño excepcional. Considerar para promociones o proyectos de alto impacto.")
+        recomendaciones.append("Puede servir como mentor para otros colaboradores.")
+        recomendaciones.append("Mantener motivación con retos profesionales y reconocimiento.")
+    elif puntaje_global >= 3.5:
+        recomendaciones.append("Empleado con desempeño destacado. Continuar fortaleciendo sus competencias.")
+        recomendaciones.append("Identificar oportunidades de desarrollo para alcanzar siguiente nivel.")
+        recomendaciones.append("Reconocer logros y mantener nivel de compromiso.")
+    elif puntaje_global >= 2.5:
+        recomendaciones.append("Empleado con desempeño satisfactorio pero con áreas de mejora identificadas.")
+        recomendaciones.append("Implementar plan de capacitación en áreas específicas.")
+        recomendaciones.append("Establecer seguimiento trimestral para monitorear progreso.")
+    else:
+        recomendaciones.append("Desempeño insuficiente. Requiere plan de acción inmediato.")
+        recomendaciones.append("Implementar plan de mejoramiento con metas claras y medibles.")
+        recomendaciones.append("Seguimiento mensual obligatorio con evaluación en 3 meses.")
+        recomendaciones.append("Considerar reubicación o capacitación intensiva.")
+    
+    # Recomendaciones específicas por áreas de mejora
+    if len(areas_mejora_rendimiento) > 0:
+        recomendaciones.append(f"Áreas prioritarias de rendimiento: {', '.join([a['titulo'] for a in areas_mejora_rendimiento[:3]])}")
+    
+    if len(areas_desarrollo_potencial) > 0:
+        recomendaciones.append(f"Dimensiones de potencial a desarrollar: {', '.join([a['nombre'] for a in areas_desarrollo_potencial])}")
+    
+    # Determinar si requiere iniciativas
+    requiere_iniciativas = promedio_rendimiento < 3 or promedio_potencial < 2
+    
+    return {
+        "promedio_rendimiento": round(promedio_rendimiento, 2),
+        "promedio_potencial": round(promedio_potencial, 2),
+        "puntaje_global": round(puntaje_global, 2),
+        "clasificacion": clasificacion,
+        "fortalezas_rendimiento": fortalezas_rendimiento,
+        "areas_mejora_rendimiento": areas_mejora_rendimiento,
+        "fortalezas_potencial": fortalezas_potencial,
+        "areas_desarrollo_potencial": areas_desarrollo_potencial,
+        "recomendaciones": recomendaciones,
+        "requiere_iniciativas": requiere_iniciativas,
+        "iniciativas": iniciativas if iniciativas else []
+    }
+
+
 # =========================================================================
 # FUNCIONES DE GRÁFICOS
 # =========================================================================
@@ -2477,6 +2722,113 @@ def create_talent_map_comparison(normalized_scores, job_profile_name, job_profil
     ax.set_facecolor('#FAFBFC')
     ax.tick_params(axis='both', colors='#475569')
     ax.grid(axis='x', alpha=0.2, color='#CBD5E1', linestyle='-')
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_desempeno_radar(potencial_scores):
+    """Crea radar chart para las 5 dimensiones de potencial."""
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection='polar')
+    
+    # Datos
+    dimensiones = [dim["nombre"] for dim in DESEMPENO_DIMENSIONES]
+    valores = [potencial_scores.get(i+1, 0) for i in range(5)]
+    
+    # Cerrar el polígono
+    valores_plot = valores + [valores[0]]
+    
+    # Ángulos
+    angulos = [n / 5 * 2 * np.pi for n in range(5)]
+    angulos_plot = angulos + [angulos[0]]
+    
+    # Dibujar área
+    ax.plot(angulos_plot, valores_plot, 'o-', linewidth=2.5, color='#3B82F6', markersize=8)
+    ax.fill(angulos_plot, valores_plot, alpha=0.25, color='#3B82F6')
+    
+    # Zonas de fondo (0-1: rojo, 1-2: amarillo, 2-3: verde)
+    for level, color, alpha in [(1, '#FEE2E2', 0.3), (2, '#FEF3C7', 0.3), (3, '#D1FAE5', 0.3)]:
+        circle_angles = np.linspace(0, 2 * np.pi, 100)
+        circle_values = [level] * 100
+        ax.fill(circle_angles, circle_values, color=color, alpha=alpha)
+    
+    # Configuración
+    ax.set_ylim(0, 3)
+    ax.set_xticks(angulos)
+    ax.set_xticklabels(dimensiones, size=11, fontweight='bold', color='#1E293B')
+    ax.set_yticks([0.5, 1, 1.5, 2, 2.5, 3])
+    ax.set_yticklabels(['', '1', '', '2', '', '3'], size=10, color='#64748B')
+    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_direction(-1)
+    ax.grid(True, color='#CBD5E1', linestyle='-', linewidth=0.5, alpha=0.7)
+    ax.set_facecolor('#FFFFFF')
+    
+    # Título
+    ax.set_title('Evaluación de Potencial\n5 Dimensiones', size=14, fontweight='bold', 
+                 pad=30, color='#1E293B')
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_desempeno_bars(rendimiento_scores):
+    """Crea gráfico de barras para los 6 objetivos de rendimiento."""
+    fig, ax = plt.subplots(figsize=(12, 8))
+    
+    # Datos
+    objetivos = [obj["titulo"] for obj in DESEMPENO_OBJETIVOS]
+    valores = [rendimiento_scores.get(i+1, 0) for i in range(6)]
+    
+    # Colores según nivel
+    colores = []
+    for valor in valores:
+        if valor >= 4.5:
+            colores.append('#10B981')  # Verde
+        elif valor >= 3.5:
+            colores.append('#3B82F6')  # Azul
+        elif valor >= 2.5:
+            colores.append('#F59E0B')  # Amarillo
+        elif valor >= 1.5:
+            colores.append('#EF4444')  # Rojo
+        else:
+            colores.append('#991B1B')  # Rojo oscuro
+    
+    # Crear barras horizontales
+    y_positions = range(len(objetivos))
+    bars = ax.barh(y_positions, valores, color=colores, alpha=0.8, height=0.6, 
+                   edgecolor='#1E293B', linewidth=1.5)
+    
+    # Agregar valores en las barras
+    for i, (bar, valor) in enumerate(zip(bars, valores)):
+        label = DESEMPENO_ESCALA_RENDIMIENTO[int(valor)]["label"]
+        ax.text(valor + 0.15, bar.get_y() + bar.get_height()/2, 
+                f'{valor:.1f} - {label}', 
+                va='center', ha='left', fontsize=10, fontweight='bold', color='#1E293B')
+    
+    # Zonas de fondo
+    ax.axvspan(0, 1.5, alpha=0.1, color='#EF4444', label='Insatisfactorio')
+    ax.axvspan(1.5, 2.5, alpha=0.1, color='#F59E0B', label='Debajo')
+    ax.axvspan(2.5, 3.5, alpha=0.1, color='#3B82F6', label='Cumple')
+    ax.axvspan(3.5, 5, alpha=0.1, color='#10B981', label='Supera/Sobresaliente')
+    
+    # Configuración
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(objetivos, fontsize=11, fontweight='bold', color='#1E293B')
+    ax.set_xlabel('Calificación (1-5)', fontsize=12, fontweight='bold', color='#475569')
+    ax.set_xlim(0, 5.5)
+    ax.set_title('Evaluación de Rendimiento\n6 Objetivos de Desempeño', 
+                 fontsize=14, fontweight='bold', pad=20, color='#1E293B')
+    
+    # Estilo
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#CBD5E1')
+    ax.spines['left'].set_color('#CBD5E1')
+    ax.set_facecolor('#FAFBFC')
+    ax.tick_params(axis='both', colors='#475569')
+    ax.grid(axis='x', alpha=0.3, color='#CBD5E1', linestyle='--')
+    ax.legend(loc='lower right', fontsize=9, framealpha=0.9)
     
     plt.tight_layout()
     return fig
@@ -3529,6 +3881,229 @@ def generate_talent_map_pdf(candidate, raw_scores, normalized, radar_fig, sessio
     return buffer
 
 
+def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, radar_fig, bars_fig, 
+                           session_id, completed_at=None, analysis=None, evaluador_nombre=None, iniciativas=None):
+    """Genera PDF de Evaluación de Desempeño."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
+    
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Title', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor("#1E40AF"), alignment=1, spaceAfter=14))
+    styles.add(ParagraphStyle(name='SubTitle', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor("#374151"), spaceAfter=10))
+    styles.add(ParagraphStyle(name='Small', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor("#6B7280")))
+    styles.add(ParagraphStyle(name='ListItem', parent=styles['Normal'], fontSize=10, leftIndent=20, spaceAfter=6))
+    
+    story = []
+    
+    # Página 1: Portada
+    story.append(Spacer(1, 72))
+    story.append(Paragraph("📊 EVALUACIÓN DE DESEMPEÑO", styles['Title']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Colaborador Evaluado:</b> {candidate['name']}", styles['Normal']))
+    story.append(Paragraph(f"<b>Cédula:</b> {candidate['cedula']}", styles['Normal']))
+    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position', 'N/A')}", styles['Normal']))
+    if evaluador_nombre:
+        story.append(Paragraph(f"<b>Evaluador:</b> {evaluador_nombre}", styles['Normal']))
+    story.append(Paragraph(f"<b>Fecha de Evaluación:</b> {completed_at or 'N/A'}", styles['Normal']))
+    story.append(Paragraph(f"<b>ID de Sesión:</b> {session_id}", styles['Small']))
+    story.append(Spacer(1, 24))
+    
+    # Banner de clasificación
+    if analysis and analysis.get("clasificacion"):
+        clasif = analysis["clasificacion"]
+        banner_color = colors.HexColor(clasif["color"])
+        banner_table = Table([[clasif["label"]]], colWidths=[450])
+        banner_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), banner_color),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 16),
+            ('TOPPADDING', (0, 0), (-1, -1), 16),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 16),
+        ]))
+        story.append(banner_table)
+        story.append(Spacer(1, 6))
+        story.append(Paragraph(f"<i>{clasif['descripcion']}</i>", styles['Small']))
+    
+    story.append(Spacer(1, 24))
+    
+    # Tabla de puntajes
+    if analysis:
+        puntajes_data = [
+            ["Componente", "Promedio", "Máximo"],
+            ["Evaluación de Rendimiento (6 objetivos)", f"{analysis['promedio_rendimiento']:.2f}", "5.00"],
+            ["Evaluación de Potencial (5 dimensiones)", f"{analysis['promedio_potencial']:.2f}", "3.00"],
+            ["Puntaje Global Ponderado", f"<b>{analysis['puntaje_global']:.2f}</b>", "5.00"]
+        ]
+        
+        puntajes_table = Table(puntajes_data, colWidths=[250, 100, 100])
+        puntajes_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#3B82F6")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BACKGROUND', (0, 1), (-1, -2), colors.HexColor("#F3F4F6")),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#DBEAFE")),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(puntajes_table)
+    
+    story.append(PageBreak())
+    
+    # Página 2: Gráfico de Rendimiento
+    story.append(Paragraph("EVALUACIÓN DE RENDIMIENTO", styles['SubTitle']))
+    story.append(Spacer(1, 12))
+    
+    if bars_fig:
+        img_buffer = BytesIO()
+        bars_fig.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+        img_buffer.seek(0)
+        img = Image(img_buffer, width=480, height=320)
+        story.append(img)
+        plt.close(bars_fig)
+    
+    story.append(Spacer(1, 12))
+    
+    # Detalles de cada objetivo
+    story.append(Paragraph("<b>Detalle por Objetivo:</b>", styles['Normal']))
+    story.append(Spacer(1, 6))
+    
+    for obj_id, score in rendimiento_scores.items():
+        objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+        nivel = DESEMPENO_ESCALA_RENDIMIENTO[score]
+        story.append(Paragraph(
+            f"<b>{objetivo['titulo']}</b> - {score:.1f}/5.0 ({nivel['label']})",
+            styles['ListItem']
+        ))
+    
+    story.append(PageBreak())
+    
+    # Página 3: Gráfico de Potencial
+    story.append(Paragraph("EVALUACIÓN DE POTENCIAL", styles['SubTitle']))
+    story.append(Spacer(1, 12))
+    
+    if radar_fig:
+        img_buffer = BytesIO()
+        radar_fig.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+        img_buffer.seek(0)
+        img = Image(img_buffer, width=400, height=400)
+        story.append(img)
+        plt.close(radar_fig)
+    
+    story.append(Spacer(1, 12))
+    
+    # Detalles de cada dimensión
+    story.append(Paragraph("<b>Detalle por Dimensión:</b>", styles['Normal']))
+    story.append(Spacer(1, 6))
+    
+    for dim_id, score in potencial_scores.items():
+        dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+        story.append(Paragraph(
+            f"<b>{dimension['nombre']}</b> - Nivel {score}/3",
+            styles['ListItem']
+        ))
+        story.append(Paragraph(
+            f"<i>{dimension['niveles'][score]}</i>",
+            ParagraphStyle(name='DimDesc', parent=styles['Small'], leftIndent=30, spaceAfter=8)
+        ))
+    
+    story.append(PageBreak())
+    
+    # Página 4: Fortalezas y Áreas de Mejora
+    story.append(Paragraph("ANÁLISIS DE FORTALEZAS Y ÁREAS DE MEJORA", styles['SubTitle']))
+    story.append(Spacer(1, 12))
+    
+    if analysis:
+        # Fortalezas de Rendimiento
+        if analysis.get("fortalezas_rendimiento"):
+            story.append(Paragraph("<b>✅ Fortalezas de Rendimiento:</b>", styles['Normal']))
+            story.append(Spacer(1, 6))
+            for item in analysis["fortalezas_rendimiento"]:
+                story.append(Paragraph(
+                    f"• {item['titulo']} ({item['score']:.1f}/5.0 - {item['label']})",
+                    styles['ListItem']
+                ))
+            story.append(Spacer(1, 12))
+        
+        # Fortalezas de Potencial
+        if analysis.get("fortalezas_potencial"):
+            story.append(Paragraph("<b>⭐ Fortalezas de Potencial:</b>", styles['Normal']))
+            story.append(Spacer(1, 6))
+            for item in analysis["fortalezas_potencial"]:
+                story.append(Paragraph(
+                    f"• {item['nombre']} ({item['nivel']})",
+                    styles['ListItem']
+                ))
+            story.append(Spacer(1, 12))
+        
+        # Áreas de Mejora de Rendimiento
+        if analysis.get("areas_mejora_rendimiento"):
+            story.append(Paragraph("<b>⚠️ Áreas de Mejora en Rendimiento:</b>", styles['Normal']))
+            story.append(Spacer(1, 6))
+            for item in analysis["areas_mejora_rendimiento"]:
+                story.append(Paragraph(
+                    f"• {item['titulo']} ({item['score']:.1f}/5.0 - {item['label']})",
+                    styles['ListItem']
+                ))
+            story.append(Spacer(1, 12))
+        
+        # Áreas de Desarrollo de Potencial
+        if analysis.get("areas_desarrollo_potencial"):
+            story.append(Paragraph("<b>📈 Áreas de Desarrollo en Potencial:</b>", styles['Normal']))
+            story.append(Spacer(1, 6))
+            for item in analysis["areas_desarrollo_potencial"]:
+                story.append(Paragraph(
+                    f"• {item['nombre']} ({item['nivel']})",
+                    styles['ListItem']
+                ))
+            story.append(Spacer(1, 12))
+    
+    story.append(PageBreak())
+    
+    # Página 5: Recomendaciones e Iniciativas
+    story.append(Paragraph("RECOMENDACIONES Y PLAN DE ACCIÓN", styles['SubTitle']))
+    story.append(Spacer(1, 12))
+    
+    if analysis and analysis.get("recomendaciones"):
+        story.append(Paragraph("<b>💡 Recomendaciones Generales:</b>", styles['Normal']))
+        story.append(Spacer(1, 6))
+        for recom in analysis["recomendaciones"]:
+            story.append(Paragraph(f"• {recom}", styles['ListItem']))
+        story.append(Spacer(1, 18))
+    
+    # Iniciativas de Mejora
+    if iniciativas and len(iniciativas) > 0:
+        story.append(Paragraph("<b>🎯 Iniciativas de Mejora Definidas:</b>", styles['Normal']))
+        story.append(Spacer(1, 6))
+        for i, iniciativa in enumerate(iniciativas, 1):
+            if iniciativa and iniciativa.strip():
+                story.append(Paragraph(f"<b>Iniciativa {i}:</b>", styles['Normal']))
+                story.append(Paragraph(iniciativa, styles['ListItem']))
+                story.append(Spacer(1, 8))
+    elif analysis and analysis.get("requiere_iniciativas"):
+        story.append(Paragraph(
+            "<b>⚠️ NOTA:</b> El promedio de evaluación requiere establecer iniciativas de mejora específicas.",
+            ParagraphStyle(name='Alert', parent=styles['Normal'], textColor=colors.HexColor("#EF4444"))
+        ))
+    
+    story.append(Spacer(1, 24))
+    
+    # Footer
+    story.append(Paragraph(
+        f"<i>Documento generado automáticamente el {completed_at or datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>",
+        styles['Small']
+    ))
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+
 # =========================================================================
 # HELPER: Load DISC questions
 # =========================================================================
@@ -3660,8 +4235,8 @@ def page_admin_dashboard():
                 st.markdown("---")
                 c3, c4 = st.columns(2)
                 with c3:
-                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map"], 
-                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else "🌟 Talent Map"))))
+                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map", "desempeno"], 
+                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else ("🌟 Talent Map" if x == "talent_map" else "📊 Evaluación Desempeño")))))
                 with c4:
                     time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60, 90], index=3, format_func=lambda x: f"{x} minutos")
 
@@ -3696,8 +4271,8 @@ def page_admin_dashboard():
                 with st.form("existing_candidate_form"):
                     c3, c4 = st.columns(2)
                     with c3:
-                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map"], 
-                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else "🌟 Talent Map"))))
+                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map", "desempeno"], 
+                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else ("🌟 Talent Map" if x == "talent_map" else "📊 Evaluación Desempeño")))))
                     with c4:
                         time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60, 90], index=3, format_func=lambda x: f"{x} minutos")
                     create_btn2 = st.form_submit_button("✅ Asignar Evaluación")
@@ -3719,8 +4294,8 @@ def page_admin_dashboard():
         # Fila de filtros
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti", "wpi", "eri", "talent_map"], key="filter_type",
-                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI", "eri": "🔐 ERI", "talent_map": "🌟 Talent Map"}.get(x, x))
+            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti", "wpi", "eri", "talent_map", "desempeno"], key="filter_type",
+                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI", "eri": "🔐 ERI", "talent_map": "🌟 Talent Map", "desempeno": "📊 Evaluación Desempeño"}.get(x, x))
         with c2:
             filter_status = st.selectbox("Filtrar por estado:", ["Todos", "pending", "in_progress", "completed", "expired"], key="filter_status",
                                           format_func=lambda x: {"Todos": "📋 Todos", "pending": "⏳ Pendiente", "in_progress": "▶️ En Progreso", "completed": "✅ Completado", "expired": "⏰ Expirado"}.get(x, x))
@@ -3854,8 +4429,18 @@ def page_admin_dashboard():
                                 show_eri_results_admin(results, candidate, sess)
                             elif sess["test_type"] == "talent_map":
                                 show_talent_map_results_admin(results, candidate, sess)
+                            elif sess["test_type"] == "desempeno":
+                                show_desempeno_results_admin(results, candidate, sess)
                         else:
                             st.warning("Resultados no disponibles.")
+                    
+                    # Botón especial para evaluaciones de desempeño pendientes
+                    elif sess["status"] == "pending" and sess["test_type"] == "desempeno":
+                        st.info("⏳ Esta evaluación de desempeño está pendiente de ser completada por un evaluador.")
+                        if st.button(f"✏️ Evaluar Ahora", key=f"eval_desemp_{sess['id']}"):
+                            st.session_state["desempeno_session_id"] = sess["id"]
+                            nav("desempeno_eval")
+                            st.rerun()
 
                     # Solo superadmin puede eliminar pruebas
                     if admin.get("role") == "superadmin":
@@ -4919,6 +5504,328 @@ def show_talent_map_results_admin(results, candidate, session):
         )
 
 
+def page_desempeno_eval():
+    """Página de evaluación de desempeño (completada por el administra
+
+dor)."""
+    session_id = st.session_state.get("desempeno_session_id")
+    
+    if not session_id:
+        st.error("No se encontró una sesión de evaluación activa.")
+        if st.button("Volver al Dashboard"):
+            nav("admin_dashboard")
+            st.rerun()
+        return
+    
+    session = db.get_session_by_id(session_id)
+    if not session:
+        st.error("Sesión no válida.")
+        return
+    
+    candidate = db.get_candidate_by_cedula(
+        db.get_connection().execute("SELECT cedula FROM candidates WHERE id = ?", (session["candidate_id"],)).fetchone()["cedula"]
+    )
+    
+    admin = st.session_state.get("admin")
+    evaluador_nombre = admin.get("name", "Administrador") if admin else "Administrador"
+    
+    st.markdown(f"## 📊 Evaluación de Desempeño")
+    st.markdown(f"**Colaborador:** {candidate['name']} (Cédula: {candidate['cedula']})")
+    st.markdown(f"**Cargo:** {candidate.get('position', 'N/A')}")
+    st.markdown(f"**Evaluador:** {evaluador_nombre}")
+    st.markdown("---")
+    
+    # Formulario de evaluación
+    with st.form("evaluacion_desempeno_form"):
+        st.markdown("### 📝 SECCIÓN 1: Evaluación de Rendimiento")
+        st.markdown("Califique los siguientes 6 objetivos con una escala del 1 al 5:")
+        st.markdown("**5** = Sobresaliente | **4** = Supera | **3** = Cumple | **2** = Debajo | **1** = Insatisfactorio")
+        
+        rendimiento_scores = {}
+        
+        for obj in DESEMPENO_OBJETIVOS:
+            st.markdown(f"**{obj['titulo']}**")
+            st.caption(obj['descripcion'])
+            
+            rendimiento_scores[obj['id']] = st.select_slider(
+                f"Calificación Objetivo {obj['id']}",
+                options=[1, 2, 3, 4, 5],
+                value=3,
+                format_func=lambda x: DESEMPENO_ESCALA_RENDIMIENTO[x]['label'],
+                key=f"rend_{obj['id']}",
+                label_visibility="collapsed"
+            )
+            st.markdown("---")
+        
+        st.markdown("### 🎯 SECCIÓN 2: Evaluación de Potencial")
+        st.markdown("Seleccione el nivel que mejor describe al colaborador en cada dimensión (0-3):")
+        
+        potencial_scores = {}
+        
+        for dim in DESEMPENO_DIMENSIONES:
+            st.markdown(f"**{dim['nombre']}**")
+            st.caption(dim['descripcion'])
+            
+            opciones_texto = [f"Nivel {nivel}: {descripcion[:80]}..." for nivel, descripcion in dim['niveles'].items()]
+            nivel_seleccionado = st.radio(
+                f"Nivel para {dim['nombre']}",
+                options=[3, 2, 1, 0],
+                format_func=lambda x: f"Nivel {x}",
+                key=f"pot_{dim['id']}",
+                horizontal=True,
+                label_visibility="collapsed"
+            )
+            
+            potencial_scores[dim['id']] = nivel_seleccionado
+            
+            # Mostrar descripción del nivel seleccionado
+            with st.expander("📄 Ver descripción completa del nivel seleccionado"):
+                st.info(dim['niveles'][nivel_seleccionado])
+            
+            st.markdown("---")
+        
+        st.markdown("### 💡 SECCIÓN 3: Iniciativas de Mejora (Opcional)")
+        st.markdown("Si el desempeño lo requiere, defina hasta 3 iniciativas de mejora:")
+        
+        iniciativa_1 = st.text_area("Iniciativa 1", placeholder="Descripción de la primera iniciativa...", key="init_1")
+        iniciativa_2 = st.text_area("Iniciativa 2", placeholder="Descripción de la segunda iniciativa...", key="init_2")
+        iniciativa_3 = st.text_area("Iniciativa 3", placeholder="Descripción de la tercera iniciativa...", key="init_3")
+        
+        iniciativas = [ini for ini in [iniciativa_1, iniciativa_2, iniciativa_3] if ini and ini.strip()]
+        
+        submitted = st.form_submit_button("✅ Completar Evaluación y Calcular Resultados", type="primary")
+        
+        if submitted:
+            # Calcular resultados
+            analysis = calculate_desempeno_results(rendimiento_scores, potencial_scores, iniciativas)
+            
+            # Guardar resultados en BD
+            results_data = {
+                "rendimiento_scores": rendimiento_scores,
+                "potencial_scores": potencial_scores,
+                "iniciativas": iniciativas,
+                "analysis": analysis,
+                "evaluador": evaluador_nombre
+            }
+            
+            db.save_results(session_id, results_data)
+            db.complete_test_session(session_id)
+            
+            st.success("✅ Evaluación completada y guardada exitosamente.")
+            st.balloons()
+            
+            # Limpiar session_id y mostrar resultados
+            del st.session_state["desempeno_session_id"]
+            
+            # Actualizar session y recargar
+            st.rerun()
+    
+    if st.button("❌ Cancelar Evaluación"):
+        if "desempeno_session_id" in st.session_state:
+            del st.session_state["desempeno_session_id"]
+        nav("admin_dashboard")
+        st.rerun()
+
+
+def show_desempeno_results_admin(results, candidate, session):
+    """Muestra resultados de Evaluación de Desempeño en el panel de administración."""
+    
+    rendimiento_scores = results.get("rendimiento_scores", {})
+    potencial_scores = results.get("potencial_scores", {})
+    iniciativas = results.get("iniciativas", [])
+    analysis = results.get("analysis", {})
+    evaluador = results.get("evaluador", "N/A")
+    
+    # Convertir session a session_id si es necesario
+    session_id = session["id"] if isinstance(session, dict) else session
+    
+    # Banner de clasificación
+    if analysis.get("clasificacion"):
+        clasif = analysis["clasificacion"]
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, {clasif['color']}22 0%, {clasif['color']}44 100%);
+                    border-left: 6px solid {clasif['color']}; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: {clasif['color']};">{clasif['label']}</h2>
+            <p style="margin: 8px 0 0 0; font-size: 15px; color: #374151;">{clasif['descripcion']}</p>
+            <p style="margin: 12px 0 0 0; font-size: 14px; color: #6B7280;">
+                <b>Evaluador:</b> {evaluador} | <b>Puntaje Global:</b> {analysis.get('puntaje_global', 0):.2f}/5.00
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Métricas principales
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(
+            "🎯 Promedio Rendimiento",
+            f"{analysis.get('promedio_rendimiento', 0):.2f}/5.00",
+            help="Promedio de los 6 objetivos de rendimiento"
+        )
+    
+    with col2:
+        st.metric(
+            "⭐ Promedio Potencial",
+            f"{analysis.get('promedio_potencial', 0):.2f}/3.00",
+            help="Promedio de las 5 dimensiones de potencial"
+        )
+    
+    with col3:
+        st.metric(
+            "📊 Puntaje Global",
+            f"{analysis.get('puntaje_global', 0):.2f}/5.00",
+            help="Puntaje ponderado: 60% Rendimiento + 40% Potencial"
+        )
+    
+    st.markdown("---")
+    
+    # Gráficos
+    st.markdown("### 📈 Visualización de Resultados")
+    
+    col_left, col_right = st.columns(2)
+    
+    with col_left:
+        st.markdown("#### Evaluación de Rendimiento")
+        bars_fig = create_desempeno_bars(rendimiento_scores)
+        st.pyplot(bars_fig)
+        plt.close(bars_fig)
+    
+    with col_right:
+        st.markdown("#### Evaluación de Potencial")
+        radar_fig = create_desempeno_radar(potencial_scores)
+        st.pyplot(radar_fig)
+        plt.close(radar_fig)
+    
+    st.markdown("---")
+    
+    # Detalles por secciones
+    tab1, tab2, tab3, tab4 = st.tabs(["📝 Rendimiento", "🎯 Potencial", "💡 Análisis", "🎯 Iniciativas"])
+    
+    with tab1:
+        st.markdown("#### Desglose por Objetivo de Rendimiento")
+        for obj_id, score in rendimiento_scores.items():
+            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+            nivel = DESEMPENO_ESCALA_RENDIMIENTO[score]
+            
+            col_obj1, col_obj2 = st.columns([3, 1])
+            with col_obj1:
+                st.markdown(f"**{objetivo['titulo']}**")
+                st.caption(objetivo['descripcion'])
+            with col_obj2:
+                st.markdown(f"<div style='background:{nivel['color']}22; padding:12px; border-radius:8px; text-align:center;'>"
+                           f"<b>{score:.1f}/5.0</b><br><span style='font-size:12px;'>{nivel['label']}</span></div>",
+                           unsafe_allow_html=True)
+            st.markdown("---")
+    
+    with tab2:
+        st.markdown("#### Desglose por Dimensión de Potencial")
+        for dim_id, score in potencial_scores.items():
+            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            
+            col_dim1, col_dim2 = st.columns([3, 1])
+            with col_dim1:
+                st.markdown(f"**{dimension['nombre']}**")
+                st.caption(dimension['descripcion'])
+                with st.expander("📄 Ver descripción del nivel asignado"):
+                    st.info(dimension['niveles'][score])
+            with col_dim2:
+                color = DESEMPENO_COLORES_DIMENSIONES.get(dimension['nombre'], "#6B7280")
+                st.markdown(f"<div style='background:{color}22; padding:12px; border-radius:8px; text-align:center;'>"
+                           f"<b>Nivel {score}/3</b></div>",
+                           unsafe_allow_html=True)
+            st.markdown("---")
+    
+    with tab3:
+        col_for, col_mej = st.columns(2)
+        
+        with col_for:
+            st.markdown("#### ✅ Fortalezas")
+            
+            if analysis.get("fortalezas_rendimiento"):
+                st.markdown("**Rendimiento:**")
+                for item in analysis["fortalezas_rendimiento"]:
+                    st.success(f"**{item['titulo']}** - {item['score']:.1f}/5.0 ({item['label']})")
+            
+            if analysis.get("fortalezas_potencial"):
+                st.markdown("**Potencial:**")
+                for item in analysis["fortalezas_potencial"]:
+                    st.success(f"**{item['nombre']}** - {item['nivel']}")
+        
+        with col_mej:
+            st.markdown("#### ⚠️ Áreas de Mejora")
+            
+            if analysis.get("areas_mejora_rendimiento"):
+                st.markdown("**Rendimiento:**")
+                for item in analysis["areas_mejora_rendimiento"]:
+                    st.warning(f"**{item['titulo']}** - {item['score']:.1f}/5.0 ({item['label']})")
+            
+            if analysis.get("areas_desarrollo_potencial"):
+                st.markdown("**Potencial:**")
+                for item in analysis["areas_desarrollo_potencial"]:
+                    st.warning(f"**{item['nombre']}** - {item['nivel']}")
+        
+        st.markdown("---")
+        st.markdown("#### 💡 Recomendaciones")
+        if analysis.get("recomendaciones"):
+            for recom in analysis["recomendaciones"]:
+                st.info(f"• {recom}")
+    
+    with tab4:
+        st.markdown("#### 🎯 Iniciativas de Mejora Definidas")
+        
+        if iniciativas and len(iniciativas) > 0:
+            for i, iniciativa in enumerate(iniciativas, 1):
+                st.markdown(f"**Iniciativa {i}:**")
+                st.info(iniciativa)
+        else:
+            if analysis.get("requiere_iniciativas"):
+                st.warning("⚠️ Esta evaluación requiere establecer iniciativas de mejora, pero no se definieron.")
+            else:
+                st.success("✅ El desempeño es satisfactorio. No se requieren iniciativas de mejora.")
+    
+    st.markdown("---")
+    
+    # Descargar PDF y JSON
+    st.markdown("### 📥 Descargar Resultados")
+    
+    col1, col2 = st.columns(2)
+    
+    # Regenerar gráficos para PDF
+    radar_fig_pdf = create_desempeno_radar(potencial_scores)
+    bars_fig_pdf = create_desempeno_bars(rendimiento_scores)
+    
+    pdf_buffer = generate_desempeno_pdf(
+        candidate=candidate,
+        rendimiento_scores=rendimiento_scores,
+        potencial_scores=potencial_scores,
+        radar_fig=radar_fig_pdf,
+        bars_fig=bars_fig_pdf,
+        session_id=session_id,
+        completed_at=session.get("completed_at") if isinstance(session, dict) else None,
+        analysis=analysis,
+        evaluador_nombre=evaluador,
+        iniciativas=iniciativas
+    )
+    
+    with col1:
+        st.download_button(
+            "📄 Descargar PDF",
+            data=pdf_buffer,
+            file_name=f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.pdf",
+            mime="application/pdf",
+            key=f"pdf_desempeno_{session_id}"
+        )
+    
+    with col2:
+        st.download_button(
+            "📄 Descargar JSON",
+            data=json.dumps(results, indent=2, ensure_ascii=False),
+            file_name=f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.json",
+            mime="application/json",
+            key=f"json_desempeno_{session_id}"
+        )
+
+
 # -------------------------------------------------------------------------
 # CANDIDATE: LOGIN
 # -------------------------------------------------------------------------
@@ -4963,6 +5870,8 @@ def page_candidate_select_test():
         return
 
     pending = db.get_pending_sessions_for_candidate(candidate["id"])
+    # Filtrar evaluaciones de desempeño (las completa el admin, no el candidato)
+    pending = [s for s in pending if s["test_type"] != "desempeno"]
     st.session_state.pending_sessions = pending
 
     st.markdown(f"## Bienvenido/a, {candidate['name']}")
@@ -5042,7 +5951,8 @@ def page_candidate_select_test():
                     "valanti_responses", "valanti_page",
                     "wpi_questions", "wpi_responses", "wpi_page",
                     "eri_questions", "eri_responses", "eri_page",
-                    "tm_questions", "tm_responses", "tm_page"]:
+                    "tm_questions", "tm_responses", "tm_page",
+                    "desempeno_session_id"]:
             st.session_state.pop(key, None)
         nav("home")
         st.rerun()
@@ -5837,6 +6747,7 @@ PAGE_MAP = {
     "wpi_test": page_wpi_test,
     "eri_test": page_eri_test,
     "talent_map_test": page_talent_map_test,
+    "desempeno_eval": page_desempeno_eval,
     "candidate_done": page_candidate_done,
 }
 
