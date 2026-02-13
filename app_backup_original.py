@@ -16,30 +16,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import database as db
 
 # =========================================================================
-# IMPORTAR MÓDULOS REFACTORIZADOS
-# =========================================================================
-from constants import *
-from calculations import (
-    normalize_disc_scores,
-    calculate_disc_results,
-    calculate_valanti_results,
-    calculate_wpi_results,
-    load_eri_questions,
-    calculate_eri_results,
-    load_talent_map_questions,
-    calculate_talent_map_results,
-    calculate_desempeno_results
-)
-from analysis import (
-    analyze_disc_aptitude,
-    analyze_valanti_aptitude,
-    analyze_wpi_aptitude,
-    analyze_eri_aptitude,
-    analyze_talent_map_match
-)
-from utils import load_disc_questions, load_disc_descriptions, load_wpi_questions, nav
-
-# =========================================================================
 # CONFIGURACIÓN DE PÁGINA
 # =========================================================================
 st.set_page_config(
@@ -57,13 +33,1888 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================================
-# NOTA: Constantes y funciones movidas a módulos separados
+# CONSTANTES VALANTI
 # =========================================================================
-# - constants.py: Todas las constantes (VALANTI, WPI, ERI, TALENT MAP, DESEMPEÑO, DISC)
-# - calculations.py: Todas las funciones de cálculo
-# - analysis.py: Todas las funciones de análisis
-# - utils.py: Funciones auxiliares
+VALANTI_PREGUNTAS = [
+    ["Muestro dedicación a las personas que amo", "Actúo con perseverancia"],
+    ["Soy tolerante", "Prefiero actuar con ética"],
+    ["Al pensar, utilizo mi intuición o 'sexto sentido'", "Me siento una persona digna"],
+    ["Logro buena concentración mental", "Perdono todas las ofensas de cualquier persona"],
+    ["Normalmente razono mucho", "Me destaco por el liderazgo en mis acciones"],
+    ["Pienso con integridad", "Me coloco objetivos y metas en mi vida personal"],
+    ["Soy una persona de iniciativa", "En mi trabajo normalmente soy curioso"],
+    ["Doy amor", "Para pensar hago síntesis de las distintas ideas"],
+    ["Me siento en calma", "Pienso con veracidad"],
+    ["Irrespetar la propiedad", "Sentir inquietud"],
+    ["Ser irrespetable", "Ser desconsiderado hacia cualquier persona"],
+    ["Caer en contradicción al pensar", "Sentir intolerancia"],
+    ["Ser violento", "Actuar con cobardía"],
+    ["Sentirse presumido", "Generar divisiones y discordia entre los seres humanos"],
+    ["Ser cruel", "Sentir ira"],
+    ["Pensar con confusión", "Tener odio en el corazón"],
+    ["Decir blasfemias", "Ser escandaloso"],
+    ["Crear desigualdades entre los seres humanos", "Apasionarse por una idea"],
+    ["Sentirse inconstante", "Crear rivalidad hacia otros"],
+    ["Pensamientos irracionales", "Traicionar a un desconocido"],
+    ["Ostentar riquezas materiales", "Sentirse infeliz"],
+    ["Entorpecer la comunicación entre seres humanos", "La maldad"],
+    ["Odiar a cualquier ser de la naturaleza", "Hacer distinciones entre las personas"],
+    ["Sentirse intranquilo", "Ser infiel"],
+    ["Tener la mente dispersa", "Mostrar apatía al pensar"],
+    ["La injusticia", "Sentirse angustiado"],
+    ["Ventajarse de los que odian a todo el mundo", "Vengarse del que hace daño a un familiar"],
+    ["Usar abusivamente el poder", "Distraerse"],
+    ["Ser desagradecido con los que ayudan", "Ser egoísta con todos"],
+    ["Cualquier forma de irrespeto", "Odiar"],
+]
+
+VALANTI_TRAITS = {
+    "Verdad": [1, 7, 13, 19, 25],
+    "Rectitud": [2, 8, 14, 20, 26],
+    "Paz": [3, 9, 15, 21, 27],
+    "Amor": [4, 10, 16, 22, 28],
+    "No Violencia": [5, 11, 17, 23, 29],
+}
+
+VALANTI_AVGS = {"Verdad": 15.65, "Rectitud": 21.05, "Paz": 17.35, "Amor": 16.68, "No Violencia": 21.22}
+VALANTI_SDS = {"Verdad": 4.7, "Rectitud": 4.44, "Paz": 6.61, "Amor": 5.41, "No Violencia": 7.19}
+
+VALANTI_COLORS = {"Verdad": "#3B82F6", "Rectitud": "#10B981", "Paz": "#8B5CF6", "Amor": "#EF4444", "No Violencia": "#F59E0B"}
+
+VALANTI_DESCRIPTIONS = {
+    "Verdad": {
+        "title": "🔍 Verdad", "high": "Fuerte inclinación hacia la búsqueda del conocimiento, honestidad intelectual y razonamiento lógico.",
+        "low": "Podría beneficiarse de desarrollar más pensamiento analítico y curiosidad intelectual."
+    },
+    "Rectitud": {
+        "title": "⚖️ Rectitud", "high": "Fuerte compromiso con la ética, integridad, perseverancia y disciplina.",
+        "low": "Podría fortalecer su sentido de disciplina y compromiso ético."
+    },
+    "Paz": {
+        "title": "☮️ Paz", "high": "Notable capacidad para mantener la calma, serenidad interior, tolerancia y armonía.",
+        "low": "Podría trabajar en desarrollar más paciencia y tolerancia."
+    },
+    "Amor": {
+        "title": "❤️ Amor", "high": "Gran capacidad de amar, empatía, compasión y facilidad para perdonar.",
+        "low": "Podría beneficiarse de abrir más su corazón y practicar la empatía."
+    },
+    "No Violencia": {
+        "title": "🕊️ No Violencia", "high": "Profundo respeto por la vida y dignidad, promueve cooperación y justicia social.",
+        "low": "Podría desarrollar mayor sensibilidad hacia el impacto de sus acciones."
+    },
+}
+
 # =========================================================================
+# CONSTANTES WPI (Work Personality Index)
+# =========================================================================
+
+# Dimensiones del WPI - Índice de Personalidad Laboral
+WPI_DIMENSIONS = [
+    "Responsabilidad",
+    "Trabajo en Equipo", 
+    "Adaptabilidad",
+    "Autodisciplina",
+    "Estabilidad Emocional",
+    "Orientación al Logro"
+]
+
+# Colores para cada dimensión WPI
+WPI_COLORS = {
+    "Responsabilidad": "#3B82F6",        # Azul
+    "Trabajo en Equipo": "#10B981",      # Verde
+    "Adaptabilidad": "#F59E0B",          # Naranja
+    "Autodisciplina": "#8B5CF6",         # Púrpura
+    "Estabilidad Emocional": "#06B6D4",  # Cian
+    "Orientación al Logro": "#EF4444"    # Rojo
+}
+
+# Descripciones de cada dimensión según nivel
+WPI_DESCRIPTIONS = {
+    "Responsabilidad": {
+        "title": "📋 Responsabilidad",
+        "high": "Alta confiabilidad, cumple compromisos, asume la rendición de cuentas y es puntual.",
+        "medium": "Cumple con responsabilidades básicas, ocasionalmente requiere seguimiento.",
+        "low": "Puede tener dificultad para cumplir compromisos, requiere supervisión frecuente."
+    },
+    "Trabajo en Equipo": {
+        "title": "🤝 Trabajo en Equipo",
+        "high": "Excelente colaborador, comparte información, apoya a compañeros y resuelve conflictos constructivamente.",
+        "medium": "Trabaja bien con otros en la mayoría de situaciones, colabora cuando se le solicita.",
+        "low": "Prefiere trabajo independiente, puede tener dificultad colaborando o compartiendo."
+    },
+    "Adaptabilidad": {
+        "title": "🔄 Adaptabilidad",
+        "high": "Muy flexible ante cambios, aprende rápido, maneja bien la incertidumbre y nuevas situaciones.",
+        "medium": "Se adapta a cambios graduales, puede requerir tiempo para ajustarse a nuevos contextos.",
+        "low": "Prefiere rutinas establecidas, los cambios rápidos pueden generar resistencia o estrés."
+    },
+    "Autodisciplina": {
+        "title": "🎯 Autodisciplina",
+        "high": "Excelente organización, gestión del tiempo, sigue procedimientos y mantiene altos estándares.",
+        "medium": "Mantiene organización básica, cumple con procedimientos principales con recordatorios.",
+        "low": "Puede tener dificultad con organización, gestión del tiempo o seguimiento de procedimientos."
+    },
+    "Estabilidad Emocional": {
+        "title": "😌 Estabilidad Emocional",
+        "high": "Maneja muy bien el estrés, mantiene calma bajo presión, se recupera rápido de contratiempos.",
+        "medium": "Maneja estrés moderado adecuadamente, puede afectarse en situaciones de alta presión.",
+        "low": "Vulnerable al estrés, puede tener reacciones emocionales intensas ante dificultades."
+    },
+    "Orientación al Logro": {
+        "title": "🏆 Orientación al Logro",
+        "high": "Alta motivación por excelencia, busca superar metas, toma iniciativa y mejora continua.",
+        "medium": "Cumple con objetivos establecidos, motivación estándar por buenos resultados.",
+        "low": "Motivación limitada por superación, prefiere tareas básicas sin desafíos adicionales."
+    }
+}
+
+# Recomendaciones por nivel de cada dimensión WPI
+WPI_RECOMMENDATIONS = {
+    "Responsabilidad": {
+        "high": ["Excelente para roles que requieren autonomía", "Puede supervisar o mentorear a otros", "Ideal para posiciones de confianza"],
+        "medium": ["Buen desempeño con supervisión regular", "Puede mejorar con sistemas de recordatorios", "Adecuado para roles estructurados"],
+        "low": ["Requiere supervisión cercana", "Beneficiaría de capacitación en gestión del tiempo", "Better en roles muy estructurados con checklists"]
+    },
+    "Trabajo en Equipo": {
+        "high": ["Excelente para proyectos colaborativos", "Puede facilitar trabajo en equipo", "Ideal para mejorar clima laboral"],
+        "medium": ["Funciona bien en equipos establecidos", "Puede colaborar con instrucciones claras", "Adecuado para trabajo semi-independiente"],
+        "low": ["Mejor en roles independientes", "Puede requerir capacitación en habilidades interpersonales", "Considerar tareas individuales"]
+    },
+    "Adaptabilidad": {
+        "high": ["Excelente para entornos dinámicos", "Ideal para proyectos de cambio", "Puede manejar múltiples prioridades"],
+        "medium": ["Funciona bien con cambios planificados", "Necesita tiempo para ajustarse", "Adecuado para entornos moderadamente estables"],
+        "low": ["Mejor en roles con rutinas establecidas", "Comunicar cambios con anticipación", "Proporcionar capacitación ante nuevas tareas"]
+    },
+    "Autodisciplina": {
+        "high": ["Excelente para trabajo remoto/autónomo", "Puede manejar múltiples tareas", "Ideal para roles que requieren precisión"],
+        "medium": ["Funciona bien con estructura externa", "Puede mejorar con herramientas de organización", "Supervisión periódica recomendada"],
+        "low": ["Requiere estructura clara y supervisión", "Beneficiaría de capacitación en organización", "Mejor con tareas simples y bien definidas"]
+    },
+    "Estabilidad Emocional": {
+        "high": ["Excelente para roles de alta presión", "Puede manejar crisis efectivamente", "Ideal para atención al cliente difícil"],
+        "medium": ["Funciona bien en condiciones normales", "Puede requerir apoyo en crisis", "Adecuado para la mayoría de roles estándar"],
+        "low": ["Mejor en entornos de bajo estrés", "Requiere apoyo emocional y capacitación", "Evitar roles con alta presión constante"]
+    },
+    "Orientación al Logro": {
+        "high": ["Excelente para roles desafiantes", "Auto-motivado y proactivo", "Ideal para innovación y mejora continua"],
+        "medium": ["Cumple objetivos con motivación externa", "Funciona bien con metas claras", "Adecuado para roles estándar"],
+        "low": ["Requiere motivación y reconocimiento frecuente", "Mejor en roles sin metas ambiciosas", "Necesita supervisión para mantener resultados"]
+    }
+}
+
+
+# =========================================================================
+# CONSTANTES ERI (Evaluación de Riesgo e Integridad)
+# =========================================================================
+
+# Dimensiones del ERI - Evaluación de Riesgo e Integridad
+ERI_DIMENSIONS = [
+    "Honestidad",
+    "Confiabilidad",
+    "Consumo de Sustancias",
+    "Control de Impulsos",
+    "Actitud hacia Normas",
+    "Hostilidad Laboral"
+]
+
+# Colores para cada dimensión ERI (Verde = bajo riesgo, Amarillo = medio, Rojo = alto)
+ERI_COLORS = {
+    "Honestidad": "#10B981",           # Verde
+    "Confiabilidad": "#3B82F6",        # Azul
+    "Consumo de Sustancias": "#F59E0B", # Naranja
+    "Control de Impulsos": "#EF4444",  # Rojo
+    "Actitud hacia Normas": "#8B5CF6", # Púrpura
+    "Hostilidad Laboral": "#EC4899"    # Rosa
+}
+
+# Descripciones de cada dimensión según nivel de riesgo
+ERI_DESCRIPTIONS = {
+    "Honestidad": {
+        "title": "🔐 Honestidad",
+        "low_risk": "Alta integridad, transparente en sus acciones, reporta irregularidades.",
+        "medium_risk": "Generalmente honesto, puede tener comportamientos cuestionables ocasionales.",
+        "high_risk": "⚠️ ALERTA: Indicadores de deshonestidad, riesgo de robo o fraude."
+    },
+    "Confiabilidad": {
+        "title": "✅ Confiabilidad",
+        "low_risk": "Alta consistencia, cumple compromisos, asistencia puntual y constante.",
+        "medium_risk": "Confiable en general, ocasionalmente puede faltar a compromisos.",
+        "high_risk": "⚠️ ALERTA: Patrón de incumplimiento, ausentismo, falta de constancia."
+    },
+    "Consumo de Sustancias": {
+        "title": "🚫 Consumo de Sustancias",
+        "low_risk": "Sin indicadores de consumo problemático, actitud preventiva.",
+        "medium_risk": "Consumo ocasional reportado, puede afectar desempeño ocasionalmente.",
+        "high_risk": "⚠️ ALERTA: Indicadores de consumo problemático, riesgo para seguridad laboral."
+    },
+    "Control de Impulsos": {
+        "title": "🧘 Control de Impulsos",
+        "low_risk": "Excelente autocontrol, maneja frustración adecuadamente, pensante antes de actuar.",
+        "medium_risk": "Control moderado, puede tener reacciones impulsivas ocasionales bajo presión.",
+        "high_risk": "⚠️ ALERTA: Indicadores de comportamiento agresivo, riesgo de violencia laboral."
+    },
+    "Actitud hacia Normas": {
+        "title": "📋 Actitud hacia Normas",
+        "low_risk": "Respeta reglas y procedimientos, valora la autoridad y estructura.",
+        "medium_risk": "Cumple normas básicas, puede cuestionar o saltarse reglas menores.",
+        "high_risk": "⚠️ ALERTA: Desafío a la autoridad, desprecio por normas, riesgo de incumplimiento."
+    },
+    "Hostilidad Laboral": {
+        "title": "🤝 Relaciones Laborales",
+        "low_risk": "Relaciones positivas, respeta a compañeros, sin indicadores de hostilidad.",
+        "medium_risk": "Ocasionalmente conflictivo, puede tener problemas interpersonales menores.",
+        "high_risk": "⚠️ ALERTA: Indicadores de acoso, intimidación, riesgo de ambiente tóxico."
+    }
+}
+
+# Umbrales de riesgo para cada dimensión (puntuaciones invertidas: más bajo = más riesgo)
+# Los scores se normalizan a 0-100, donde:
+# 0-40 = ALTO RIESGO (Rojo)
+# 41-65 = RIESGO MODERADO (Amarillo)
+# 66-100 = BAJO RIESGO (Verde)
+ERI_RISK_THRESHOLDS = {
+    "low_risk": 66,     # >= 66 = Bajo riesgo (Verde)
+    "medium_risk": 41,  # 41-65 = Riesgo moderado (Amarillo)
+    "high_risk": 0      # 0-40 = Alto riesgo (Rojo)
+}
+
+# Número de preguntas de validez en el test (aproximadamente el 20-25% de las preguntas)
+ERI_VALIDITY_QUESTIONS_COUNT = 12
+
+# Umbral de inconsistencias para invalidar el test
+# Si el candidato responde 5 o más con falta extrema de honestidad en preguntas de validez (ej: "Nunca he mentido")
+ERI_VALIDITY_THRESHOLD = 5
+
+# Recomendaciones por nivel de riesgo en cada dimensión
+ERI_RECOMMENDATIONS = {
+    "Honestidad": {
+        "low_risk": ["Excelente para roles de manejo de efectivo o activos", "Apto para posiciones de confianza", "Bajo riesgo de robo o fraude"],
+        "medium_risk": ["Supervisión estándar recomendada", "Entrevista profunda sobre valores éticos", "Monitoreo en período de prueba"],
+        "high_risk": ["⚠️ NO RECOMENDADO para roles con acceso a dinero o activos", "Riesgo elevado de pérdidas por deshonestidad", "Considerar descarte del candidato"]
+    },
+    "Confiabilidad": {
+        "low_risk": ["Excelente para roles que requieren autonomía", "Bajo riesgo de ausentismo", "Ideal para trabajos sin supervisión directa"],
+        "medium_risk": ["Sistemas de seguimiento recomendados", "Puede requerir recordatorios de compromisos", "Adecuado con supervisión regular"],
+        "high_risk": ["⚠️ Alto riesgo de ausentismo y rotación", "Requiere supervisión constante", "Considerar para roles de bajo impacto solamente"]
+    },
+    "Consumo de Sustancias": {
+        "low_risk": ["Apto para roles de seguridad crítica", "Sin riesgos relacionados con sustancias", "Excelente para operación de maquinaria"],
+        "medium_risk": ["Evaluar con pruebas adicionales si el rol es crítico", "Considerar política de pruebas aleatorias", "Entrevista sobre hábitos"],
+        "high_risk": ["⚠️ NO RECOMENDADO para roles de seguridad o conducción", "Riesgo grave de accidentes", "Requiere evaluación de adicciones profesional"]
+    },
+    "Control de Impulsos": {
+        "low_risk": ["Apto para roles de alta presión", "Bajo riesgo de conflictos violentos", "Excelente para atención al cliente difícil"],
+        "medium_risk": ["Capacitación en manejo de emociones recomendada", "Evitar roles de muy alta tensión", "Monitoreo de comportamiento"],
+        "high_risk": ["⚠️ Riesgo de violencia laboral", "NO RECOMENDADO para roles de atención al público", "Requiere evaluación psicológica profesional"]
+    },
+    "Actitud hacia Normas": {
+        "low_risk": ["Excelente para roles regulados o compliance", "Respeta procedimientos de seguridad", "Ideal para ambientes estructurados"],
+        "medium_risk": ["Comunicar claramente expectativas y consecuencias", "Supervisión de cumplimiento de normas", "Puede funcionar con autonomía limitada"],
+        "high_risk": ["⚠️ Riesgo de incumplimiento de seguridad y normativas", "NO RECOMENDADO para roles regulados", "Puede generar sanciones legales a la empresa"]
+    },
+    "Hostilidad Laboral": {
+        "low_risk": ["Excelente para trabajo en equipo", "Contribuye a clima laboral positivo", "Bajo riesgo de demandas por acoso"],
+        "medium_risk": ["Capacitación en relaciones interpersonales", "Monitoreo de interacciones con equipo", "Puede requerir mediación ocasional"],
+        "high_risk": ["⚠️ Alto riesgo de acoso laboral y demandas", "Puede crear ambiente tóxico", "Considerar descarte para proteger al equipo"]
+    }
+}
+
+# Recomendaciones de contratación según perfil de riesgo general
+ERI_HIRING_RECOMMENDATIONS = {
+    "low_risk": {
+        "decision": "✅ RECOMENDADO PARA CONTRATACIÓN",
+        "resumen": "Perfil de bajo riesgo en integridad y comportamiento laboral. Candidato confiable.",
+        "acciones": [
+            "Proceso de contratación estándar",
+            "Supervisión normal según el puesto",
+            "Buen prospecto para desarrollo a largo plazo"
+        ]
+    },
+    "medium_risk": {
+        "decision": "⚠️ CONTRATAR CON PRECAUCIONES",
+        "resumen": "Perfil con señales de alerta moderadas. Requiere medidas preventivas.",
+        "acciones": [
+            "Entrevista profunda sobre dimensiones de riesgo identificadas",
+            "Referencias laborales exhaustivas",
+            "Período de prueba extendido con supervisión cercana",
+            "Evaluaciones de desempeño frecuentes (30-60-90 días)",
+            "Capacitación específica en áreas de riesgo"
+        ]
+    },
+    "high_risk": {
+        "decision": "🚫 NO RECOMENDADO PARA CONTRATACIÓN",
+        "resumen": "Perfil de alto riesgo. Contratación representa riesgo significativo para la organización.",
+        "acciones": [
+            "⚠️ Considerar seriamente descartar al candidato",
+            "Si se decide contratar: rol de muy bajo impacto y alta supervisión",
+            "Evaluación psicológica profesional obligatoria",
+            "Políticas estrictas de monitoreo y consecuencias claras",
+            "Documentación exhaustiva de comportamiento"
+        ]
+    }
+}
+
+
+# =========================================================================
+# CONSTANTES TALENT MAP (Mapeo de Competencias y Talentos)
+# =========================================================================
+
+# Dimensiones del Talent Map - 8 competencias universales
+TALENT_MAP_COMPETENCIES = [
+    "Liderazgo",
+    "Comunicación",
+    "Pensamiento Analítico",
+    "Innovación y Creatividad",
+    "Orientación al Cliente",
+    "Trabajo en Equipo",
+    "Gestión del Cambio",
+    "Resolución de Problemas"
+]
+
+# Colores para cada competencia
+TALENT_MAP_COLORS = {
+    "Liderazgo": "#EF4444",              # Rojo
+    "Comunicación": "#3B82F6",           # Azul
+    "Pensamiento Analítico": "#8B5CF6",  # Púrpura
+    "Innovación y Creatividad": "#F59E0B", # Naranja
+    "Orientación al Cliente": "#10B981", # Verde
+    "Trabajo en Equipo": "#06B6D4",      # Cian
+    "Gestión del Cambio": "#EC4899",     # Rosa
+    "Resolución de Problemas": "#14B8A6" # Teal
+}
+
+# Descripciones de cada competencia según nivel
+TALENT_MAP_DESCRIPTIONS = {
+    "Liderazgo": {
+        "title": "👑 Liderazgo",
+        "high": "Capacidad sobresaliente para dirigir equipos, inspirar y tomar decisiones estratégicas. Asume responsabilidad y desarrolla talento.",
+        "medium": "Muestra iniciativa de liderazgo ocasional, puede dirigir con apoyo. En desarrollo.",
+        "low": "Prefiere roles sin responsabilidad de dirección. Requiere desarrollo significativo en habilidades de liderazgo."
+    },
+    "Comunicación": {
+        "title": "💬 Comunicación",
+        "high": "Comunicador excepcional, expresa ideas claramente, escucha activamente y adapta mensaje a audiencias diversas.",
+        "medium": "Comunicación efectiva en situaciones estándar, puede mejorar en contextos complejos o audiencias difíciles.",
+        "low": "Desafíos en expresión clara o escucha activa. Requiere capacitación en comunicación efectiva."
+    },
+    "Pensamiento Analítico": {
+        "title": "🔍 Pensamiento Analítico",
+        "high": "Analiza problemas complejos desde múltiples perspectivas, identifica patrones, usa datos para decisiones fundamentadas.",
+        "medium": "Capacidad analítica básica, maneja problemas de complejidad moderada con orientación.",
+        "low": "Prefiere intuición sobre análisis estructurado. Requiere desarrollo en pensamiento crítico y análisis de datos."
+    },
+    "Innovación y Creatividad": {
+        "title": "💡 Innovación y Creatividad",
+        "high": "Genera constantemente ideas originales, propone soluciones innovadoras, cómodo con experimentación y riesgo calculado.",
+        "medium": "Muestra creatividad ocasional, puede aportar ideas con estímulo. Balancea innovación con métodos probados.",
+        "low": "Prefiere métodos establecidos, resistencia al cambio. Requiere estímulo para pensar creativamente."
+    },
+    "Orientación al Cliente": {
+        "title": "🎯 Orientación al Cliente",
+        "high": "Comprende profundamente necesidades del cliente, anticipa expectativas, construye relaciones de largo plazo, va más allá.",
+        "medium": "Atiende necesidades básicas del cliente adecuadamente, puede mejorar en anticipación y personalización.",
+        "low": "Enfoque limitado en cliente, prioriza procesos internos. Requiere desarrollo en mentalidad centrada en cliente."
+    },
+    "Trabajo en Equipo": {
+        "title": "🤝 Trabajo en Equipo",
+        "high": "Colaborador excepcional, comparte conocimiento abiertamente, construye consenso, valora diversidad, contribuye al éxito colectivo.",
+        "medium": "Trabaja bien en equipo cuando se requiere, colaboración estándar. Ocasionalmente prefiere trabajo individual.",
+        "low": "Preferencia marcada por trabajo independiente, desafíos en colaboración. Requiere desarrollo en habilidades interpersonales."
+    },
+    "Gestión del Cambio": {
+        "title": "🔄 Gestión del Cambio",
+        "high": "Altamente adaptable, ve cambios como oportunidades, ayuda a otros en transiciones, aprende rápido, positivo ante incertidumbre.",
+        "medium": "Se adapta a cambios graduales, puede requerir tiempo de ajuste. Maneja cambios planificados adecuadamente.",
+        "low": "Resistencia al cambio, prefiere rutinas establecidas. Requiere apoyo significativo en períodos de transformación."
+    },
+    "Resolución de Problemas": {
+        "title": "🎯 Resolución de Problemas",
+        "high": "Identifica soluciones efectivas bajo presión, evalúa alternativas, implementa decisiones, aprende de errores, decisivo.",
+        "medium": "Resuelve problemas estándar efectivamente, puede requerir apoyo en situaciones complejas o de alta presión.",
+        "low": "Desafíos para tomar decisiones, se paraliza con problemas complejos. Requiere capacitación estructurada en solución de problemas."
+    }
+}
+
+# Perfiles de referencia por puesto (benchmarks de competencias en escala 0-100)
+TALENT_MAP_JOB_PROFILES = {
+    "Gerente General": {
+        "emoji": "👔",
+        "descripcion": "Lidera organización, toma decisiones estratégicas, gestiona recursos",
+        "competencias": {
+            "Liderazgo": 90,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 85,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 80,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 85,
+            "Resolución de Problemas": 90
+        }
+    },
+    "Gerente de Ventas": {
+        "emoji": "📊",
+        "descripcion": "Dirige equipo comercial, desarrolla estrategias de venta, alcanza metas",
+        "competencias": {
+            "Liderazgo": 85,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 70,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 75,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Gerente de Recursos Humanos": {
+        "emoji": "👥",
+        "descripcion": "Gestiona talento humano, cultura organizacional, desarrollo de personal",
+        "competencias": {
+            "Liderazgo": 80,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 75,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 75,
+            "Trabajo en Equipo": 90,
+            "Gestión del Cambio": 85,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Gerente de Operaciones": {
+        "emoji": "⚙️",
+        "descripcion": "Optimiza procesos, gestiona producción, controla calidad y eficiencia",
+        "competencias": {
+            "Liderazgo": 85,
+            "Comunicación": 75,
+            "Pensamiento Analítico": 90,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 70,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 90
+        }
+    },
+    "Gerente de TI": {
+        "emoji": "💻",
+        "descripcion": "Lidera tecnología, infraestructura, seguridad y proyectos digitales",
+        "competencias": {
+            "Liderazgo": 80,
+            "Comunicación": 75,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 85,
+            "Orientación al Cliente": 70,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 90,
+            "Resolución de Problemas": 95
+        }
+    },
+    "Vendedor Senior": {
+        "emoji": "🎯",
+        "descripcion": "Desarrolla clientes, negocia contratos, alcanza cuotas de venta",
+        "competencias": {
+            "Liderazgo": 60,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 70,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 75,
+            "Resolución de Problemas": 75
+        }
+    },
+    "Analista de Datos": {
+        "emoji": "📈",
+        "descripcion": "Analiza información, genera insights, reporta métricas de negocio",
+        "competencias": {
+            "Liderazgo": 50,
+            "Comunicación": 70,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 65,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 70,
+            "Resolución de Problemas": 85
+        }
+    },
+    "Especialista en Marketing": {
+        "emoji": "📱",
+        "descripcion": "Desarrolla campañas, gestiona marca, analiza mercados y tendencias",
+        "competencias": {
+            "Liderazgo": 60,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 75,
+            "Innovación y Creatividad": 90,
+            "Orientación al Cliente": 85,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 75
+        }
+    },
+    "Ingeniero de Software": {
+        "emoji": "⌨️",
+        "descripcion": "Desarrolla aplicaciones, mantiene sistemas, resuelve problemas técnicos",
+        "competencias": {
+            "Liderazgo": 50,
+            "Comunicación": 65,
+            "Pensamiento Analítico": 90,
+            "Innovación y Creatividad": 85,
+            "Orientación al Cliente": 60,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 95
+        }
+    },
+    "Coordinador de Proyectos": {
+        "emoji": "📋",
+        "descripcion": "Planifica, organiza y supervisa proyectos, coordina equipos multifuncionales",
+        "competencias": {
+            "Liderazgo": 75,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 80,
+            "Innovación y Creatividad": 65,
+            "Orientación al Cliente": 75,
+            "Trabajo en Equipo": 90,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 85
+        }
+    },
+    "Especialista en Servicio al Cliente": {
+        "emoji": "☎️",
+        "descripcion": "Atiende consultas, resuelve problemas, mantiene satisfacción del cliente",
+        "competencias": {
+            "Liderazgo": 45,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 65,
+            "Innovación y Creatividad": 60,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 70,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Contador/Analista Financiero": {
+        "emoji": "💰",
+        "descripcion": "Gestiona finanzas, reportes contables, análisis financiero y presupuestos",
+        "competencias": {
+            "Liderazgo": 55,
+            "Comunicación": 70,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 60,
+            "Orientación al Cliente": 60,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 65,
+            "Resolución de Problemas": 85
+        }
+    }
+}
+
+# Niveles de coincidencia (match) con perfil de puesto
+TALENT_MAP_MATCH_LEVELS = {
+    "excelente": {"min": 85, "label": "🌟 Excelente Match", "color": "#10B981", "descripcion": "Competencias altamente alineadas con el perfil del puesto"},
+    "muy_bueno": {"min": 75, "label": "✅ Muy Buen Match", "color": "#3B82F6", "descripcion": "Competencias bien alineadas, candidato muy apto para el rol"},
+    "bueno": {"min": 65, "label": "👍 Buen Match", "color": "#F59E0B", "descripcion": "Competencias aceptables, puede requerir desarrollo en algunas áreas"},
+    "aceptable": {"min": 50, "label": "⚠️ Match Aceptable", "color": "#EF4444", "descripcion": "Competencias limitadas, requiere capacitación significativa"},
+    "bajo": {"min": 0, "label": "❌ Match Bajo", "color": "#991B1B", "descripcion": "Competencias insuficientes para el rol, no recomendado"}
+}
+
+# Recomendaciones por nivel de competencia
+TALENT_MAP_COMPETENCY_RECOMMENDATIONS = {
+    "high": [
+        "Fortaleza clave: aprovechar en el rol",
+        "Puede mentorear a otros en esta competencia",
+        "Considerar para proyectos que requieran esta habilidad"
+    ],
+    "medium": [
+        "Nivel adecuado para el rol",
+        "Puede beneficiarse de capacitación para alcanzar excelencia",
+        "Monitorear desarrollo continuo"
+    ],
+    "low": [
+        "Área de desarrollo prioritaria",
+        "Requiere plan de capacitación específico",
+        "Considerar apoyo o mentoría en esta competencia"
+    ]
+}
+
+
+# =========================================================================
+# EVALUACIÓN DE DESEMPEÑO
+# =========================================================================
+
+# 6 Objetivos de Rendimiento (Escala 1-5)
+DESEMPENO_OBJETIVOS = [
+    {
+        "id": 1,
+        "titulo": "Conocimiento y Proactividad",
+        "descripcion": "Conoce sus deberes y es proactivo al momento de realizar su trabajo. Conoce a cabalidad los procedimientos de la operación y los aplica en el trabajo diario, realizando las tareas de manera proactiva y autónoma dentro de sus responsabilidades."
+    },
+    {
+        "id": 2,
+        "titulo": "Puntualidad",
+        "descripcion": "Es puntual con el cumplimiento de Horarios y Jornada Laboral asignados."
+    },
+    {
+        "id": 3,
+        "titulo": "Cumplimiento de Responsabilidades",
+        "descripcion": "Cumple con las solicitudes, requerimientos, obligaciones, funciones y responsabilidades respondiendo de manera inmediata en el tiempo estimado."
+    },
+    {
+        "id": 4,
+        "titulo": "Trabajo en Equipo",
+        "descripcion": "Es cordial y respetuoso con sus compañeros, demostrando empatía, colaboración y actitud positiva dentro del equipo. Ayuda a los demás y demuestra buenas relaciones interpersonales."
+    },
+    {
+        "id": 5,
+        "titulo": "Orientación al Cliente",
+        "descripcion": "Demuestra buena actitud, disponibilidad y preocupación para responder a las necesidades e inquietudes de los usuarios. Tiene una buena postura, actitud, simpatía y proactividad en el contacto establecido con el usuario en su trabajo diario."
+    },
+    {
+        "id": 6,
+        "titulo": "Calificación Global",
+        "descripcion": "Teniendo en cuenta el resultado de la evaluación y los comportamientos evidenciados durante el periodo. Otorgue una calificación global al colaborador dentro de este periodo de acuerdo a lo observado."
+    }
+]
+
+# Escala de Rendimiento (1-5)
+DESEMPENO_ESCALA_RENDIMIENTO = {
+    5: {"label": "Sobresaliente", "descripcion": "Resultado claramente sobre lo esperado", "color": "#10B981"},
+    4: {"label": "Supera las expectativas", "descripcion": "Resultado que satisface plenamente las expectativas", "color": "#3B82F6"},
+    3: {"label": "Cumple las expectativas", "descripcion": "Nivel de resultado aceptable, pero podría mejorar", "color": "#F59E0B"},
+    2: {"label": "Debajo de las expectativas", "descripcion": "Resultado elemental, poco satisfactorio", "color": "#EF4444"},
+    1: {"label": "Insatisfactorio", "descripcion": "Resultado deficiente. No alcanzó los requerimientos mínimos", "color": "#991B1B"}
+}
+
+# 5 Dimensiones de Potencial (Escala 0-3)
+DESEMPENO_DIMENSIONES = [
+    {
+        "id": 1,
+        "nombre": "Motivaciones Personales",
+        "descripcion": "Capacidad para asumir nuevas responsabilidades y retos",
+        "niveles": {
+            3: "Es capaz de asumir con entereza y entusiasmo nuevas responsabilidades, así como nuevos retos y desafíos. Demuestra tener gran potencial de desarrollo en la Organización.",
+            2: "Demuestra el potencial para asumir en un mediano plazo nuevos retos y mayores responsabilidades. Es capaz de consolidarse en su posición actual.",
+            1: "No se encuentra consolidado en su posición actual y requiere de mayor tiempo y fortalecimiento para poder asumir mayores responsabilidades a futuro.",
+            0: "No se evidencia motivación en el colaborador para asumir nuevos retos o asumir responsabilidades adicionales."
+        }
+    },
+    {
+        "id": 2,
+        "nombre": "Visión",
+        "descripcion": "Habilidad para analizar situaciones y configurar perspectivas",
+        "niveles": {
+            3: "Cuenta con facilidad y destreza para analizar situaciones complejas desde una perspectiva general y amplia, con el fin de configurar cada circunstancia o decisión dentro de un contexto más amplio.",
+            2: "Es capaz de analizar diversas situaciones y contextos con la intención de establecer criterios de decisión o acción acertados.",
+            1: "Requiere que se le brinde la información completa sobre alguna situación, problema o circunstancia para poder actuar o tomar decisiones al respecto.",
+            0: "No se evidencia habilidad para integrar temas ni información diversa para analizar desde múltiples perspectivas y tomar decisiones."
+        }
+    },
+    {
+        "id": 3,
+        "nombre": "Disposición para Sobresalir",
+        "descripcion": "Compromiso con objetivos y metas organizacionales",
+        "niveles": {
+            3: "Se compromete a lograr los objetivos y metas que se le asignen, incluso cuando no tiene definidas o claras las condiciones o parámetros para hacerlo. Busca activamente la forma de hacerlo.",
+            2: "Tiene claro cuáles son sus objetivos y qué se espera de él, y se esfuerza por cumplirlos. Cuando se le asigna una tarea adicional, responde positivamente y hace lo que corresponde.",
+            1: "Requiere de motivación externa y constante para lograr sus objetivos, así como de supervisión cercana de su jefe directo.",
+            0: "No se evidencia disposición para lograr sus objetivos ni para entregar resultados. No se compromete con el cumplimiento de sus responsabilidades."
+        }
+    },
+    {
+        "id": 4,
+        "nombre": "Compromiso",
+        "descripcion": "Capacidad para mantener relaciones positivas con clientes",
+        "niveles": {
+            3: "Se preocupa por lograr y mantener relaciones positivas con sus clientes internos y externos, de tal manera que realiza esfuerzos adicionales para lograrlo.",
+            2: "Establece relaciones adecuadas con sus clientes internos y externos, considerando que logra comprender sus necesidades y actuar en consecuencia.",
+            1: "Se relaciona con sus clientes internos y externos solo con la finalidad de atender sus necesidades y requerimientos más básicos.",
+            0: "No se evidencia en el colaborador voluntad ni capacidad para relacionarse adecuadamente con sus clientes internos o externos."
+        }
+    },
+    {
+        "id": 5,
+        "nombre": "Capacidad de Aprendizaje",
+        "descripcion": "Interés por adquirir nuevos conocimientos y habilidades",
+        "niveles": {
+            3: "Le motiva y demuestra gran interés por buscar y adquirir nuevos conocimientos y habilidades. Invierte tiempo y esfuerzo con tal de seguir  aprendiendo y capacitándose.",
+            2: "Muestra disposición para recibir e interiorizar nuevos conocimientos e información, con el fin de continuar su proceso de aprendizaje.",
+            1: "No evidencia conductas de interés por continuar aprendiendo y/o capacitándose para mejorar en su desempeño.",
+            0: "No se evidencia en el colaborador actitud o voluntad de aprender y capacitarse."
+        }
+    }
+]
+
+# Clasificación de desempeño
+DESEMPENO_CLASIFICACION = {
+    "sobresaliente": {"min": 4.5, "label": "🌟 Sobresaliente", "color": "#10B981", "descripcion": "Desempeño excepcional que supera ampliamente las expectativas"},
+    "supera": {"min": 3.5, "label": "⭐ Supera las Expectativas", "color": "#3B82F6", "descripcion": "Desempeño destacado que supera lo esperado"},
+    "cumple": {"min": 2.5, "label": "✅ Cumple las Expectativas", "color": "#F59E0B", "descripcion": "Desempeño satisfactorio que cumple lo esperado"},
+    "debajo": {"min": 1.5, "label": "⚠️ Debajo de las Expectativas", "color": "#EF4444", "descripcion": "Desempeño insuficiente que requiere mejora"},
+    "insatisfactorio": {"min": 0, "label": "❌ Insatisfactorio", "color": "#991B1B", "descripcion": "Desempeño deficiente que requiere plan de acción inmediato"}
+}
+
+# Colores para dimensiones de potencial
+DESEMPENO_COLORES_DIMENSIONES = {
+    "Motivaciones Personales": "#8B5CF6",
+    "Visión": "#3B82F6",
+    "Disposición para Sobresalir": "#10B981",
+    "Compromiso": "#F59E0B",
+    "Capacidad de Aprendizaje": "#EF4444"
+}
+
+
+# =========================================================================
+# ANÁLISIS DE APTITUD Y RECOMENDACIONES
+# =========================================================================
+
+# --- Nombres legibles de cada estilo DISC ---
+DISC_STYLE_NAMES = {
+    "D": "Dominancia",
+    "I": "Influencia",
+    "S": "Estabilidad",
+    "C": "Cumplimiento/Minuciosidad"
+}
+
+# --- Recomendaciones por estilo DISC según nivel ---
+DISC_RECOMMENDATIONS = {
+    "D": {
+        "high": {
+            "fortalezas": ["Liderazgo natural y toma de decisiones rápida", "Orientación a resultados y metas", "Capacidad para asumir retos y resolver problemas", "Iniciativa y autonomía"],
+            "alertas": ["Puede ser percibido como autoritario o impaciente", "Riesgo de conflictos interpersonales por estilo directo", "Puede descuidar el bienestar emocional del equipo"],
+            "recomendaciones": ["Desarrollar la escucha activa y empatía con el equipo", "Practicar la delegación efectiva", "Equilibrar la exigencia con el reconocimiento positivo", "Trabajar la paciencia en procesos que requieren consenso"]
+        },
+        "low": {
+            "fortalezas": ["Colaborativo y receptivo a las ideas de otros", "Evita conflictos innecesarios", "Flexible y adaptable"],
+            "alertas": ["Puede tener dificultad para tomar decisiones bajo presión", "Riesgo de ser percibido como indeciso o pasivo", "Puede evitar confrontaciones necesarias"],
+            "recomendaciones": ["Fortalecer la asertividad y confianza en la toma de decisiones", "Practicar la comunicación directa en situaciones importantes", "Asumir gradualmente roles de mayor responsabilidad"]
+        }
+    },
+    "I": {
+        "high": {
+            "fortalezas": ["Excelente comunicador y motivador", "Crea ambientes positivos y entusiastas", "Habilidad natural para networking y relaciones", "Persuasivo e inspirador"],
+            "alertas": ["Puede perder el enfoque en los detalles", "Riesgo de comprometerse en exceso sin cumplir", "Puede priorizar popularidad sobre efectividad"],
+            "recomendaciones": ["Desarrollar disciplina en seguimiento de tareas", "Establecer sistemas de organización personal", "Practicar la gestión del tiempo y priorización", "Equilibrar sociabilidad con productividad"]
+        },
+        "low": {
+            "fortalezas": ["Enfocado y centrado en la tarea", "Trabaja bien de forma independiente", "Analítico y reservado"],
+            "alertas": ["Puede tener dificultad para trabajar en equipo", "Riesgo de aislamiento social en el entorno laboral", "Comunicación limitada puede generar malentendidos"],
+            "recomendaciones": ["Participar activamente en dinámicas de equipo", "Desarrollar habilidades de presentación y comunicación", "Practicar la colaboración y trabajo grupal"]
+        }
+    },
+    "S": {
+        "high": {
+            "fortalezas": ["Confiable, leal y consistente", "Excelente trabajo en equipo y colaboración", "Paciente y buen oyente", "Estabilizador del grupo"],
+            "alertas": ["Resistencia al cambio y nuevas situaciones", "Puede evitar conflictos necesarios", "Dificultad para expresar desacuerdos"],
+            "recomendaciones": ["Desarrollar flexibilidad ante cambios organizacionales", "Practicar la expresión asertiva de opiniones", "Asumir riesgos calculados gradualmente", "Trabajar la adaptabilidad en entornos cambiantes"]
+        },
+        "low": {
+            "fortalezas": ["Adaptable y flexible ante cambios", "Cómodo con la variedad y lo impredecible", "Dinámico y de ritmo rápido"],
+            "alertas": ["Puede ser percibido como impaciente o inquieto", "Riesgo de falta de constancia en proyectos largos", "Puede generar inestabilidad en equipos que necesitan estructura"],
+            "recomendaciones": ["Cultivar la paciencia en procesos a largo plazo", "Practicar la constancia y seguimiento de rutinas", "Desarrollar mayor empatía con compañeros de ritmo diferente"]
+        }
+    },
+    "C": {
+        "high": {
+            "fortalezas": ["Analítico y detallista", "Altos estándares de calidad", "Organizado y metódico", "Excelente para análisis de datos y procesos"],
+            "alertas": ["Perfeccionismo que puede retrasar entregas", "Puede ser excesivamente crítico consigo mismo y con otros", "Dificultad para tomar decisiones sin información completa"],
+            "recomendaciones": ["Aprender a aceptar 'suficientemente bueno' en ciertos contextos", "Practicar la toma de decisiones con información incompleta", "Desarrollar tolerancia a la ambigüedad", "Equilibrar calidad con agilidad"]
+        },
+        "low": {
+            "fortalezas": ["Flexible con las reglas y procedimientos", "Cómodo con la ambigüedad", "Rápido para actuar sin parálisis por análisis"],
+            "alertas": ["Puede descuidar detalles importantes", "Riesgo de errores por falta de verificación", "Puede resistir normas y procesos establecidos"],
+            "recomendaciones": ["Implementar listas de verificación para tareas críticas", "Desarrollar atención al detalle en áreas clave", "Respetar procedimientos y estándares de calidad"]
+        }
+    }
+}
+
+# --- Recomendaciones combinadas para perfiles DISC dominantes ---
+DISC_PROFILE_RECOMMENDATIONS = {
+    "DI": {
+        "perfil": "Líder Inspirador",
+        "ideal_para": ["Ventas y desarrollo de negocios", "Liderazgo de equipos comerciales", "Emprendimiento", "Roles que requieran persuasión y acción rápida"],
+        "cuidado_en": ["Roles muy analíticos o rutinarios", "Posiciones que requieran paciencia extrema", "Tareas con muchos detalles técnicos"]
+    },
+    "DS": {
+        "perfil": "Líder Estable",
+        "ideal_para": ["Gerencia intermedia", "Coordinación de proyectos", "Roles que combinen liderazgo con estabilidad"],
+        "cuidado_en": ["Ambientes muy dinámicos y cambiantes", "Roles que requieran sociabilidad constante"]
+    },
+    "DC": {
+        "perfil": "Estratega Analítico",
+        "ideal_para": ["Dirección de proyectos complejos", "Consultoría estratégica", "Ingeniería y tecnología", "Roles de auditoría y control"],
+        "cuidado_en": ["Roles con alta interacción social", "Posiciones que requieran alta flexibilidad"]
+    },
+    "ID": {
+        "perfil": "Comunicador Dinámico",
+        "ideal_para": ["Relaciones públicas", "Marketing y publicidad", "Capacitación y formación", "Roles creativos con liderazgo"],
+        "cuidado_en": ["Roles muy estructurados", "Posiciones con poco contacto humano"]
+    },
+    "IS": {
+        "perfil": "Facilitador Empático",
+        "ideal_para": ["Recursos Humanos", "Servicio al cliente premium", "Coaching y mentoría", "Roles de bienestar organizacional"],
+        "cuidado_en": ["Roles de alta presión competitiva", "Posiciones que requieran confrontación frecuente"]
+    },
+    "IC": {
+        "perfil": "Comunicador Preciso",
+        "ideal_para": ["Investigación de mercados", "Capacitación técnica", "Consultoría", "Roles analíticos con presentación"],
+        "cuidado_en": ["Roles puramente operativos", "Ambientes de alta tensión"]
+    },
+    "SD": {
+        "perfil": "Ejecutor Confiable",
+        "ideal_para": ["Operaciones y logística", "Supervisión de equipos operativos", "Administración", "Roles de implementación"],
+        "cuidado_en": ["Roles de venta agresiva", "Posiciones de cambio constante"]
+    },
+    "SI": {
+        "perfil": "Colaborador Armonioso",
+        "ideal_para": ["Trabajo social", "Atención al cliente", "Educación", "Roles de soporte y asistencia"],
+        "cuidado_en": ["Roles competitivos individuales", "Posiciones de toma de decisiones rápidas"]
+    },
+    "SC": {
+        "perfil": "Especialista Metódico",
+        "ideal_para": ["Contabilidad y finanzas", "Control de calidad", "Archivo y documentación", "Roles técnicos especializados"],
+        "cuidado_en": ["Roles de liderazgo de alta presión", "Posiciones con mucha improvisación"]
+    },
+    "CD": {
+        "perfil": "Analista Determinado",
+        "ideal_para": ["Ingeniería", "Análisis financiero", "Desarrollo de software", "Roles de investigación con impacto"],
+        "cuidado_en": ["Roles de ventas directas", "Posiciones muy sociales"]
+    },
+    "CI": {
+        "perfil": "Analista Comunicativo",
+        "ideal_para": ["Investigación y desarrollo", "Docencia universitaria", "Consultoría especializada", "Roles analíticos con interacción"],
+        "cuidado_en": ["Roles operativos repetitivos", "Posiciones de alta agresividad comercial"]
+    },
+    "CS": {
+        "perfil": "Ejecutor Preciso",
+        "ideal_para": ["Calidad y procesos", "Administración", "Soporte técnico", "Roles de cumplimiento normativo"],
+        "cuidado_en": ["Roles de innovación disruptiva", "Posiciones de alta presión social"]
+    }
+}
+
+
+def analyze_disc_aptitude(normalized, relative):
+    """Analiza los resultados DISC y genera recomendaciones, fortalezas, alertas y nivel de aptitud."""
+    
+    # Determinar estilos dominante y secundario
+    sorted_styles = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    dominant = sorted_styles[0]
+    secondary = sorted_styles[1]
+    weakest = sorted_styles[-1]
+    
+    dominant_style = dominant[0]
+    secondary_style = secondary[0]
+    dominant_score = dominant[1]
+    secondary_score = secondary[1]
+    weakest_score = weakest[1]
+    
+    # Determinar perfil combinado
+    profile_key = dominant_style + secondary_style
+    profile_info = DISC_PROFILE_RECOMMENDATIONS.get(profile_key, {})
+    
+    # Calcular nivel de aptitud general (0-100)
+    # Basado en: claridad del perfil (diferenciación entre estilos) y balance general
+    score_range = dominant_score - weakest_score
+    balance_score = 100 - abs(50 - (sum(normalized.values()) / 4))  # Qué tan centrado está
+    differentiation = min(score_range * 1.5, 100)  # Qué tan claro es el perfil
+    
+    # Un perfil claro (buena diferenciación) con al menos un estilo bien definido es positivo
+    aptitude_score = round((differentiation * 0.6 + balance_score * 0.4))
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    # Determinar nivel de aptitud
+    if aptitude_score >= 70:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"  # verde
+        aptitude_emoji = "✅"
+        aptitude_desc = "Perfil DISC claramente definido. El candidato muestra un patrón conductual coherente y diferenciado."
+    elif aptitude_score >= 45:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"  # amarillo
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil DISC con áreas que requieren atención. Se recomienda considerar las observaciones para el cargo."
+    else:
+        aptitude_level = "REQUIERE EVALUACIÓN ADICIONAL"
+        aptitude_color = "#EF4444"  # rojo
+        aptitude_emoji = "🔴"
+        aptitude_desc = "Perfil DISC poco diferenciado. Se sugiere complementar con entrevista por competencias u otra evaluación."
+    
+    # Obtener fortalezas y alertas del estilo dominante
+    dom_level = "high" if dominant_score >= 55 else "low"
+    sec_level = "high" if secondary_score >= 55 else "low"
+    
+    fortalezas = DISC_RECOMMENDATIONS[dominant_style][dom_level]["fortalezas"]
+    alertas = DISC_RECOMMENDATIONS[dominant_style][dom_level]["alertas"]
+    recomendaciones = DISC_RECOMMENDATIONS[dominant_style][dom_level]["recomendaciones"]
+    
+    # Agregar info del estilo secundario
+    sec_fortalezas = DISC_RECOMMENDATIONS[secondary_style][sec_level]["fortalezas"][:2]
+    sec_alertas = DISC_RECOMMENDATIONS[secondary_style][sec_level]["alertas"][:1]
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "dominant_style": dominant_style,
+        "dominant_name": DISC_STYLE_NAMES[dominant_style],
+        "dominant_score": dominant_score,
+        "secondary_style": secondary_style,
+        "secondary_name": DISC_STYLE_NAMES[secondary_style],
+        "secondary_score": secondary_score,
+        "profile_key": profile_key,
+        "profile_name": profile_info.get("perfil", f"{DISC_STYLE_NAMES[dominant_style]}-{DISC_STYLE_NAMES[secondary_style]}"),
+        "ideal_para": profile_info.get("ideal_para", []),
+        "cuidado_en": profile_info.get("cuidado_en", []),
+        "fortalezas": fortalezas + sec_fortalezas,
+        "alertas": alertas + sec_alertas,
+        "recomendaciones": recomendaciones,
+    }
+
+
+def analyze_valanti_aptitude(standard):
+    """Analiza los resultados VALANTI y genera recomendaciones, fortalezas, alertas y nivel de aptitud."""
+    
+    sorted_values = sorted(standard.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_values[0]
+    second = sorted_values[1]
+    weakest = sorted_values[-1]
+    second_weakest = sorted_values[-2]
+    
+    # Evaluar aptitud basada en valores
+    # Un candidato "apto" tiene al menos 2 valores en rango alto (>=55) y ninguno críticamente bajo (<35)
+    high_values = [v for v, s in standard.items() if s >= 55]
+    low_values = [v for v, s in standard.items() if s < 40]
+    critical_values = [v for v, s in standard.items() if s < 30]
+    avg_score = sum(standard.values()) / len(standard)
+    
+    # Calcular puntaje de aptitud
+    aptitude_score = round(avg_score + len(high_values) * 5 - len(low_values) * 8 - len(critical_values) * 15)
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    if len(critical_values) > 0:
+        aptitude_level = "REQUIERE EVALUACIÓN ADICIONAL"
+        aptitude_color = "#EF4444"
+        aptitude_emoji = "🔴"
+        aptitude_desc = f"Valores críticamente bajos detectados en: {', '.join(critical_values)}. Se recomienda entrevista profunda sobre ética y valores."
+    elif len(low_values) >= 2:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Valores por debajo del promedio en: {', '.join(low_values)}. Considerar programas de desarrollo en estas áreas."
+    elif avg_score >= 50 and len(high_values) >= 2:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✅"
+        aptitude_desc = "Perfil de valores sólido y equilibrado. El candidato demuestra una base ética consistente."
+    else:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil de valores en rango promedio. Se sugiere profundizar en entrevista sobre valores organizacionales."
+    
+    # Generar fortalezas
+    fortalezas = []
+    for value, score in sorted_values:
+        if score >= 55:
+            desc = VALANTI_DESCRIPTIONS[value]
+            fortalezas.append(f"{value} (T={score}): {desc['high']}")
+    
+    # Generar alertas
+    alertas = []
+    for value, score in sorted_values:
+        if score < 40:
+            desc = VALANTI_DESCRIPTIONS[value]
+            alertas.append(f"{value} (T={score}): {desc['low']}")
+    
+    # Generar recomendaciones según perfil
+    recomendaciones = []
+    
+    VALANTI_RECS = {
+        "Verdad": {
+            "high": "Aprovechar su capacidad analítica e intelectual asignando tareas de investigación y resolución de problemas complejos.",
+            "low": "Fomentar la curiosidad intelectual mediante capacitaciones, lecturas y exposición a nuevos conceptos.",
+        },
+        "Rectitud": {
+            "high": "Ideal para roles que requieran integridad, cumplimiento de normas y ética profesional.",
+            "low": "Reforzar el compromiso con normas y procesos. Incluir en programas de ética organizacional.",
+        },
+        "Paz": {
+            "high": "Eficaz en mediación de conflictos y roles que requieran calma bajo presión.",
+            "low": "Brindar herramientas de manejo de estrés y técnicas de relajación. Considerar carga laboral.",
+        },
+        "Amor": {
+            "high": "Excelente para trabajo en equipo, mentoría y roles de servicio al cliente.",
+            "low": "Desarrollar la empatía mediante dinámicas de grupo y ejercicios de inteligencia emocional.",
+        },
+        "No Violencia": {
+            "high": "Promotor natural de ambientes de trabajo respetuosos e inclusivos.",
+            "low": "Sensibilizar sobre el impacto de las acciones en otros. Incluir en programas de convivencia laboral.",
+        }
+    }
+    
+    for value, score in sorted_values:
+        level = "high" if score >= 55 else "low"
+        if score >= 55 or score < 45:
+            recomendaciones.append(f"**{value}:** {VALANTI_RECS[value][level]}")
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "strongest_value": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_value": weakest[0],
+        "weakest_score": weakest[1],
+        "high_values": high_values,
+        "low_values": low_values,
+        "critical_values": critical_values,
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+    }
+
+
+def analyze_wpi_aptitude(normalized):
+    """
+    Analiza los resultados WPI y genera recomendaciones, fortalezas, alertas y nivel de aptitud laboral.
+    
+    Args:
+        normalized: Dict con puntajes normalizados (0-100) por dimensión
+        
+    Returns:
+        Dict con análisis completo: aptitud, fortalezas, alertas, recomendaciones
+    """
+    # Ordenar dimensiones por puntaje
+    sorted_dims = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_dims[0]
+    second_strongest = sorted_dims[1]
+    weakest = sorted_dims[-1]
+    second_weakest = sorted_dims[-2]
+    
+    # Clasificar dimensiones por nivel de puntaje
+    # Alto: >= 70, Medio: 45-69, Bajo: < 45
+    high_dims = [d for d, s in normalized.items() if s >= 70]
+    medium_dims = [d for d, s in normalized.items() if 45 <= s < 70]
+    low_dims = [d for d, s in normalized.items() if s < 45]
+    critical_dims = [d for d, s in normalized.items() if s < 30]
+    
+    # Calcular puntaje promedio
+    avg_score = sum(normalized.values()) / len(normalized)
+    
+    # Calcular puntaje de aptitud general (0-100)
+    # Basado en: promedio + bonificación por fortalezas - penalización por debilidades
+    aptitude_score = round(
+        avg_score + 
+        len(high_dims) * 5 -      # Bonificación por dimensiones altas
+        len(low_dims) * 10 -       # Penalización por dimensiones bajas
+        len(critical_dims) * 20    # Penalización fuerte por dimensiones críticas
+    )
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    # Determinar nivel de aptitud laboral
+    if len(critical_dims) > 0:
+        aptitude_level = "NO RECOMENDADO"
+        aptitude_color = "#EF4444"
+        aptitude_emoji = "🔴"
+        aptitude_desc = f"Deficiencias críticas en: {', '.join(critical_dims)}. Alto riesgo de bajo desempeño laboral. Se requiere desarrollo sustancial."
+    elif len(low_dims) >= 3:
+        aptitude_level = "CONTRATACIÓN CON RESERVAS"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Múltiples áreas de mejora ({', '.join(low_dims)}). Requiere supervisión cercana y plan de desarrollo."
+    elif len(low_dims) >= 1 and len(high_dims) >= 2:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Buen potencial con fortalezas en {strongest[0]} y {second_strongest[0]}, pero requiere desarrollo en: {', '.join(low_dims)}."
+    elif avg_score >= 60 and len(high_dims) >= 3:
+        aptitude_level = "ALTAMENTE RECOMENDADO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✅"
+        aptitude_desc = f"Perfil laboral sobresaliente. Fortalezas destacadas en {', '.join(high_dims)}. Candidato ideal para el puesto."
+    elif avg_score >= 50:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✓"
+        aptitude_desc = "Perfil laboral adecuado. Competencias en nivel esperado para desempeño satisfactorio."
+    else:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil laboral en nivel básico. Se recomienda evaluar ajuste específico al puesto."
+    
+    # Generar fortalezas (dimensiones altas)
+    fortalezas = []
+    for dim, score in sorted_dims:
+        if score >= 70:
+            desc = WPI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100): {desc['high']}")
+        elif score >= 60 and len(fortalezas) < 3:  # Incluir algunas medias-altas si no hay muchas altas
+            desc = WPI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100): {desc['medium']}")
+    
+    # Generar alertas (dimensiones bajas)
+    alertas = []
+    for dim, score in sorted_dims:
+        if score < 45:
+            desc = WPI_DESCRIPTIONS[dim]
+            alertas.append(f"⚠️ **{dim}** ({int(score)}/100): {desc['low']}")
+    
+    # Generar recomendaciones específicas por dimensión
+    recomendaciones = []
+    for dim, score in sorted_dims:
+        if score >= 70:
+            level = "high"
+        elif score >= 45:
+            level = "medium"
+        else:
+            level = "low"
+        
+        # Solo incluir recomendaciones para extremos (muy alto o muy bajo)
+        if score >= 70 or score < 50:
+            recs = WPI_RECOMMENDATIONS[dim][level]
+            recomendaciones.append(f"**{dim}:** {' | '.join(recs)}")
+    
+    # Determinar roles ideales según perfil
+    ideal_para = []
+    avoid_roles = []
+    
+    # Lógica de roles según combinación de dimensiones
+    if normalized.get("Responsabilidad", 0) >= 70 and normalized.get("Autodisciplina", 0) >= 70:
+        ideal_para.append("Trabajo remoto o autónomo")
+    if normalized.get("Trabajo en Equipo", 0) >= 70:
+        ideal_para.append("Proyectos colaborativos")
+    if normalized.get("Adaptabilidad", 0) >= 70:
+        ideal_para.append("Entornos dinámicos o de cambio")
+    if normalized.get("Estabilidad Emocional", 0) >= 70:
+        ideal_para.append("Roles de alta presión")
+    if normalized.get("Orientación al Logro", 0) >= 70:
+        ideal_para.append("Posiciones de desarrollo y crecimiento")
+    
+    # Roles a evitar
+    if normalized.get("Trabajo en Equipo", 0) < 40:
+        avoid_roles.append("Proyectos colaborativos intensivos")
+    if normalized.get("Adaptabilidad", 0) < 40:
+        avoid_roles.append("Entornos de cambio constante")
+    if normalized.get("Estabilidad Emocional", 0) < 40:
+        avoid_roles.append("Roles de alta presión o crisis")
+    if normalized.get("Orientación al Logro", 0) < 40:
+        avoid_roles.append("Posiciones que requieren auto-motivación")
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "strongest_dimension": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_dimension": weakest[0],
+        "weakest_score": weakest[1],
+        "high_dimensions": high_dims,
+        "medium_dimensions": medium_dims,
+        "low_dimensions": low_dims,
+        "critical_dimensions": critical_dims,
+        "average_score": round(avg_score, 1),
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+        "ideal_para": ideal_para,
+        "avoid_roles": avoid_roles,
+    }
+
+
+# =========================================================================
+# FUNCIONES DE SCORING
+# =========================================================================
+
+def normalize_disc_scores(scores, questions):
+    max_possible = {s: 0.0 for s in "DISC"}
+    min_possible = {s: 0.0 for s in "DISC"}
+    for q in questions:
+        for style in "DISC":
+            m = q["mapping"][style]
+            if m >= 0:
+                max_possible[style] += m * 2
+                min_possible[style] += m * (-2)
+            else:
+                max_possible[style] += m * (-2)
+                min_possible[style] += m * 2
+    normalized = {}
+    for style in "DISC":
+        score = max(min(scores[style], max_possible[style]), min_possible[style])
+        r = max_possible[style] - min_possible[style]
+        normalized[style] = ((score - min_possible[style]) / r) * 100 if r != 0 else 50.0
+        normalized[style] = max(0, min(normalized[style], 100))
+    return normalized
+
+
+def calculate_disc_results(answers_list, questions):
+    raw = {"D": 0, "I": 0, "S": 0, "C": 0}
+    for i, q in enumerate(questions):
+        answer = answers_list[i]
+        for style in "DISC":
+            raw[style] += q["mapping"][style] * (answer - 3)
+    normalized = normalize_disc_scores(raw, questions)
+    total = sum(normalized.values())
+    relative = {s: (v / total * 100 if total > 0 else 25) for s, v in normalized.items()}
+    return raw, normalized, relative
+
+
+def calculate_valanti_results(responses):
+    direct = {t: 0 for t in VALANTI_TRAITS}
+    for trait, indices in VALANTI_TRAITS.items():
+        for idx in indices:
+            if idx - 1 < len(responses) and responses[idx - 1] is not None:
+                direct[trait] += responses[idx - 1]
+    standard = {}
+    for trait in VALANTI_TRAITS:
+        z = (direct[trait] - VALANTI_AVGS[trait]) / VALANTI_SDS[trait]
+        standard[trait] = round(z * 10 + 50)
+    return direct, standard
+
+
+def calculate_wpi_results(responses, questions):
+    """
+    Calcula los resultados del WPI (Work Personality Index).
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+        questions: Lista de preguntas con dimension y reverse flag
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages)
+            - raw_scores: Puntajes directos por dimensión
+            - normalized_scores: Puntajes normalizados 0-100
+            - percentages: Porcentajes relativos entre dimensiones
+    """
+    # Contar preguntas por dimensión
+    questions_per_dim = {}
+    for q in questions:
+        dim = q["dimension"]
+        questions_per_dim[dim] = questions_per_dim.get(dim, 0) + 1
+    
+    # Calcular puntajes directos por dimensión
+    raw_scores = {dim: 0 for dim in WPI_DIMENSIONS}
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            dim = q["dimension"]
+            answer = responses[i]
+            
+            # Si es pregunta reversa, invertir escala (1->5, 2->4, 3->3, 4->2, 5->1)
+            if q.get("reverse", False):
+                answer = 6 - answer
+            
+            raw_scores[dim] += answer
+    
+    # Normalizar a escala 0-100
+    # Cada dimensión tiene ~8 preguntas, escala 1-5
+    # Mínimo posible: 8 * 1 = 8
+    # Máximo posible: 8 * 5 = 40
+    normalized_scores = {}
+    for dim in WPI_DIMENSIONS:
+        num_questions = questions_per_dim.get(dim, 8)
+        min_possible = num_questions * 1
+        max_possible = num_questions * 5
+        raw = raw_scores[dim]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[dim] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for dim in WPI_DIMENSIONS:
+            percentages[dim] = round((normalized_scores[dim] / total) * 100, 1)
+    else:
+        for dim in WPI_DIMENSIONS:
+            percentages[dim] = 16.67  # 100% / 6 dimensiones
+    
+    return raw_scores, normalized_scores, percentages
+
+
+def load_eri_questions():
+    """Carga las preguntas del ERI desde el archivo JSON."""
+    qfile = os.path.join(os.path.dirname(__file__), "questions_eri.json")
+    with open(qfile, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def calculate_eri_results(responses, questions):
+    """
+    Calcula los resultados del ERI (Evaluación de Riesgo e Integridad).
+    
+    IMPORTANTE: En ERI, las puntuaciones altas indican BAJO riesgo, puntuaciones bajas indican ALTO riesgo.
+    - Escala Likert: 1 = Totalmente de acuerdo, 5 = Totalmente en desacuerdo
+    - Preguntas normales (riesgo): respuesta 1 = riesgo, respuesta 5 = seguro
+    - Preguntas reversas (positivas): respuesta 5 = riesgo, respuesta 1 = seguro
+    - Preguntas de validez: detectan respuestas poco sinceras (ej: "Nunca he mentido" = sospechoso si responde 1)
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+        questions: Lista de preguntas con dimension, reverse, y validity_check flags
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages, validity_score, validity_flags)
+            - raw_scores: Puntajes directos por dimensión
+            - normalized_scores: Puntajes normalizados 0-100 (100 = bajo riesgo, 0 = alto riesgo)
+            - percentages: Porcentajes relativos entre dimensiones
+            - validity_score: Número de respuestas válidas/sospechosas en preguntas de validez
+            - validity_flags: Lista de alertas de validez
+    """
+    # Contar preguntas por dimensión
+    questions_per_dim = {}
+    for q in questions:
+        dim = q["dimension"]
+        questions_per_dim[dim] = questions_per_dim.get(dim, 0) + 1
+    
+    # Calcular puntajes directos por dimensión
+    raw_scores = {dim: 0 for dim in ERI_DIMENSIONS}
+    
+    # Validez: contar respuestas sospechosas en preguntas de validez
+    validity_suspicious = 0
+    validity_flags = []
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            dim = q["dimension"]
+            answer = responses[i]
+            
+            # Detectar respuestas de validez (perfeccionismo poco realista)
+            if q.get("validity_check", False):
+                # Preguntas de validez son afirmaciones perfectas poco realistas:
+                # "Nunca he mentido", "Siempre llego puntual", "Nunca he sentido enojo"
+                # Si responde 1 o 2 (de acuerdo), es sospechoso
+                if answer <= 2:
+                    validity_suspicious += 1
+                    validity_flags.append(f"Respuesta poco realista en pregunta {i+1}: '{q['question'][:60]}...'")
+            
+            # Normalizar respuesta a escala de riesgo:
+            # Para preguntas normales (reverse=False, comportamiento de riesgo):
+            #   respuesta 1 (de acuerdo) = alto riesgo = puntaje bajo
+            #   respuesta 5 (en desacuerdo) = bajo riesgo = puntaje alto
+            # Para preguntas reversas (reverse=True, comportamiento positivo):
+            #   respuesta 5 (en desacuerdo con lo positivo) = alto riesgo = puntaje bajo
+            #   respuesta 1 (de acuerdo con lo positivo) = bajo riesgo = puntaje alto
+            
+            if q.get("reverse", False):
+                # Pregunta positiva: mantener directo (1=bueno=5pts, 5=malo=1pt)
+                risk_score = answer
+            else:
+                # Pregunta de riesgo: invertir (1=riesgo=1pt, 5=seguro=5pts)
+                risk_score = 6 - answer
+            
+            raw_scores[dim] += risk_score
+    
+    # Normalizar a escala 0-100 (100 = bajo riesgo, 0 = alto riesgo)
+    normalized_scores = {}
+    for dim in ERI_DIMENSIONS:
+        num_questions = questions_per_dim.get(dim, 10)
+        min_possible = num_questions * 1  # Peor caso: todas respuestas de alto riesgo
+        max_possible = num_questions * 5  # Mejor caso: todas respuestas de bajo riesgo
+        raw = raw_scores[dim]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[dim] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for dim in ERI_DIMENSIONS:
+            percentages[dim] = round((normalized_scores[dim] / total) * 100, 1)
+    else:
+        for dim in ERI_DIMENSIONS:
+            percentages[dim] = 16.67  # 100% / 6 dimensiones
+    
+    # Validez del test: si hay 5 o más respuestas sospechosas, test no confiable
+    validity_score = ERI_VALIDITY_QUESTIONS_COUNT - validity_suspicious
+    
+    return raw_scores, normalized_scores, percentages, validity_score, validity_flags
+
+
+def analyze_eri_aptitude(normalized, validity_score, validity_flags):
+    """
+    Analiza los resultados ERI y genera recomendaciones de contratación según nivel de riesgo.
+    
+    Args:
+        normalized: Dict con puntajes normalizados (0-100) por dimensión (100 = bajo riesgo)
+        validity_score: Puntaje de validez del test (0-12)
+        validity_flags: Lista de alertas de validez
+        
+    Returns:
+        Dict con análisis completo: nivel de riesgo, decisión, fortalezas, alertas, recomendaciones
+    """
+    # VALIDEZ: Verificar si el test es confiable
+    test_valid = validity_score >= (ERI_VALIDITY_QUESTIONS_COUNT - ERI_VALIDITY_THRESHOLD)
+    validity_warning = None
+    
+    if not test_valid:
+        validity_warning = f"⚠️ TEST POCO CONFIABLE: {ERI_VALIDITY_QUESTIONS_COUNT - validity_score} respuestas sospechosas detectadas. El candidato puede estar respondiendo de manera poco sincera o tratando de presentarse de forma irrealmente perfecta."
+    
+    # Ordenar dimensiones por puntaje (mayor = menos riesgo)
+    sorted_dims = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    safest = sorted_dims[0]
+    riskiest = sorted_dims[-1]
+    
+    # Clasificar dimensiones por nivel de riesgo
+    # Bajo riesgo: >= 66 (Verde)
+    # Riesgo moderado: 41-65 (Amarillo)
+    # Alto riesgo: 0-40 (Rojo)
+    low_risk_dims = [d for d, s in normalized.items() if s >= ERI_RISK_THRESHOLDS["low_risk"]]
+    medium_risk_dims = [d for d, s in normalized.items() if ERI_RISK_THRESHOLDS["medium_risk"] <= s < ERI_RISK_THRESHOLDS["low_risk"]]
+    high_risk_dims = [d for d, s in normalized.items() if s < ERI_RISK_THRESHOLDS["medium_risk"]]
+    critical_risk_dims = [d for d, s in normalized.items() if s < 25]  # Riesgo crítico muy alto
+    
+    # Calcular puntaje promedio general
+    avg_score = sum(normalized.values()) / len(normalized)
+    
+    # Determinar perfil de riesgo general
+    if not test_valid:
+        risk_profile = "high_risk"
+        risk_level = "🚫 ALTO RIESGO - TEST NO CONFIABLE"
+        risk_color = "#EF4444"
+        risk_emoji = "🚫"
+        risk_desc = validity_warning
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["high_risk"]["decision"]
+    elif len(critical_risk_dims) > 0 or len(high_risk_dims) >= 3:
+        risk_profile = "high_risk"
+        risk_level = "🚫 ALTO RIESGO"
+        risk_color = "#EF4444"
+        risk_emoji = "🚫"
+        risk_desc = f"Múltiples indicadores de riesgo significativo en: {', '.join(high_risk_dims + critical_risk_dims)}. Contratación NO recomendada."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["high_risk"]["decision"]
+    elif len(high_risk_dims) >= 1 or len(medium_risk_dims) >= 3:
+        risk_profile = "medium_risk"
+        risk_level = "⚠️ RIESGO MODERADO"
+        risk_color = "#F59E0B"
+        risk_emoji = "⚠️"
+        all_risk_dims = high_risk_dims + medium_risk_dims
+        risk_desc = f"Señales de alerta en: {', '.join(all_risk_dims)}. Requiere evaluación adicional y medidas preventivas."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["medium_risk"]["decision"]
+    elif avg_score >= 70:
+        risk_profile = "low_risk"
+        risk_level = "✅ BAJO RIESGO"
+        risk_color = "#10B981"
+        risk_emoji = "✅"
+        risk_desc = f"Perfil de integridad sobresaliente. Sin indicadores significativos de riesgo. Candidato confiable."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["low_risk"]["decision"]
+    else:
+        risk_profile = "medium_risk"
+        risk_level = "⚠️ RIESGO MODERADO"
+        risk_color = "#F59E0B"
+        risk_emoji = "⚠️"
+        risk_desc = "Perfil dentro de parámetros aceptables con algunas áreas de atención."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["medium_risk"]["decision"]
+    
+    # Generar fortalezas (dimensiones de bajo riesgo)
+    fortalezas = []
+    for dim, score in sorted_dims:
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            desc = ERI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100 - Bajo Riesgo): {desc['low_risk']}")
+    
+    # Generar alertas (dimensiones de riesgo)
+    alertas = []
+    if validity_warning:
+        alertas.append(validity_warning)
+    
+    for dim, score in sorted_dims:
+        desc = ERI_DESCRIPTIONS[dim]
+        if score < ERI_RISK_THRESHOLDS["medium_risk"]:
+            alertas.append(f"🚨 **{dim}** ({int(score)}/100 - ALTO RIESGO): {desc['high_risk']}")
+        elif score < ERI_RISK_THRESHOLDS["low_risk"]:
+            alertas.append(f"⚠️ **{dim}** ({int(score)}/100 - Riesgo Moderado): {desc['medium_risk']}")
+    
+    # Generar recomendaciones específicas por dimensión
+    recomendaciones = []
+    hiring_recommendations = ERI_HIRING_RECOMMENDATIONS[risk_profile]
+    
+    # Agregar recomendaciones de contratación general
+    recomendaciones.append(f"**Decisión Recomendada:** {hiring_recommendations['decision']}")
+    recomendaciones.append(f"**Resumen:** {hiring_recommendations['resumen']}")
+    recomendaciones.append("**Acciones:**")
+    for action in hiring_recommendations['acciones']:
+        recomendaciones.append(f"  • {action}")
+    
+    # Agregar recomendaciones específicas por dimensión de riesgo
+    recomendaciones.append("\n**Recomendaciones por Dimensión:**")
+    for dim, score in sorted_dims:
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            level = "low_risk"
+        elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            level = "medium_risk"
+        else:
+            level = "high_risk"
+        
+        # Solo incluir recomendaciones para dimensiones con algún riesgo
+        if score < ERI_RISK_THRESHOLDS["low_risk"]:
+            recs = ERI_RECOMMENDATIONS[dim][level]
+            recomendaciones.append(f"**{dim}:** {' | '.join(recs)}")
+    
+    return {
+        "risk_score": round(avg_score, 1),
+        "risk_profile": risk_profile,
+        "risk_level": risk_level,
+        "risk_color": risk_color,
+        "risk_emoji": risk_emoji,
+        "risk_desc": risk_desc,
+        "hiring_decision": hiring_decision,
+        "safest_dimension": safest[0],
+        "safest_score": safest[1],
+        "riskiest_dimension": riskiest[0],
+        "riskiest_score": riskiest[1],
+        "low_risk_dimensions": low_risk_dims,
+        "medium_risk_dimensions": medium_risk_dims,
+        "high_risk_dimensions": high_risk_dims,
+        "critical_risk_dimensions": critical_risk_dims,
+        "average_score": round(avg_score, 1),
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+        "test_valid": test_valid,
+        "validity_score": validity_score,
+        "validity_warning": validity_warning,
+        "validity_flags": validity_flags,
+    }
+
+
+def load_talent_map_questions():
+    """Carga las preguntas del Talent Map desde el archivo JSON."""
+    qfile = os.path.join(os.path.dirname(__file__), "questions_talent_map.json")
+    with open(qfile, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def calculate_talent_map_results(responses, questions):
+    """
+    Calcula los resultados del Talent Map (Mapeo de Competencias).
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+            1 = Totalmente en desacuerdo
+            5 = Totalmente de acuerdo
+        questions: Lista de preguntas con competency y reverse flags
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages)
+            - raw_scores: Puntajes directos por competencia
+            - normalized_scores: Puntajes normalizados 0-100
+            - percentages: Porcentajes relativos entre competencias
+    """
+    # Contar preguntas por competencia
+    questions_per_comp = {}
+    for q in questions:
+        comp = q["competency"]
+        questions_per_comp[comp] = questions_per_comp.get(comp, 0) + 1
+    
+    # Calcular puntajes directos por competencia
+    raw_scores = {comp: 0 for comp in TALENT_MAP_COMPETENCIES}
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            comp = q["competency"]
+            answer = responses[i]
+            
+            # Procesar respuesta según si es reversa o no
+            if q.get("reverse", False):
+                # Pregunta reversa: invertir escala (5->1, 4->2, etc.)
+                score = 6 - answer
+            else:
+                # Pregunta normal: mantener escala (5 = totalmente de acuerdo = alto)
+                score = answer
+            
+            raw_scores[comp] += score
+    
+    # Normalizar a escala 0-100
+    normalized_scores = {}
+    for comp in TALENT_MAP_COMPETENCIES:
+        num_questions = questions_per_comp.get(comp, 10)
+        min_possible = num_questions * 1  # Peor caso
+        max_possible = num_questions * 5  # Mejor caso
+        raw = raw_scores[comp]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[comp] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for comp in TALENT_MAP_COMPETENCIES:
+            percentages[comp] = round((normalized_scores[comp] / total) * 100, 1)
+    else:
+        for comp in TALENT_MAP_COMPETENCIES:
+            percentages[comp] = 12.5  # 100% / 8 competencias
+    
+    return raw_scores, normalized_scores, percentages
+
+
+def analyze_talent_map_match(normalized_scores, selected_job_profile=None):
+    """
+    Analiza los resultados de Talent Map y calcula match con perfil de puesto.
+    
+    Args:
+        normalized_scores: Dict con puntajes normalizados (0-100) por competencia
+        selected_job_profile: Nombre del perfil de puesto para comparar (opcional)
+        
+    Returns:
+        Dict con análisis completo: fortalezas, áreas de desarrollo, recomendaciones, match
+    """
+    # Ordenar competencias por puntaje
+    sorted_comps = sorted(normalized_scores.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_comps[0]
+    weakest = sorted_comps[-1]
+    
+    # Clasificar competencias por nivel
+    # Alto: >= 75
+    # Medio: 50-74
+    # Bajo: < 50
+    high_comps = [(c, s) for c, s in normalized_scores.items() if s >= 75]
+    medium_comps = [(c, s) for c, s in normalized_scores.items() if 50 <= s < 75]
+    low_comps = [(c, s) for c, s in normalized_scores.items() if s < 50]
+    
+    # Calcular puntaje promedio general
+    avg_score = sum(normalized_scores.values()) / len(normalized_scores)
+    
+    # Generar fortalezas (competencias altas)
+    fortalezas = []
+    for comp, score in high_comps:
+        desc = TALENT_MAP_DESCRIPTIONS[comp]
+        fortalezas.append(f"**{comp}** ({int(score)}/100): {desc['high']}")
+    
+    # Generar áreas de desarrollo (competencias bajas)
+    areas_desarrollo = []
+    for comp, score in low_comps:
+        desc = TALENT_MAP_DESCRIPTIONS[comp]
+        areas_desarrollo.append(f"**{comp}** ({int(score)}/100): {desc['low']}")
+    
+    # Generar recomendaciones generales
+    recomendaciones = []
+    for comp, score in sorted_comps:
+        if score >= 75:
+            level = "high"
+        elif score >= 50:
+            level = "medium"
+        else:
+            level = "low"
+        
+        recs = TALENT_MAP_COMPETENCY_RECOMMENDATIONS[level]
+        recomendaciones.append(f"**{comp}:** {' | '.join(recs)}")
+    
+    # Análisis de match con perfil de puesto (si se especificó)
+    match_analysis = None
+    match_percentage = None
+    match_level = None
+    match_color = None
+    match_label = None
+    match_gaps = []
+    match_strengths = []
+    
+    if selected_job_profile and selected_job_profile in TALENT_MAP_JOB_PROFILES:
+        profile = TALENT_MAP_JOB_PROFILES[selected_job_profile]
+        profile_comps = profile["competencias"]
+        
+        # Calcular diferencias por competencia
+        total_gap = 0
+        max_possible_gap = 0
+        
+        for comp in TALENT_MAP_COMPETENCIES:
+            required = profile_comps.get(comp, 50)
+            actual = normalized_scores.get(comp, 0)
+            gap = required - actual
+            
+            max_possible_gap += required
+            
+            if gap > 15:  # Gap significativo
+                match_gaps.append(f"**{comp}**: Requiere {int(required)}, tiene {int(actual)} (brecha de {int(gap)} puntos)")
+            elif gap < -10:  # Excede significativamente
+                match_strengths.append(f"**{comp}**: Excede requisito ({int(actual)} vs {int(required)} requerido)")
+            
+            # Calcular distancia absoluta para el match
+            total_gap += abs(gap)
+        
+        # Calcular match percentage (inverso de la brecha promedio)
+        # 100% = sin brecha, 0% = brecha máxima
+        avg_gap = total_gap / len(TALENT_MAP_COMPETENCIES)
+        match_percentage = max(0, min(100, 100 - avg_gap))
+        
+        # Determinar nivel de match
+        for level_name, level_info in TALENT_MAP_MATCH_LEVELS.items():
+            if match_percentage >= level_info["min"]:
+                match_level = level_name
+                match_label = level_info["label"]
+                match_color = level_info["color"]
+                match_desc = level_info["descripcion"]
+                break
+        
+        match_analysis = {
+            "job_profile": selected_job_profile,
+            "job_emoji": profile["emoji"],
+            "job_description": profile["descripcion"],
+            "match_percentage": round(match_percentage, 1),
+            "match_level": match_level,
+            "match_label": match_label,
+            "match_color": match_color,
+            "match_desc": match_desc,
+            "match_gaps": match_gaps,
+            "match_strengths": match_strengths,
+            "profile_scores": profile_comps
+        }
+    
+    return {
+        "average_score": round(avg_score, 1),
+        "strongest_competency": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_competency": weakest[0],
+        "weakest_score": weakest[1],
+        "high_competencies": [c for c, s in high_comps],
+        "medium_competencies": [c for c, s in medium_comps],
+        "low_competencies": [c for c, s in low_comps],
+        "fortalezas": fortalezas,
+        "areas_desarrollo": areas_desarrollo,
+        "recomendaciones": recomendaciones,
+        "match_analysis": match_analysis
+    }
+
+
+def calculate_desempeno_results(rendimiento_scores, potencial_scores, iniciativas=None):
+    """
+    Calcula resultados de evaluación de desempeño.
+    
+    rendimiento_scores: dict con calificaciones 1-5 de los 6 objetivos {1: 5, 2: 4, ...}
+    potencial_scores: dict con calificaciones 0-3 de las 5 dimensiones {1: 3, 2: 2, ...}
+    iniciativas: list de 3 textos con iniciativas de mejora (opcional)
+    
+    Returns: dict con análisis completo
+    """
+    # Calcular promedios
+    promedio_rendimiento = sum(rendimiento_scores.values()) / len(rendimiento_scores)
+    promedio_potencial = sum(potencial_scores.values()) / len(potencial_scores)
+    
+    # Puntaje global ponderado (60% rendimiento + 40% potencial normalizado)
+    # Normalizar potencial de escala 0-3 a escala 0-5
+    potencial_normalizado = (promedio_potencial / 3) * 5
+    puntaje_global = (promedio_rendimiento * 0.6) + (potencial_normalizado * 0.4)
+    
+    # Determinar clasificación
+    clasificacion = None
+    for nivel, info in sorted(DESEMPENO_CLASIFICACION.items(), key=lambda x: x[1]["min"], reverse=True):
+        if puntaje_global >= info["min"]:
+            clasificacion = {
+                "nivel": nivel,
+                "label": info["label"],
+                "color": info["color"],
+                "descripcion": info["descripcion"]
+            }
+            break
+    
+    # Identificar fortalezas (objetivos con 4 o 5)
+    fortalezas_rendimiento = []
+    for obj_id, score in rendimiento_scores.items():
+        if score >= 4:
+            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+            fortalezas_rendimiento.append({
+                "titulo": objetivo["titulo"],
+                "score": score,
+                "label": DESEMPENO_ESCALA_RENDIMIENTO[score]["label"]
+            })
+    
+    # Identificar áreas de mejora (objetivos con 1, 2 o 3)
+    areas_mejora_rendimiento = []
+    for obj_id, score in rendimiento_scores.items():
+        if score <= 3:
+            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+            areas_mejora_rendimiento.append({
+                "titulo": objetivo["titulo"],
+                "score": score,
+                "label": DESEMPENO_ESCALA_RENDIMIENTO[score]["label"]
+            })
+    
+    # Identificar fortalezas de potencial (nivel 3 o 2)
+    fortalezas_potencial = []
+    for dim_id, score in potencial_scores.items():
+        if score >= 2:
+            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            fortalezas_potencial.append({
+                "nombre": dimension["nombre"],
+                "score": score,
+                "nivel": f"Nivel {score}"
+            })
+    
+    # Identificar áreas de desarrollo de potencial (nivel 0 o 1)
+    areas_desarrollo_potencial = []
+    for dim_id, score in potencial_scores.items():
+        if score <= 1:
+            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            areas_desarrollo_potencial.append({
+                "nombre": dimension["nombre"],
+                "score": score,
+                "nivel": f"Nivel {score}"
+            })
+    
+    # Generar recomendaciones generales
+    recomendaciones = []
+    if puntaje_global >= 4.5:
+        recomendaciones.append("Empleado con desempeño excepcional. Considerar para promociones o proyectos de alto impacto.")
+        recomendaciones.append("Puede servir como mentor para otros colaboradores.")
+        recomendaciones.append("Mantener motivación con retos profesionales y reconocimiento.")
+    elif puntaje_global >= 3.5:
+        recomendaciones.append("Empleado con desempeño destacado. Continuar fortaleciendo sus competencias.")
+        recomendaciones.append("Identificar oportunidades de desarrollo para alcanzar siguiente nivel.")
+        recomendaciones.append("Reconocer logros y mantener nivel de compromiso.")
+    elif puntaje_global >= 2.5:
+        recomendaciones.append("Empleado con desempeño satisfactorio pero con áreas de mejora identificadas.")
+        recomendaciones.append("Implementar plan de capacitación en áreas específicas.")
+        recomendaciones.append("Establecer seguimiento trimestral para monitorear progreso.")
+    else:
+        recomendaciones.append("Desempeño insuficiente. Requiere plan de acción inmediato.")
+        recomendaciones.append("Implementar plan de mejoramiento con metas claras y medibles.")
+        recomendaciones.append("Seguimiento mensual obligatorio con evaluación en 3 meses.")
+        recomendaciones.append("Considerar reubicación o capacitación intensiva.")
+    
+    # Recomendaciones específicas por áreas de mejora
+    if len(areas_mejora_rendimiento) > 0:
+        recomendaciones.append(f"Áreas prioritarias de rendimiento: {', '.join([a['titulo'] for a in areas_mejora_rendimiento[:3]])}")
+    
+    if len(areas_desarrollo_potencial) > 0:
+        recomendaciones.append(f"Dimensiones de potencial a desarrollar: {', '.join([a['nombre'] for a in areas_desarrollo_potencial])}")
+    
+    # Determinar si requiere iniciativas
+    requiere_iniciativas = promedio_rendimiento < 3 or promedio_potencial < 2
+    
+    return {
+        "promedio_rendimiento": round(promedio_rendimiento, 2),
+        "promedio_potencial": round(promedio_potencial, 2),
+        "puntaje_global": round(puntaje_global, 2),
+        "clasificacion": clasificacion,
+        "fortalezas_rendimiento": fortalezas_rendimiento,
+        "areas_mejora_rendimiento": areas_mejora_rendimiento,
+        "fortalezas_potencial": fortalezas_potencial,
+        "areas_desarrollo_potencial": areas_desarrollo_potencial,
+        "recomendaciones": recomendaciones,
+        "requiere_iniciativas": requiere_iniciativas,
+        "iniciativas": iniciativas if iniciativas else []
+    }
+
 
 # =========================================================================
 # FUNCIONES DE GRÁFICOS
