@@ -1,0 +1,252 @@
+[
+    {
+        "dimension": "Responsabilidad",
+        "question": "Siempre cumplo con mis compromisos laborales, incluso cuando nadie me está supervisando.",
+        "reverse": false
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Me aseguro de terminar todas mis tareas antes de irme del trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "A veces dejo tareas sin terminar si me aburro.",
+        "reverse": true
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Cuando cometo un error, lo reconozco y busco solucionarlo de inmediato.",
+        "reverse": false
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Me cuesta asumir responsabilidad cuando algo sale mal.",
+        "reverse": true
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Prefiero que otros verifiquen mi trabajo antes de entregarlo.",
+        "reverse": true
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Puedo trabajar sin supervisión constante y mantener la calidad.",
+        "reverse": false
+    },
+    {
+        "dimension": "Responsabilidad",
+        "question": "Soy puntual y respeto los horarios establecidos.",
+        "reverse": false
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Disfruto colaborar con otros para lograr objetivos comunes.",
+        "reverse": false
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Prefiero trabajar solo que coordinarme con otros compañeros.",
+        "reverse": true
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Ayudo a mis compañeros cuando veo que tienen dificultades.",
+        "reverse": false
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Me molesta cuando tengo que compartir el crédito por un logro.",
+        "reverse": true
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Escucho las ideas de los demás antes de tomar decisiones en grupo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Evito los conflictos con mis compañeros y busco soluciones pacíficas.",
+        "reverse": false
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Me resulta difícil confiar en que otros harán bien su parte del trabajo.",
+        "reverse": true
+    },
+    {
+        "dimension": "Trabajo en Equipo",
+        "question": "Comparto información importante con mi equipo de manera oportuna.",
+        "reverse": false
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Me adapto fácilmente a cambios en procedimientos o rutinas de trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Los cambios repentinos en mis tareas me generan mucha ansiedad.",
+        "reverse": true
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Puedo trabajar eficientemente en diferentes áreas si es necesario.",
+        "reverse": false
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Prefiero hacer las cosas de la misma manera en lugar de probar nuevos métodos.",
+        "reverse": true
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Me interesa aprender nuevas habilidades para mejorar en mi trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Mantengo la calma cuando surgen imprevistos en el trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Me cuesta trabajar con personas de diferentes personalidades.",
+        "reverse": true
+    },
+    {
+        "dimension": "Adaptabilidad",
+        "question": "Veo los cambios organizacionales como oportunidades de crecimiento.",
+        "reverse": false
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Organizo mi tiempo eficientemente para completar todas mis tareas.",
+        "reverse": false
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "A menudo me distraigo fácilmente durante el horario laboral.",
+        "reverse": true
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Establezco prioridades claras en mi lista de tareas diarias.",
+        "reverse": false
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Me cuesta mantener la concentración en tareas repetitivas.",
+        "reverse": true
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Sigo los procedimientos y normas establecidas sin necesidad de recordatorios.",
+        "reverse": false
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Prefiero trabajar bajo presión de última hora que planificar con anticipación.",
+        "reverse": true
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Reviso mi trabajo para asegurarme de que cumple con los estándares.",
+        "reverse": false
+    },
+    {
+        "dimension": "Autodisciplina",
+        "question": "Mantengo mi área de trabajo ordenada y organizada.",
+        "reverse": false
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Manejo el estrés laboral sin que afecte mi desempeño.",
+        "reverse": false
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Las críticas constructivas me afectan emocionalmente por días.",
+        "reverse": true
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Mantengo una actitud positiva incluso en situaciones difíciles.",
+        "reverse": false
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Me siento abrumado fácilmente cuando hay mucha carga de trabajo.",
+        "reverse": true
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Puedo separar mis problemas personales de mi vida laboral.",
+        "reverse": false
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Reacciono con frustración visible cuando algo no sale como esperaba.",
+        "reverse": true
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Me recupero rápidamente de contratiempos en el trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Estabilidad Emocional",
+        "question": "Mantengo la calma en situaciones de alta presión.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Me motiva superar los objetivos establecidos en mi trabajo.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Estoy satisfecho con hacer lo mínimo necesario para cumplir.",
+        "reverse": true
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Busco constantemente formas de mejorar mi eficiencia laboral.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "No me importa si mi trabajo es promedio mientras cumpla con lo básico.",
+        "reverse": true
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Me siento orgulloso cuando completo proyectos de alta calidad.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Establezco metas personales para mejorar mi desempeño laboral.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Prefiero tareas fáciles que pueda completar sin esfuerzo extra.",
+        "reverse": true
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Me motiva recibir reconocimiento por un trabajo bien hecho.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Tomo iniciativa para resolver problemas sin esperar que me lo pidan.",
+        "reverse": false
+    },
+    {
+        "dimension": "Orientación al Logro",
+        "question": "Me esfuerzo por ser el mejor en lo que hago.",
+        "reverse": false
+    }
+]

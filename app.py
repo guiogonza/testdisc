@@ -104,6 +104,104 @@ VALANTI_DESCRIPTIONS = {
     },
 }
 
+# =========================================================================
+# CONSTANTES WPI (Work Personality Index)
+# =========================================================================
+
+# Dimensiones del WPI - Índice de Personalidad Laboral
+WPI_DIMENSIONS = [
+    "Responsabilidad",
+    "Trabajo en Equipo", 
+    "Adaptabilidad",
+    "Autodisciplina",
+    "Estabilidad Emocional",
+    "Orientación al Logro"
+]
+
+# Colores para cada dimensión WPI
+WPI_COLORS = {
+    "Responsabilidad": "#3B82F6",        # Azul
+    "Trabajo en Equipo": "#10B981",      # Verde
+    "Adaptabilidad": "#F59E0B",          # Naranja
+    "Autodisciplina": "#8B5CF6",         # Púrpura
+    "Estabilidad Emocional": "#06B6D4",  # Cian
+    "Orientación al Logro": "#EF4444"    # Rojo
+}
+
+# Descripciones de cada dimensión según nivel
+WPI_DESCRIPTIONS = {
+    "Responsabilidad": {
+        "title": "📋 Responsabilidad",
+        "high": "Alta confiabilidad, cumple compromisos, asume la rendición de cuentas y es puntual.",
+        "medium": "Cumple con responsabilidades básicas, ocasionalmente requiere seguimiento.",
+        "low": "Puede tener dificultad para cumplir compromisos, requiere supervisión frecuente."
+    },
+    "Trabajo en Equipo": {
+        "title": "🤝 Trabajo en Equipo",
+        "high": "Excelente colaborador, comparte información, apoya a compañeros y resuelve conflictos constructivamente.",
+        "medium": "Trabaja bien con otros en la mayoría de situaciones, colabora cuando se le solicita.",
+        "low": "Prefiere trabajo independiente, puede tener dificultad colaborando o compartiendo."
+    },
+    "Adaptabilidad": {
+        "title": "🔄 Adaptabilidad",
+        "high": "Muy flexible ante cambios, aprende rápido, maneja bien la incertidumbre y nuevas situaciones.",
+        "medium": "Se adapta a cambios graduales, puede requerir tiempo para ajustarse a nuevos contextos.",
+        "low": "Prefiere rutinas establecidas, los cambios rápidos pueden generar resistencia o estrés."
+    },
+    "Autodisciplina": {
+        "title": "🎯 Autodisciplina",
+        "high": "Excelente organización, gestión del tiempo, sigue procedimientos y mantiene altos estándares.",
+        "medium": "Mantiene organización básica, cumple con procedimientos principales con recordatorios.",
+        "low": "Puede tener dificultad con organización, gestión del tiempo o seguimiento de procedimientos."
+    },
+    "Estabilidad Emocional": {
+        "title": "😌 Estabilidad Emocional",
+        "high": "Maneja muy bien el estrés, mantiene calma bajo presión, se recupera rápido de contratiempos.",
+        "medium": "Maneja estrés moderado adecuadamente, puede afectarse en situaciones de alta presión.",
+        "low": "Vulnerable al estrés, puede tener reacciones emocionales intensas ante dificultades."
+    },
+    "Orientación al Logro": {
+        "title": "🏆 Orientación al Logro",
+        "high": "Alta motivación por excelencia, busca superar metas, toma iniciativa y mejora continua.",
+        "medium": "Cumple con objetivos establecidos, motivación estándar por buenos resultados.",
+        "low": "Motivación limitada por superación, prefiere tareas básicas sin desafíos adicionales."
+    }
+}
+
+# Recomendaciones por nivel de cada dimensión WPI
+WPI_RECOMMENDATIONS = {
+    "Responsabilidad": {
+        "high": ["Excelente para roles que requieren autonomía", "Puede supervisar o mentorear a otros", "Ideal para posiciones de confianza"],
+        "medium": ["Buen desempeño con supervisión regular", "Puede mejorar con sistemas de recordatorios", "Adecuado para roles estructurados"],
+        "low": ["Requiere supervisión cercana", "Beneficiaría de capacitación en gestión del tiempo", "Better en roles muy estructurados con checklists"]
+    },
+    "Trabajo en Equipo": {
+        "high": ["Excelente para proyectos colaborativos", "Puede facilitar trabajo en equipo", "Ideal para mejorar clima laboral"],
+        "medium": ["Funciona bien en equipos establecidos", "Puede colaborar con instrucciones claras", "Adecuado para trabajo semi-independiente"],
+        "low": ["Mejor en roles independientes", "Puede requerir capacitación en habilidades interpersonales", "Considerar tareas individuales"]
+    },
+    "Adaptabilidad": {
+        "high": ["Excelente para entornos dinámicos", "Ideal para proyectos de cambio", "Puede manejar múltiples prioridades"],
+        "medium": ["Funciona bien con cambios planificados", "Necesita tiempo para ajustarse", "Adecuado para entornos moderadamente estables"],
+        "low": ["Mejor en roles con rutinas establecidas", "Comunicar cambios con anticipación", "Proporcionar capacitación ante nuevas tareas"]
+    },
+    "Autodisciplina": {
+        "high": ["Excelente para trabajo remoto/autónomo", "Puede manejar múltiples tareas", "Ideal para roles que requieren precisión"],
+        "medium": ["Funciona bien con estructura externa", "Puede mejorar con herramientas de organización", "Supervisión periódica recomendada"],
+        "low": ["Requiere estructura clara y supervisión", "Beneficiaría de capacitación en organización", "Mejor con tareas simples y bien definidas"]
+    },
+    "Estabilidad Emocional": {
+        "high": ["Excelente para roles de alta presión", "Puede manejar crisis efectivamente", "Ideal para atención al cliente difícil"],
+        "medium": ["Funciona bien en condiciones normales", "Puede requerir apoyo en crisis", "Adecuado para la mayoría de roles estándar"],
+        "low": ["Mejor en entornos de bajo estrés", "Requiere apoyo emocional y capacitación", "Evitar roles con alta presión constante"]
+    },
+    "Orientación al Logro": {
+        "high": ["Excelente para roles desafiantes", "Auto-motivado y proactivo", "Ideal para innovación y mejora continua"],
+        "medium": ["Cumple objetivos con motivación externa", "Funciona bien con metas claras", "Adecuado para roles estándar"],
+        "low": ["Requiere motivación y reconocimiento frecuente", "Mejor en roles sin metas ambiciosas", "Necesita supervisión para mantener resultados"]
+    }
+}
+
 
 # =========================================================================
 # ANÁLISIS DE APTITUD Y RECOMENDACIONES
@@ -419,6 +517,156 @@ def analyze_valanti_aptitude(standard):
     }
 
 
+def analyze_wpi_aptitude(normalized):
+    """
+    Analiza los resultados WPI y genera recomendaciones, fortalezas, alertas y nivel de aptitud laboral.
+    
+    Args:
+        normalized: Dict con puntajes normalizados (0-100) por dimensión
+        
+    Returns:
+        Dict con análisis completo: aptitud, fortalezas, alertas, recomendaciones
+    """
+    # Ordenar dimensiones por puntaje
+    sorted_dims = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_dims[0]
+    second_strongest = sorted_dims[1]
+    weakest = sorted_dims[-1]
+    second_weakest = sorted_dims[-2]
+    
+    # Clasificar dimensiones por nivel de puntaje
+    # Alto: >= 70, Medio: 45-69, Bajo: < 45
+    high_dims = [d for d, s in normalized.items() if s >= 70]
+    medium_dims = [d for d, s in normalized.items() if 45 <= s < 70]
+    low_dims = [d for d, s in normalized.items() if s < 45]
+    critical_dims = [d for d, s in normalized.items() if s < 30]
+    
+    # Calcular puntaje promedio
+    avg_score = sum(normalized.values()) / len(normalized)
+    
+    # Calcular puntaje de aptitud general (0-100)
+    # Basado en: promedio + bonificación por fortalezas - penalización por debilidades
+    aptitude_score = round(
+        avg_score + 
+        len(high_dims) * 5 -      # Bonificación por dimensiones altas
+        len(low_dims) * 10 -       # Penalización por dimensiones bajas
+        len(critical_dims) * 20    # Penalización fuerte por dimensiones críticas
+    )
+    aptitude_score = max(0, min(100, aptitude_score))
+    
+    # Determinar nivel de aptitud laboral
+    if len(critical_dims) > 0:
+        aptitude_level = "NO RECOMENDADO"
+        aptitude_color = "#EF4444"
+        aptitude_emoji = "🔴"
+        aptitude_desc = f"Deficiencias críticas en: {', '.join(critical_dims)}. Alto riesgo de bajo desempeño laboral. Se requiere desarrollo sustancial."
+    elif len(low_dims) >= 3:
+        aptitude_level = "CONTRATACIÓN CON RESERVAS"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Múltiples áreas de mejora ({', '.join(low_dims)}). Requiere supervisión cercana y plan de desarrollo."
+    elif len(low_dims) >= 1 and len(high_dims) >= 2:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = f"Buen potencial con fortalezas en {strongest[0]} y {second_strongest[0]}, pero requiere desarrollo en: {', '.join(low_dims)}."
+    elif avg_score >= 60 and len(high_dims) >= 3:
+        aptitude_level = "ALTAMENTE RECOMENDADO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✅"
+        aptitude_desc = f"Perfil laboral sobresaliente. Fortalezas destacadas en {', '.join(high_dims)}. Candidato ideal para el puesto."
+    elif avg_score >= 50:
+        aptitude_level = "APTO"
+        aptitude_color = "#10B981"
+        aptitude_emoji = "✓"
+        aptitude_desc = "Perfil laboral adecuado. Competencias en nivel esperado para desempeño satisfactorio."
+    else:
+        aptitude_level = "APTO CON OBSERVACIONES"
+        aptitude_color = "#F59E0B"
+        aptitude_emoji = "⚠️"
+        aptitude_desc = "Perfil laboral en nivel básico. Se recomienda evaluar ajuste específico al puesto."
+    
+    # Generar fortalezas (dimensiones altas)
+    fortalezas = []
+    for dim, score in sorted_dims:
+        if score >= 70:
+            desc = WPI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100): {desc['high']}")
+        elif score >= 60 and len(fortalezas) < 3:  # Incluir algunas medias-altas si no hay muchas altas
+            desc = WPI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100): {desc['medium']}")
+    
+    # Generar alertas (dimensiones bajas)
+    alertas = []
+    for dim, score in sorted_dims:
+        if score < 45:
+            desc = WPI_DESCRIPTIONS[dim]
+            alertas.append(f"⚠️ **{dim}** ({int(score)}/100): {desc['low']}")
+    
+    # Generar recomendaciones específicas por dimensión
+    recomendaciones = []
+    for dim, score in sorted_dims:
+        if score >= 70:
+            level = "high"
+        elif score >= 45:
+            level = "medium"
+        else:
+            level = "low"
+        
+        # Solo incluir recomendaciones para extremos (muy alto o muy bajo)
+        if score >= 70 or score < 50:
+            recs = WPI_RECOMMENDATIONS[dim][level]
+            recomendaciones.append(f"**{dim}:** {' | '.join(recs)}")
+    
+    # Determinar roles ideales según perfil
+    ideal_para = []
+    avoid_roles = []
+    
+    # Lógica de roles según combinación de dimensiones
+    if normalized.get("Responsabilidad", 0) >= 70 and normalized.get("Autodisciplina", 0) >= 70:
+        ideal_para.append("Trabajo remoto o autónomo")
+    if normalized.get("Trabajo en Equipo", 0) >= 70:
+        ideal_para.append("Proyectos colaborativos")
+    if normalized.get("Adaptabilidad", 0) >= 70:
+        ideal_para.append("Entornos dinámicos o de cambio")
+    if normalized.get("Estabilidad Emocional", 0) >= 70:
+        ideal_para.append("Roles de alta presión")
+    if normalized.get("Orientación al Logro", 0) >= 70:
+        ideal_para.append("Posiciones de desarrollo y crecimiento")
+    
+    # Roles a evitar
+    if normalized.get("Trabajo en Equipo", 0) < 40:
+        avoid_roles.append("Proyectos colaborativos intensivos")
+    if normalized.get("Adaptabilidad", 0) < 40:
+        avoid_roles.append("Entornos de cambio constante")
+    if normalized.get("Estabilidad Emocional", 0) < 40:
+        avoid_roles.append("Roles de alta presión o crisis")
+    if normalized.get("Orientación al Logro", 0) < 40:
+        avoid_roles.append("Posiciones que requieren auto-motivación")
+    
+    return {
+        "aptitude_score": aptitude_score,
+        "aptitude_level": aptitude_level,
+        "aptitude_color": aptitude_color,
+        "aptitude_emoji": aptitude_emoji,
+        "aptitude_desc": aptitude_desc,
+        "strongest_dimension": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_dimension": weakest[0],
+        "weakest_score": weakest[1],
+        "high_dimensions": high_dims,
+        "medium_dimensions": medium_dims,
+        "low_dimensions": low_dims,
+        "critical_dimensions": critical_dims,
+        "average_score": round(avg_score, 1),
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+        "ideal_para": ideal_para,
+        "avoid_roles": avoid_roles,
+    }
+
+
 # =========================================================================
 # FUNCIONES DE SCORING
 # =========================================================================
@@ -467,6 +715,72 @@ def calculate_valanti_results(responses):
         z = (direct[trait] - VALANTI_AVGS[trait]) / VALANTI_SDS[trait]
         standard[trait] = round(z * 10 + 50)
     return direct, standard
+
+
+def calculate_wpi_results(responses, questions):
+    """
+    Calcula los resultados del WPI (Work Personality Index).
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+        questions: Lista de preguntas con dimension y reverse flag
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages)
+            - raw_scores: Puntajes directos por dimensión
+            - normalized_scores: Puntajes normalizados 0-100
+            - percentages: Porcentajes relativos entre dimensiones
+    """
+    # Contar preguntas por dimensión
+    questions_per_dim = {}
+    for q in questions:
+        dim = q["dimension"]
+        questions_per_dim[dim] = questions_per_dim.get(dim, 0) + 1
+    
+    # Calcular puntajes directos por dimensión
+    raw_scores = {dim: 0 for dim in WPI_DIMENSIONS}
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            dim = q["dimension"]
+            answer = responses[i]
+            
+            # Si es pregunta reversa, invertir escala (1->5, 2->4, 3->3, 4->2, 5->1)
+            if q.get("reverse", False):
+                answer = 6 - answer
+            
+            raw_scores[dim] += answer
+    
+    # Normalizar a escala 0-100
+    # Cada dimensión tiene ~8 preguntas, escala 1-5
+    # Mínimo posible: 8 * 1 = 8
+    # Máximo posible: 8 * 5 = 40
+    normalized_scores = {}
+    for dim in WPI_DIMENSIONS:
+        num_questions = questions_per_dim.get(dim, 8)
+        min_possible = num_questions * 1
+        max_possible = num_questions * 5
+        raw = raw_scores[dim]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[dim] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for dim in WPI_DIMENSIONS:
+            percentages[dim] = round((normalized_scores[dim] / total) * 100, 1)
+    else:
+        for dim in WPI_DIMENSIONS:
+            percentages[dim] = 16.67  # 100% / 6 dimensiones
+    
+    return raw_scores, normalized_scores, percentages
 
 
 # =========================================================================
@@ -624,6 +938,150 @@ def create_valanti_bars(direct_scores, standard_scores):
     ax2.tick_params(axis='x', labelsize=10)
     ax2.tick_params(axis='y', colors='#94A3B8')
     ax2.legend(fontsize=10, loc='upper right')
+    plt.tight_layout()
+    return fig
+
+
+def create_wpi_radar(normalized_scores):
+    """
+    Crea un gráfico de radar para visualizar las 6 dimensiones del WPI.
+    
+    Args:
+        normalized_scores: Dict con puntajes normalizados (0-100) por dimensión
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de radar
+    """
+    # Preparar datos para el radar
+    dimensions = WPI_DIMENSIONS
+    values = [normalized_scores[dim] for dim in dimensions]
+    values_closed = values + [values[0]]  # Cerrar el polígono
+    
+    # Calcular ángulos para cada dimensión
+    angles = np.linspace(0, 2 * np.pi, len(dimensions), endpoint=False).tolist()
+    angles_closed = angles + [angles[0]]
+    
+    # Colores para cada dimensión
+    dim_colors = [WPI_COLORS[dim] for dim in dimensions]
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(9, 9), subplot_kw=dict(polar=True))
+    
+    # Línea principal del perfil
+    ax.plot(angles_closed, values_closed, "o-", linewidth=2.5, color="#6366F1", 
+            markersize=8, markerfacecolor="#818CF8", markeredgecolor="white", 
+            markeredgewidth=2, zorder=5)
+    
+    # Rellenar área
+    ax.fill(angles_closed, values_closed, alpha=0.2, color="#6366F1")
+    
+    # Puntos coloreados por dimensión con valores
+    for i, (angle, val, color) in enumerate(zip(angles, values, dim_colors)):
+        # Punto
+        ax.plot(angle, val, "o", markersize=16, color=color, zorder=6, 
+                markeredgecolor='white', markeredgewidth=2.5)
+        # Valor del punto
+        ax.text(angle, val + 7, f"{int(val)}", ha='center', va='center', 
+                fontsize=11, fontweight='bold', color=color)
+    
+    # Configurar etiquetas de dimensiones
+    ax.set_xticks(angles)
+    ax.set_xticklabels(dimensions, fontsize=11, fontweight="bold", color='#1E293B')
+    
+    # Configurar escala radial
+    ax.set_ylim(0, 100)
+    ax.set_yticks([20, 40, 60, 80, 100])
+    ax.set_yticklabels(['20', '40', '60', '80', '100'], fontsize=9, color='#94A3B8')
+    
+    # Líneas de referencia
+    ref_50 = [50] * (len(dimensions) + 1)
+    ref_70 = [70] * (len(dimensions) + 1)
+    ax.plot(angles_closed, ref_50, "--", linewidth=1.5, color="#F59E0B", 
+            alpha=0.6, label="Promedio (50)")
+    ax.plot(angles_closed, ref_70, ":", linewidth=1.5, color="#10B981", 
+            alpha=0.6, label="Alto (70)")
+    
+    # Zonas de color de fondo
+    theta = np.linspace(0, 2*np.pi, 100)
+    ax.fill_between(theta, 0, 45, alpha=0.04, color='#EF4444')   # zona baja (rojo)
+    ax.fill_between(theta, 70, 100, alpha=0.05, color='#10B981') # zona alta (verde)
+    
+    # Estilo del gráfico
+    ax.grid(True, alpha=0.3, color='#CBD5E1', linestyle='-', linewidth=0.8)
+    ax.spines["polar"].set_visible(False)
+    ax.set_facecolor('#FAFBFC')
+    fig.patch.set_facecolor('white')
+    
+    # Título y leyenda
+    plt.title("Perfil de Personalidad Laboral - WPI", fontsize=16, fontweight="bold", 
+              pad=30, color='#1E293B')
+    plt.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1), fontsize=10)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_wpi_bars(normalized_scores):
+    """
+    Crea un gráfico de barras horizontales para visualizar las dimensiones del WPI.
+    
+    Args:
+        normalized_scores: Dict con puntajes normalize (0-100) por dimensión
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de barras horizontales
+    """
+    fig, ax = plt.subplots(figsize=(10, 7))
+    fig.patch.set_facecolor('white')
+    
+    dimensions = WPI_DIMENSIONS
+    values = [normalized_scores[dim] for dim in dimensions]
+    colors = [WPI_COLORS[dim] for dim in dimensions]
+    
+    # Crear barras horizontales (de abajo hacia arriba)
+    y_positions = np.arange(len(dimensions))
+    bars = ax.barh(y_positions, values, color=colors, alpha=0.85, 
+                   edgecolor='white', linewidth=2, height=0.7)
+    
+    # Agregar valores al final de cada barra
+    for i, (bar, val, color) in enumerate(zip(bars, values, colors)):
+        ax.text(val + 2, bar.get_y() + bar.get_height()/2, f"{int(val)}/100", 
+                va='center', fontweight='bold', fontsize=12, color=color)
+    
+    # Líneas de referencia verticales
+    ax.axvline(x=50, color="#F59E0B", linestyle="--", alpha=0.7, linewidth=2, 
+               label="Promedio (50)")
+    ax.axvline(x=70, color="#10B981", linestyle=":", alpha=0.7, linewidth=2, 
+               label="Alto (70)")
+    
+    # Zonas de color de fondo
+    ax.axvspan(0, 45, alpha=0.05, color='#EF4444')   # zona baja
+    ax.axvspan(70, 100, alpha=0.05, color='#10B981') # zona alta
+    
+    # Configuración de ejes
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(dimensions, fontsize=12, fontweight='bold', color='#1E293B')
+    ax.set_xlabel('Puntaje (0-100)', fontsize=12, fontweight='bold', color='#475569')
+    ax.set_xlim(0, 105)
+    ax.set_ylim(-0.5, len(dimensions) - 0.5)
+    
+    # Título
+    ax.set_title("Dimensiones de Personalidad Laboral", fontsize=14, 
+                 fontweight="bold", pad=20, color='#1E293B')
+    
+    # Estilo
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#CBD5E1')
+    ax.spines['left'].set_color('#CBD5E1')
+    ax.set_facecolor('#FAFBFC')
+    ax.tick_params(axis='x', colors='#94A3B8')
+    ax.tick_params(axis='y', colors='#475569')
+    ax.grid(axis='x', alpha=0.2, color='#CBD5E1', linestyle='-')
+    
+    # Leyenda
+    ax.legend(fontsize=10, loc='lower right', framealpha=0.95)
+    
     plt.tight_layout()
     return fig
 
@@ -878,6 +1336,214 @@ def generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id, com
     return buffer
 
 
+def generate_wpi_pdf(candidate, raw_scores, normalized, radar_fig, session_id, completed_at=None, analysis=None):
+    """
+    Genera un PDF con los resultados del WPI (Work Personality Index).
+    
+    Args:
+        candidate: Dict con información del candidato
+        raw_scores: Puntajes directos por dimensión
+        normalized: Puntajes normalizados (0-100) por dimensión
+        radar_fig: Figura matplotlib del radar
+        session_id: ID de la sesión
+        completed_at: Fecha de completación (opcional)
+        analysis: Dict con análisis de aptitud (opcional, se genera si no se proporciona)
+        
+    Returns:
+        BytesIO: Buffer con el PDF generado
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=14))
+    styles.add(ParagraphStyle(name="SmallBold", parent=styles["Normal"], 
+                             fontSize=9, leading=12, fontName="Helvetica-Bold"))
+    styles.add(ParagraphStyle(name="Small", parent=styles["Normal"], 
+                             fontSize=9, leading=12))
+    
+    story = []
+    
+    # === PÁGINA 1: PORTADA Y RESULTADOS ===
+    story.append(Paragraph("WPI - Work Personality Index", styles["Title"]))
+    story.append(Paragraph("Evaluación de Personalidad Laboral", styles["Heading2"]))
+    story.append(Spacer(1, 12))
+    
+    # Información del candidato
+    story.append(Paragraph(f"<b>ID Evaluación:</b> {session_id}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Candidato:</b> {candidate['name']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cédula:</b> {candidate['cedula']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position', 'N/A')}", styles["Normal"]))
+    
+    # Formatear fecha
+    if completed_at:
+        try:
+            fecha_obj = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+            fecha_str = fecha_obj.strftime('%d/%m/%Y %H:%M')
+        except:
+            fecha_str = completed_at
+    else:
+        fecha_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    story.append(Paragraph(f"<b>Fecha de Presentación:</b> {fecha_str}", styles["Normal"]))
+    story.append(Spacer(1, 16))
+    
+    # Generar análisis si no se proporcionó
+    if analysis is None:
+        analysis = analyze_wpi_aptitude(normalized)
+    
+    # === RESULTADO DE APTITUD ===
+    story.append(Paragraph(
+        f"<b>RESULTADO: {analysis['aptitude_level']} ({analysis['aptitude_score']}/100)</b>", 
+        styles["Heading2"]
+    ))
+    story.append(Paragraph(f"{analysis['aptitude_desc']}", styles["Normal"]))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        f"<b>Dimensión más fuerte:</b> {analysis['strongest_dimension']} "
+        f"({int(analysis['strongest_score'])}/100) | "
+        f"<b>Dimensión a desarrollar:</b> {analysis['weakest_dimension']} "
+        f"({int(analysis['weakest_score'])}/100)",
+        styles["Normal"]
+    ))
+    story.append(Paragraph(
+        f"<b>Promedio general:</b> {analysis['average_score']}/100",
+        styles["Normal"]
+    ))
+    story.append(Spacer(1, 16))
+    
+    # === TABLA DE PUNTAJES ===
+    story.append(Paragraph("Puntajes por Dimensión", styles["Heading2"]))
+    story.append(Spacer(1, 8))
+    
+    data = [["Dimensión", "Puntaje Directo", "Puntaje Normalizado (0-100)", "Nivel"]]
+    for dim in WPI_DIMENSIONS:
+        nivel = "Alto" if normalized[dim] >= 70 else ("Medio" if normalized[dim] >= 45 else "Bajo")
+        data.append([
+            dim,
+            str(int(raw_scores[dim])),
+            f"{int(normalized[dim])}/100",
+            nivel
+        ])
+    
+    t = Table(data, colWidths=[140, 80, 130, 60])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1e40af")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+        ("ALIGN", (0, 0), (0, -1), "LEFT"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 9),
+        ("FONTSIZE", (0, 1), (-1, -1), 8),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 16))
+    
+    # === GRÁFICO RADAR ===
+    if radar_fig:
+        img_buf = BytesIO()
+        radar_fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
+        img_buf.seek(0)
+        story.append(Image(img_buf, width=320, height=320))
+    
+    # === PÁGINA 2: ANÁLISIS DETALLADO ===
+    story.append(PageBreak())
+    story.append(Paragraph("Análisis Detallado y Recomendaciones", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    # === FORTALEZAS ===
+    if analysis.get('fortalezas'):
+        story.append(Paragraph("✅ FORTALEZAS DESTACADAS", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for f in analysis['fortalezas']:
+            # Limpiar markdown para PDF
+            f_clean = f.replace("**", "")
+            story.append(Paragraph(f"• {f_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ALERTAS ===
+    if analysis.get('alertas'):
+        story.append(Paragraph("⚠️ ÁREAS DE ATENCIÓN", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for a in analysis['alertas']:
+            # Limpiar markdown para PDF
+            a_clean = a.replace("**", "").replace("⚠️ ", "")
+            story.append(Paragraph(f"• {a_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ROLES IDEALES ===
+    if analysis.get('ideal_para'):
+        story.append(Paragraph("🎯 ROLES IDEALES PARA EL CANDIDATO", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for role in analysis['ideal_para']:
+            story.append(Paragraph(f"• {role}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ROLES A EVITAR ===
+    if analysis.get('avoid_roles'):
+        story.append(Paragraph("⛔ ROLES NO RECOMENDADOS", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for role in analysis['avoid_roles']:
+            story.append(Paragraph(f"• {role}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === RECOMENDACIONES ===
+    if analysis.get('recomendaciones'):
+        story.append(Paragraph("💡 RECOMENDACIONES ESPECÍFICAS", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown para PDF
+            r_clean = r.replace("**", "")
+            story.append(Paragraph(f"• {r_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === DESCRIPCIÓN DE DIMENSIONES ===
+    story.append(PageBreak())
+    story.append(Paragraph("Descripción de las Dimensiones del WPI", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    for dim in WPI_DIMENSIONS:
+        score = normalized[dim]
+        desc_info = WPI_DESCRIPTIONS[dim]
+        
+        # Determinar nivel y descripción
+        if score >= 70:
+            level_text = "ALTO"
+            desc_text = desc_info["high"]
+        elif score >= 45:
+            level_text = "MEDIO"
+            desc_text = desc_info["medium"]
+        else:
+            level_text = "BAJO"
+            desc_text = desc_info["low"]
+        
+        story.append(Paragraph(
+            f"<b>{desc_info['title']}</b> - Nivel: {level_text} ({int(score)}/100)",
+            styles["Heading3"]
+        ))
+        story.append(Paragraph(desc_text, styles["Small"]))
+        story.append(Spacer(1, 8))
+    
+    # === FOOTER ===
+    story.append(Spacer(1, 20))
+    story.append(Paragraph(
+        "<i>Este reporte es generado automáticamente como herramienta de apoyo para "
+        "Recursos Humanos. Los resultados deben complementarse con entrevistas, "
+        "referencias laborales y otras evaluaciones pertinentes.</i>",
+        styles["Small"]
+    ))
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+
 # =========================================================================
 # HELPER: Load DISC questions
 # =========================================================================
@@ -891,6 +1557,13 @@ def load_disc_questions():
 def load_disc_descriptions():
     dfile = os.path.join(os.path.dirname(__file__), "disc_descriptions_es.json")
     with open(dfile, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_wpi_questions():
+    """Carga las preguntas del WPI desde el archivo JSON."""
+    qfile = os.path.join(os.path.dirname(__file__), "questions_wpi.json")
+    with open(qfile, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -1002,7 +1675,8 @@ def page_admin_dashboard():
                 st.markdown("---")
                 c3, c4 = st.columns(2)
                 with c3:
-                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti"], format_func=lambda x: "🎯 DISC" if x == "disc" else "🧭 VALANTI")
+                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi"], 
+                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else "💼 WPI"))
                 with c4:
                     time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
 
@@ -1037,7 +1711,8 @@ def page_admin_dashboard():
                 with st.form("existing_candidate_form"):
                     c3, c4 = st.columns(2)
                     with c3:
-                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti"], format_func=lambda x: "🎯 DISC" if x == "disc" else "🧭 VALANTI")
+                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi"], 
+                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else "💼 WPI"))
                     with c4:
                         time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
                     create_btn2 = st.form_submit_button("✅ Asignar Evaluación")
@@ -1175,8 +1850,10 @@ def page_admin_dashboard():
                         if results:
                             if sess["test_type"] == "disc":
                                 show_disc_results_admin(results, candidate, sess)
-                            else:
+                            elif sess["test_type"] == "valanti":
                                 show_valanti_results_admin(results, candidate, sess)
+                            elif sess["test_type"] == "wpi":
+                                show_wpi_results_admin(results, candidate, sess)
                         else:
                             st.warning("Resultados no disponibles.")
 
@@ -1412,6 +2089,173 @@ def show_valanti_results_admin(results, candidate, session):
         st.download_button("📄 Descargar JSON", data=json.dumps(results, indent=2, ensure_ascii=False), file_name=f"valanti_{candidate['cedula']}.json", mime="application/json", key=f"json_val_{session_id}")
 
 
+def show_wpi_results_admin(results, candidate, session):
+    """
+    Muestra los resultados del WPI en el panel de administración.
+    
+    Args:
+        results: Dict con raw, normalized y percentages
+        candidate: Dict con información del candidato
+        session: Dict con información de la sesión o str con session_id
+    """
+    raw = results.get("raw", {})
+    normalized = results.get("normalized", {})
+    percentages = results.get("percentages", {})
+    
+    # Análisis de aptitud
+    analysis = analyze_wpi_aptitude(normalized)
+    
+    # === BANNER DE APTITUD ===
+    st.markdown(f"""
+    <div style="background: {analysis['aptitude_color']}22; border-left: 5px solid {analysis['aptitude_color']};
+                padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: {analysis['aptitude_color']};">
+            {analysis['aptitude_emoji']} {analysis['aptitude_level']} — Puntaje: {analysis['aptitude_score']}/100
+        </h3>
+        <p style="margin: 5px 0 0 0; color: #374151;">{analysis['aptitude_desc']}</p>
+        <p style="margin: 5px 0 0 0; color: #6B7280;">
+            <b>Dimensión más fuerte:</b> {analysis['strongest_dimension']} ({int(analysis['strongest_score'])}/100) | 
+            <b>Dimensión a desarrollar:</b> {analysis['weakest_dimension']} ({int(analysis['weakest_score'])}/100) |
+            <b>Promedio:</b> {analysis['average_score']}/100
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # === MÉTRICAS POR DIMENSIÓN ===
+    st.markdown("### 📊 Puntajes por Dimensión")
+    
+    # Crear 6 columnas para las 6 dimensiones
+    cols = st.columns(3)
+    for idx, dim in enumerate(WPI_DIMENSIONS):
+        with cols[idx % 3]:
+            score = normalized.get(dim, 0)
+            nivel = "🟢 Alto" if score >= 70 else ("🟡 Medio" if score >= 45 else "🔴 Bajo")
+            st.metric(
+                label=dim,
+                value=f"{int(score)}/100",
+                delta=nivel,
+                delta_color="off"
+            )
+    
+    st.markdown("---")
+    
+    # === GRÁFICOS ===
+    col_radar, col_bars = st.columns(2)
+    
+    with col_radar:
+        st.markdown("#### 🎯 Perfil Radar")
+        radar_fig = create_wpi_radar(normalized)
+        st.pyplot(radar_fig)
+    
+    with col_bars:
+        st.markdown("#### 📊 Puntajes por Dimensión")
+        bar_fig = create_wpi_bars(normalized)
+        st.pyplot(bar_fig)
+    
+    st.markdown("---")
+    
+    # === ANÁLISIS POR DIMENSIÓN ===
+    st.markdown("### 📋 Análisis Detallado por Dimensión")
+    
+    sorted_scores = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    
+    for dim, score in sorted_scores:
+        desc_info = WPI_DESCRIPTIONS[dim]
+        
+        # Determinar nivel
+        if score >= 70:
+            level = "🟢 Alto"
+            text = desc_info["high"]
+            color = "#10B981"
+        elif score >= 45:
+            level = "🟡 Medio"
+            text = desc_info["medium"]
+            color = "#F59E0B"
+        else:
+            level = "🔴 Bajo"
+            text = desc_info["low"]
+            color = "#EF4444"
+        
+        st.markdown(f"""
+        <div style="background: {color}15; border-left: 3px solid {color}; 
+                    padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+            <b style="color: {color};">{desc_info['title']}</b> — {level} ({int(score)}/100)
+            <br><span style="color: #374151;">{text}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # === FORTALEZAS ===
+    if analysis.get('fortalezas'):
+        st.markdown("### 💪 Fortalezas Destacadas")
+        for f in analysis['fortalezas']:
+            # Limpiar markdown
+            f_clean = f.replace("**", "")
+            st.markdown(f"- ✅ {f_clean}")
+        st.markdown("")
+    
+    # === ALERTAS ===
+    if analysis.get('alertas'):
+        st.markdown("### ⚠️ Áreas de Atención")
+        for a in analysis['alertas']:
+            # Limpiar markdown
+            a_clean = a.replace("**", "").replace("⚠️ ", "")
+            st.markdown(f"- 🔸 {a_clean}")
+        st.markdown("")
+    
+    # === ROLES IDEALES ===
+    if analysis.get('ideal_para'):
+        st.markdown("### 🎯 Roles Ideales para el Candidato")
+        for role in analysis['ideal_para']:
+            st.markdown(f"- 🎯 {role}")
+        st.markdown("")
+    
+    # === ROLES A EVITAR ===
+    if analysis.get('avoid_roles'):
+        st.markdown("### ⛔ Roles No Recomendados")
+        for role in analysis['avoid_roles']:
+            st.markdown(f"- ⛔ {role}")
+        st.markdown("")
+    
+    # === RECOMENDACIONES ===
+    if analysis.get('recomendaciones'):
+        st.markdown("### 💡 Recomendaciones Específicas")
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown
+            r_clean = r.replace("**", "")
+            st.markdown(f"- {r_clean}")
+    
+    st.markdown("---")
+    
+    # === DESCARGA DE REPORTES ===
+    st.markdown("### 📥 Descargar Reportes")
+    
+    session_id = session if isinstance(session, str) else session.get("id")
+    completed_at = session.get("completed_at") if isinstance(session, dict) else None
+    
+    # Generar PDF
+    pdf_buffer = generate_wpi_pdf(candidate, raw, normalized, radar_fig, session_id, completed_at, analysis)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button(
+            "📑 Descargar PDF Completo",
+            data=pdf_buffer.getvalue(),
+            file_name=f"wpi_{candidate['cedula']}_{session_id}.pdf",
+            mime="application/pdf",
+            key=f"pdf_wpi_{session_id}"
+        )
+    with col2:
+        st.download_button(
+            "📄 Descargar JSON",
+            data=json.dumps(results, indent=2, ensure_ascii=False),
+            file_name=f"wpi_{candidate['cedula']}_{session_id}.json",
+            mime="application/json",
+            key=f"json_wpi_{session_id}"
+        )
+
+
 # -------------------------------------------------------------------------
 # CANDIDATE: LOGIN
 # -------------------------------------------------------------------------
@@ -1471,8 +2315,20 @@ def page_candidate_select_test():
         return
 
     for sess in pending:
-        test_emoji = "🎯" if sess["test_type"] == "disc" else "🧭"
-        test_name = "Evaluación DISC" if sess["test_type"] == "disc" else "Cuestionario VALANTI"
+        # Determinar emoji y nombre según tipo de test
+        if sess["test_type"] == "disc":
+            test_emoji = "🎯"
+            test_name = "Evaluación DISC"
+        elif sess["test_type"] == "valanti":
+            test_emoji = "🧭"
+            test_name = "Cuestionario VALANTI"
+        elif sess["test_type"] == "wpi":
+            test_emoji = "💼"
+            test_name = "WPI - Work Personality Index"
+        else:
+            test_emoji = "📝"
+            test_name = "Evaluación"
+        
         status_text = "En progreso ▶️" if sess["status"] == "in_progress" else "Pendiente ⏳"
 
         with st.container():
@@ -1500,13 +2356,18 @@ def page_candidate_select_test():
 
                     if sess["test_type"] == "disc":
                         nav("disc_test")
-                    else:
+                    elif sess["test_type"] == "valanti":
                         nav("valanti_test")
+                    elif sess["test_type"] == "wpi":
+                        nav("wpi_test")
                     st.rerun()
 
     st.markdown("---")
     if st.button("🔑 Cerrar Sesión"):
-        for key in ["candidate", "pending_sessions", "test_session", "disc_questions", "disc_page", "disc_answers", "valanti_responses", "valanti_page"]:
+        for key in ["candidate", "pending_sessions", "test_session", 
+                    "disc_questions", "disc_page", "disc_answers", 
+                    "valanti_responses", "valanti_page",
+                    "wpi_questions", "wpi_responses", "wpi_page"]:
             st.session_state.pop(key, None)
         nav("home")
         st.rerun()
@@ -1834,6 +2695,208 @@ def page_valanti_test():
                     st.rerun()
 
 
+def page_wpi_test():
+    """
+    Página del test WPI (Work Personality Index) - 50 preguntas con escala Likert 1-5.
+    """
+    session = st.session_state.get("test_session")
+    candidate = st.session_state.get("candidate")
+    
+    if not session or not candidate:
+        nav("candidate_login")
+        st.rerun()
+        return
+
+    session = db.get_session_by_id(session["id"])
+    if not session or session["status"] not in ("in_progress",):
+        if session and session["status"] == "expired":
+            st.error("⏰ El tiempo de esta evaluación ha expirado.")
+            if st.button("Volver"):
+                nav("candidate_select_test")
+                st.rerun()
+            return
+        nav("candidate_select_test")
+        st.rerun()
+        return
+
+    # Verificar tiempo restante
+    remaining = db.check_session_time(session)
+    if remaining == -1:
+        st.error("⏰ El tiempo de esta evaluación ha expirado.")
+        if st.button("Volver"):
+            nav("candidate_select_test")
+            st.rerun()
+        return
+
+    # Mostrar timer
+    deadline_ts = db.get_session_deadline_timestamp(session)
+    if deadline_ts:
+        render_timer(deadline_ts, session["id"])
+
+    st.markdown(f"### 💼 WPI - Work Personality Index")
+    st.caption(f"Candidato: {candidate['name']} | ID: {session['id']}")
+    
+    # Cargar preguntas si no están en session_state
+    if "wpi_questions" not in st.session_state:
+        all_questions = load_wpi_questions()
+        # Mezclar preguntas de manera consistente por sesión
+        rng = random.Random(session["id"])
+        rng.shuffle(all_questions)
+        st.session_state.wpi_questions = all_questions
+        db.update_session_questions(session["id"], all_questions)
+
+    # Inicializar respuestas
+    if "wpi_responses" not in st.session_state:
+        st.session_state.wpi_responses = [None] * len(st.session_state.wpi_questions)
+
+    # Inicializar página
+    if "wpi_page" not in st.session_state:
+        st.session_state.wpi_page = 0
+
+    questions = st.session_state.wpi_questions
+    total = len(questions)
+    questions_per_page = 10  # 10 preguntas por página
+    page = st.session_state.wpi_page
+    q_start = page * questions_per_page
+    q_end = min(q_start + questions_per_page, total)
+
+    # Barra de progreso
+    progress = q_end / total
+    st.progress(progress)
+    st.markdown(f"**Preguntas {q_start + 1} - {q_end} de {total}**")
+
+    # Instrucciones
+    st.info("""
+    **Instrucciones:** Responde con sinceridad a cada afirmación según la siguiente escala:
+    - **1** = Totalmente en desacuerdo
+    - **2** = En desacuerdo
+    - **3** = Neutral
+    - **4** = De acuerdo
+    - **5** = Totalmente de acuerdo
+    """)
+
+    # Mostrar preguntas de la página actual
+    all_answered = True
+    
+    for i in range(q_start, q_end):
+        q = questions[i]
+        q_text = q["question"]
+        dim = q["dimension"]
+        
+        # Crear tarjeta visual para cada pregunta
+        st.markdown(
+            f"""
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                        border-radius: 12px; padding: 20px; margin: 15px 0;
+                        border-left: 4px solid {WPI_COLORS.get(dim, '#3b82f6')};">
+                <div style="margin-bottom: 8px;">
+                    <span style="background: {WPI_COLORS.get(dim, '#3b82f6')}; color: white; 
+                                padding: 4px 12px; border-radius: 20px; 
+                                font-size: 0.85em; font-weight: bold;">
+                        Pregunta {i + 1} - {dim}
+                    </span>
+                </div>
+                <p style="color: #e2e8f0; font-size: 1.1em; margin: 12px 0;">
+                    {q_text}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Radio buttons para la respuesta
+        response_key = f"wpi_q_{i}"
+        
+        # Inicializar desde respuestas guardadas
+        if response_key not in st.session_state and st.session_state.wpi_responses[i] is not None:
+            st.session_state[response_key] = st.session_state.wpi_responses[i]
+        
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            response = st.radio(
+                f"Respuesta {i + 1}",
+                options=[1, 2, 3, 4, 5],
+                format_func=lambda x: {
+                    1: "1 - Totalmente en desacuerdo",
+                    2: "2 - En desacuerdo",
+                    3: "3 - Neutral",
+                    4: "4 - De acuerdo",
+                    5: "5 - Totalmente de acuerdo"
+                }[x],
+                key=response_key,
+                horizontal=False,
+                index=None if response_key not in st.session_state else st.session_state[response_key] - 1
+            )
+        
+        with col2:
+            st.markdown("<br>" * 2, unsafe_allow_html=True)
+            if response is not None:
+                st.success("✅")
+                st.session_state.wpi_responses[i] = response
+            else:
+                st.warning("⚠️")
+                all_answered = False
+
+    # Navegación
+    st.markdown("---")
+    col_prev, col_space, col_next = st.columns([1, 4, 1])
+
+    with col_prev:
+        if page > 0:
+            if st.button("⬅️ Anterior", key="wpi_prev"):
+                st.session_state.wpi_page -= 1
+                st.rerun()
+
+    with col_next:
+        is_last = q_end >= total
+        btn_label = "✅ Finalizar Evaluación" if is_last else "Siguiente ➡️"
+        if st.button(btn_label, key="wpi_next", disabled=not all_answered):
+            # Verificar tiempo nuevamente
+            remaining = db.check_session_time(db.get_session_by_id(session["id"]))
+            if remaining == -1:
+                st.error("⏰ El tiempo ha expirado.")
+                return
+
+            if is_last:
+                # Verificar que todas las preguntas estén respondidas
+                if None in st.session_state.wpi_responses:
+                    st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
+                else:
+                    # Calcular resultados
+                    responses = st.session_state.wpi_responses
+                    raw, normalized, percentages = calculate_wpi_results(responses, questions)
+
+                    # Guardar respuestas
+                    answer_records = []
+                    for i in range(total):
+                        answer_records.append({
+                            "question_index": i,
+                            "question_text": questions[i]["question"],
+                            "answer_value": responses[i],
+                            "answer_b_value": None,  # No aplica para WPI
+                        })
+                    db.save_answers(session["id"], answer_records)
+
+                    # Guardar resultados
+                    results = {
+                        "raw": raw,
+                        "normalized": normalized,
+                        "percentages": percentages
+                    }
+                    db.save_results(session["id"], results)
+                    db.complete_test_session(session["id"])
+
+                    # Limpiar session state
+                    for key in ["wpi_questions", "wpi_responses", "wpi_page", "test_session"]:
+                        st.session_state.pop(key, None)
+
+                    nav("candidate_done")
+                    st.rerun()
+            else:
+                st.session_state.wpi_page += 1
+                st.rerun()
+
+
 # -------------------------------------------------------------------------
 # CANDIDATE: DONE
 # -------------------------------------------------------------------------
@@ -1861,7 +2924,10 @@ def page_candidate_done():
             st.rerun()
 
         if st.button("🚪 Salir", use_container_width=True):
-            for key in ["candidate", "pending_sessions", "test_session", "disc_questions", "disc_page", "disc_answers", "valanti_responses", "valanti_page"]:
+            for key in ["candidate", "pending_sessions", "test_session", 
+                       "disc_questions", "disc_page", "disc_answers", 
+                       "valanti_responses", "valanti_page",
+                       "wpi_questions", "wpi_responses", "wpi_page"]:
                 st.session_state.pop(key, None)
             nav("home")
             st.rerun()
@@ -1884,6 +2950,7 @@ PAGE_MAP = {
     "candidate_select_test": page_candidate_select_test,
     "disc_test": page_disc_test,
     "valanti_test": page_valanti_test,
+    "wpi_test": page_wpi_test,
     "candidate_done": page_candidate_done,
 }
 
