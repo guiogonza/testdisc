@@ -14,12 +14,13 @@ ENV PYTHONUNBUFFERED=1 \
 # Directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema para matplotlib y reportlab
+# Instalar dependencias del sistema para matplotlib, reportlab y health check
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     libfreetype6-dev \
     libpng-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements y instalar dependencias Python
