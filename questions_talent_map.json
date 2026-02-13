@@ -1,0 +1,402 @@
+[
+    {
+        "competency": "Liderazgo",
+        "question": "Tomo la iniciativa para dirigir proyectos y equipos.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Me resulta natural motivar e inspirar a otros.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Prefiero que otros tomen las decisiones importantes.",
+        "reverse": true
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Me siento cómodo asignando tareas y supervisando su cumplimiento.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Me cuesta dar retroalimentación constructiva a mi equipo.",
+        "reverse": true
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Establezco visiones claras y metas alcanzables para mi equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Asumo la responsabilidad por los resultados del equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Desarrollo el talento de las personas a mi cargo.",
+        "reverse": false
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Evito situaciones donde tenga que liderar a otros.",
+        "reverse": true
+    },
+    {
+        "competency": "Liderazgo",
+        "question": "Soy efectivo resolviendo conflictos dentro del equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Expreso mis ideas de forma clara y concisa.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Escucho activamente las opiniones de los demás.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Me cuesta adaptar mi mensaje a diferentes audiencias.",
+        "reverse": true
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Soy hábil presentando información compleja de manera simple.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Evito comunicar malas noticias o información difícil.",
+        "reverse": true
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Hago preguntas para asegurar que he comprendido correctamente.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Domino la comunicación escrita profesional.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Manejo eficazmente comunicaciones difíciles o de conflicto.",
+        "reverse": false
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Me resulta difícil defender mis ideas frente a otros.",
+        "reverse": true
+    },
+    {
+        "competency": "Comunicación",
+        "question": "Utilizo el lenguaje corporal adecuadamente en mis interacciones.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Analizo problemas desde múltiples perspectivas antes de decidir.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Identifico patrones y tendencias en datos complejos.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Prefiero actuar por intuición que por análisis detallado.",
+        "reverse": true
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Descompongo problemas complejos en partes manejables.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Me cuesta evaluar pros y contras de diferentes opciones.",
+        "reverse": true
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Utilizo datos y evidencia para respaldar mis conclusiones.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Identifico causas raíz de problemas, no solo síntomas.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Aplico lógica estructurada para resolver situaciones complejas.",
+        "reverse": false
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Me resulta difícil procesar información técnica o numérica.",
+        "reverse": true
+    },
+    {
+        "competency": "Pensamiento Analítico",
+        "question": "Anticipo consecuencias y escenarios futuros en mis decisiones.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Genero ideas nuevas y originales con facilidad.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Busco constantemente formas de mejorar procesos existentes.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Prefiero seguir métodos probados antes que experimentar.",
+        "reverse": true
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Me siento cómodo con la ambigüedad y la experimentación.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Me resisto a cambiar formas establecidas de hacer las cosas.",
+        "reverse": true
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Conecto ideas de diferentes áreas para crear soluciones innovadoras.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Propongo soluciones no convencionales a problemas.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Estimulo la creatividad en otros.",
+        "reverse": false
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Me cuesta pensar 'fuera de la caja'.",
+        "reverse": true
+    },
+    {
+        "competency": "Innovación y Creatividad",
+        "question": "Tomo riesgos calculados para implementar nuevas ideas.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Comprendo profundamente las necesidades de mis clientes.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Voy más allá de lo esperado para satisfacer al cliente.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Me cuesta manejar clientes difíciles o insatisfechos.",
+        "reverse": true
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Anticipo necesidades del cliente antes de que las exprese.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Priorizo procesos internos sobre la satisfacción del cliente.",
+        "reverse": true
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Construyo relaciones de largo plazo con clientes.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Busco retroalimentación activamente para mejorar el servicio.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Resuelvo quejas de manera efectiva y oportuna.",
+        "reverse": false
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Evito interacciones directas con clientes cuando es posible.",
+        "reverse": true
+    },
+    {
+        "competency": "Orientación al Cliente",
+        "question": "Personalizo mi enfoque según las necesidades específicas de cada cliente.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Colaboro efectivamente con personas de diferentes áreas.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Comparto información y conocimiento abiertamente con el equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Prefiero trabajar solo que coordinar con otros.",
+        "reverse": true
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Apoyo activamente a mis compañeros en sus tareas.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Me cuesta ceder el crédito por logros del equipo.",
+        "reverse": true
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Construyo consenso y alineación en el equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Valoro y respeto las perspectivas diversas de mis compañeros.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Contribuyo activamente al éxito colectivo del equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Evito involucrarme en proyectos colaborativos.",
+        "reverse": true
+    },
+    {
+        "competency": "Trabajo en Equipo",
+        "question": "Manejo constructivamente desacuerdos dentro del equipo.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Me adapto rápidamente a nuevas situaciones y prioridades.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Veo los cambios como oportunidades, no amenazas.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Me resisto a cambios en mi rutina o procesos de trabajo.",
+        "reverse": true
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Ayudo a otros a navegar y aceptar cambios organizacionales.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Me cuesta dejar ir formas antiguas de hacer las cosas.",
+        "reverse": true
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Mantengo una actitud positiva durante períodos de incertidumbre.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Aprendo rápidamente nuevas herramientas y tecnologías.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Impulso iniciativas de cambio en mi organización.",
+        "reverse": false
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Evito situaciones donde tenga que aprender cosas nuevas.",
+        "reverse": true
+    },
+    {
+        "competency": "Gestión del Cambio",
+        "question": "Manejo efectivamente el estrés asociado con cambios.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Identifico soluciones efectivas bajo presión.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Evalúo múltiples alternativas antes de decidir un curso de acción.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Me paralizo cuando enfrento problemas complejos.",
+        "reverse": true
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Implemento soluciones de manera práctica y efectiva.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Me cuesta tomar decisiones cuando la información es limitada.",
+        "reverse": true
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Aprendo de errores pasados para mejorar futuras decisiones.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Busco aportes de otros para enriquecer mis soluciones.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Actúo decisivamente una vez que identifico la mejor solución.",
+        "reverse": false
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Evito problemas complejos prefiriendo delegar su resolución.",
+        "reverse": true
+    },
+    {
+        "competency": "Resolución de Problemas",
+        "question": "Monitoreo resultados para asegurar que mis soluciones funcionen.",
+        "reverse": false
+    }
+]

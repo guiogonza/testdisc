@@ -356,6 +356,287 @@ ERI_HIRING_RECOMMENDATIONS = {
 
 
 # =========================================================================
+# CONSTANTES TALENT MAP (Mapeo de Competencias y Talentos)
+# =========================================================================
+
+# Dimensiones del Talent Map - 8 competencias universales
+TALENT_MAP_COMPETENCIES = [
+    "Liderazgo",
+    "Comunicación",
+    "Pensamiento Analítico",
+    "Innovación y Creatividad",
+    "Orientación al Cliente",
+    "Trabajo en Equipo",
+    "Gestión del Cambio",
+    "Resolución de Problemas"
+]
+
+# Colores para cada competencia
+TALENT_MAP_COLORS = {
+    "Liderazgo": "#EF4444",              # Rojo
+    "Comunicación": "#3B82F6",           # Azul
+    "Pensamiento Analítico": "#8B5CF6",  # Púrpura
+    "Innovación y Creatividad": "#F59E0B", # Naranja
+    "Orientación al Cliente": "#10B981", # Verde
+    "Trabajo en Equipo": "#06B6D4",      # Cian
+    "Gestión del Cambio": "#EC4899",     # Rosa
+    "Resolución de Problemas": "#14B8A6" # Teal
+}
+
+# Descripciones de cada competencia según nivel
+TALENT_MAP_DESCRIPTIONS = {
+    "Liderazgo": {
+        "title": "👑 Liderazgo",
+        "high": "Capacidad sobresaliente para dirigir equipos, inspirar y tomar decisiones estratégicas. Asume responsabilidad y desarrolla talento.",
+        "medium": "Muestra iniciativa de liderazgo ocasional, puede dirigir con apoyo. En desarrollo.",
+        "low": "Prefiere roles sin responsabilidad de dirección. Requiere desarrollo significativo en habilidades de liderazgo."
+    },
+    "Comunicación": {
+        "title": "💬 Comunicación",
+        "high": "Comunicador excepcional, expresa ideas claramente, escucha activamente y adapta mensaje a audiencias diversas.",
+        "medium": "Comunicación efectiva en situaciones estándar, puede mejorar en contextos complejos o audiencias difíciles.",
+        "low": "Desafíos en expresión clara o escucha activa. Requiere capacitación en comunicación efectiva."
+    },
+    "Pensamiento Analítico": {
+        "title": "🔍 Pensamiento Analítico",
+        "high": "Analiza problemas complejos desde múltiples perspectivas, identifica patrones, usa datos para decisiones fundamentadas.",
+        "medium": "Capacidad analítica básica, maneja problemas de complejidad moderada con orientación.",
+        "low": "Prefiere intuición sobre análisis estructurado. Requiere desarrollo en pensamiento crítico y análisis de datos."
+    },
+    "Innovación y Creatividad": {
+        "title": "💡 Innovación y Creatividad",
+        "high": "Genera constantemente ideas originales, propone soluciones innovadoras, cómodo con experimentación y riesgo calculado.",
+        "medium": "Muestra creatividad ocasional, puede aportar ideas con estímulo. Balancea innovación con métodos probados.",
+        "low": "Prefiere métodos establecidos, resistencia al cambio. Requiere estímulo para pensar creativamente."
+    },
+    "Orientación al Cliente": {
+        "title": "🎯 Orientación al Cliente",
+        "high": "Comprende profundamente necesidades del cliente, anticipa expectativas, construye relaciones de largo plazo, va más allá.",
+        "medium": "Atiende necesidades básicas del cliente adecuadamente, puede mejorar en anticipación y personalización.",
+        "low": "Enfoque limitado en cliente, prioriza procesos internos. Requiere desarrollo en mentalidad centrada en cliente."
+    },
+    "Trabajo en Equipo": {
+        "title": "🤝 Trabajo en Equipo",
+        "high": "Colaborador excepcional, comparte conocimiento abiertamente, construye consenso, valora diversidad, contribuye al éxito colectivo.",
+        "medium": "Trabaja bien en equipo cuando se requiere, colaboración estándar. Ocasionalmente prefiere trabajo individual.",
+        "low": "Preferencia marcada por trabajo independiente, desafíos en colaboración. Requiere desarrollo en habilidades interpersonales."
+    },
+    "Gestión del Cambio": {
+        "title": "🔄 Gestión del Cambio",
+        "high": "Altamente adaptable, ve cambios como oportunidades, ayuda a otros en transiciones, aprende rápido, positivo ante incertidumbre.",
+        "medium": "Se adapta a cambios graduales, puede requerir tiempo de ajuste. Maneja cambios planificados adecuadamente.",
+        "low": "Resistencia al cambio, prefiere rutinas establecidas. Requiere apoyo significativo en períodos de transformación."
+    },
+    "Resolución de Problemas": {
+        "title": "🎯 Resolución de Problemas",
+        "high": "Identifica soluciones efectivas bajo presión, evalúa alternativas, implementa decisiones, aprende de errores, decisivo.",
+        "medium": "Resuelve problemas estándar efectivamente, puede requerir apoyo en situaciones complejas o de alta presión.",
+        "low": "Desafíos para tomar decisiones, se paraliza con problemas complejos. Requiere capacitación estructurada en solución de problemas."
+    }
+}
+
+# Perfiles de referencia por puesto (benchmarks de competencias en escala 0-100)
+TALENT_MAP_JOB_PROFILES = {
+    "Gerente General": {
+        "emoji": "👔",
+        "descripcion": "Lidera organización, toma decisiones estratégicas, gestiona recursos",
+        "competencias": {
+            "Liderazgo": 90,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 85,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 80,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 85,
+            "Resolución de Problemas": 90
+        }
+    },
+    "Gerente de Ventas": {
+        "emoji": "📊",
+        "descripcion": "Dirige equipo comercial, desarrolla estrategias de venta, alcanza metas",
+        "competencias": {
+            "Liderazgo": 85,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 70,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 75,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Gerente de Recursos Humanos": {
+        "emoji": "👥",
+        "descripcion": "Gestiona talento humano, cultura organizacional, desarrollo de personal",
+        "competencias": {
+            "Liderazgo": 80,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 75,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 75,
+            "Trabajo en Equipo": 90,
+            "Gestión del Cambio": 85,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Gerente de Operaciones": {
+        "emoji": "⚙️",
+        "descripcion": "Optimiza procesos, gestiona producción, controla calidad y eficiencia",
+        "competencias": {
+            "Liderazgo": 85,
+            "Comunicación": 75,
+            "Pensamiento Analítico": 90,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 70,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 90
+        }
+    },
+    "Gerente de TI": {
+        "emoji": "💻",
+        "descripcion": "Lidera tecnología, infraestructura, seguridad y proyectos digitales",
+        "competencias": {
+            "Liderazgo": 80,
+            "Comunicación": 75,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 85,
+            "Orientación al Cliente": 70,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 90,
+            "Resolución de Problemas": 95
+        }
+    },
+    "Vendedor Senior": {
+        "emoji": "🎯",
+        "descripcion": "Desarrolla clientes, negocia contratos, alcanza cuotas de venta",
+        "competencias": {
+            "Liderazgo": 60,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 70,
+            "Innovación y Creatividad": 75,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 75,
+            "Resolución de Problemas": 75
+        }
+    },
+    "Analista de Datos": {
+        "emoji": "📈",
+        "descripcion": "Analiza información, genera insights, reporta métricas de negocio",
+        "competencias": {
+            "Liderazgo": 50,
+            "Comunicación": 70,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 70,
+            "Orientación al Cliente": 65,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 70,
+            "Resolución de Problemas": 85
+        }
+    },
+    "Especialista en Marketing": {
+        "emoji": "📱",
+        "descripcion": "Desarrolla campañas, gestiona marca, analiza mercados y tendencias",
+        "competencias": {
+            "Liderazgo": 60,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 75,
+            "Innovación y Creatividad": 90,
+            "Orientación al Cliente": 85,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 75
+        }
+    },
+    "Ingeniero de Software": {
+        "emoji": "⌨️",
+        "descripcion": "Desarrolla aplicaciones, mantiene sistemas, resuelve problemas técnicos",
+        "competencias": {
+            "Liderazgo": 50,
+            "Comunicación": 65,
+            "Pensamiento Analítico": 90,
+            "Innovación y Creatividad": 85,
+            "Orientación al Cliente": 60,
+            "Trabajo en Equipo": 75,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 95
+        }
+    },
+    "Coordinador de Proyectos": {
+        "emoji": "📋",
+        "descripcion": "Planifica, organiza y supervisa proyectos, coordina equipos multifuncionales",
+        "competencias": {
+            "Liderazgo": 75,
+            "Comunicación": 85,
+            "Pensamiento Analítico": 80,
+            "Innovación y Creatividad": 65,
+            "Orientación al Cliente": 75,
+            "Trabajo en Equipo": 90,
+            "Gestión del Cambio": 80,
+            "Resolución de Problemas": 85
+        }
+    },
+    "Especialista en Servicio al Cliente": {
+        "emoji": "☎️",
+        "descripcion": "Atiende consultas, resuelve problemas, mantiene satisfacción del cliente",
+        "competencias": {
+            "Liderazgo": 45,
+            "Comunicación": 90,
+            "Pensamiento Analítico": 65,
+            "Innovación y Creatividad": 60,
+            "Orientación al Cliente": 95,
+            "Trabajo en Equipo": 80,
+            "Gestión del Cambio": 70,
+            "Resolución de Problemas": 80
+        }
+    },
+    "Contador/Analista Financiero": {
+        "emoji": "💰",
+        "descripcion": "Gestiona finanzas, reportes contables, análisis financiero y presupuestos",
+        "competencias": {
+            "Liderazgo": 55,
+            "Comunicación": 70,
+            "Pensamiento Analítico": 95,
+            "Innovación y Creatividad": 60,
+            "Orientación al Cliente": 60,
+            "Trabajo en Equipo": 70,
+            "Gestión del Cambio": 65,
+            "Resolución de Problemas": 85
+        }
+    }
+}
+
+# Niveles de coincidencia (match) con perfil de puesto
+TALENT_MAP_MATCH_LEVELS = {
+    "excelente": {"min": 85, "label": "🌟 Excelente Match", "color": "#10B981", "descripcion": "Competencias altamente alineadas con el perfil del puesto"},
+    "muy_bueno": {"min": 75, "label": "✅ Muy Buen Match", "color": "#3B82F6", "descripcion": "Competencias bien alineadas, candidato muy apto para el rol"},
+    "bueno": {"min": 65, "label": "👍 Buen Match", "color": "#F59E0B", "descripcion": "Competencias aceptables, puede requerir desarrollo en algunas áreas"},
+    "aceptable": {"min": 50, "label": "⚠️ Match Aceptable", "color": "#EF4444", "descripcion": "Competencias limitadas, requiere capacitación significativa"},
+    "bajo": {"min": 0, "label": "❌ Match Bajo", "color": "#991B1B", "descripcion": "Competencias insuficientes para el rol, no recomendado"}
+}
+
+# Recomendaciones por nivel de competencia
+TALENT_MAP_COMPETENCY_RECOMMENDATIONS = {
+    "high": [
+        "Fortaleza clave: aprovechar en el rol",
+        "Puede mentorear a otros en esta competencia",
+        "Considerar para proyectos que requieran esta habilidad"
+    ],
+    "medium": [
+        "Nivel adecuado para el rol",
+        "Puede beneficiarse de capacitación para alcanzar excelencia",
+        "Monitorear desarrollo continuo"
+    ],
+    "low": [
+        "Área de desarrollo prioritaria",
+        "Requiere plan de capacitación específico",
+        "Considerar apoyo o mentoría en esta competencia"
+    ]
+}
+
+
+# =========================================================================
 # ANÁLISIS DE APTITUD Y RECOMENDACIONES
 # =========================================================================
 
@@ -1186,6 +1467,210 @@ def analyze_eri_aptitude(normalized, validity_score, validity_flags):
     }
 
 
+def load_talent_map_questions():
+    """Carga las preguntas del Talent Map desde el archivo JSON."""
+    qfile = os.path.join(os.path.dirname(__file__), "questions_talent_map.json")
+    with open(qfile, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def calculate_talent_map_results(responses, questions):
+    """
+    Calcula los resultados del Talent Map (Mapeo de Competencias).
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+            1 = Totalmente en desacuerdo
+            5 = Totalmente de acuerdo
+        questions: Lista de preguntas con competency y reverse flags
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages)
+            - raw_scores: Puntajes directos por competencia
+            - normalized_scores: Puntajes normalizados 0-100
+            - percentages: Porcentajes relativos entre competencias
+    """
+    # Contar preguntas por competencia
+    questions_per_comp = {}
+    for q in questions:
+        comp = q["competency"]
+        questions_per_comp[comp] = questions_per_comp.get(comp, 0) + 1
+    
+    # Calcular puntajes directos por competencia
+    raw_scores = {comp: 0 for comp in TALENT_MAP_COMPETENCIES}
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            comp = q["competency"]
+            answer = responses[i]
+            
+            # Procesar respuesta según si es reversa o no
+            if q.get("reverse", False):
+                # Pregunta reversa: invertir escala (5->1, 4->2, etc.)
+                score = 6 - answer
+            else:
+                # Pregunta normal: mantener escala (5 = totalmente de acuerdo = alto)
+                score = answer
+            
+            raw_scores[comp] += score
+    
+    # Normalizar a escala 0-100
+    normalized_scores = {}
+    for comp in TALENT_MAP_COMPETENCIES:
+        num_questions = questions_per_comp.get(comp, 10)
+        min_possible = num_questions * 1  # Peor caso
+        max_possible = num_questions * 5  # Mejor caso
+        raw = raw_scores[comp]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[comp] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for comp in TALENT_MAP_COMPETENCIES:
+            percentages[comp] = round((normalized_scores[comp] / total) * 100, 1)
+    else:
+        for comp in TALENT_MAP_COMPETENCIES:
+            percentages[comp] = 12.5  # 100% / 8 competencias
+    
+    return raw_scores, normalized_scores, percentages
+
+
+def analyze_talent_map_match(normalized_scores, selected_job_profile=None):
+    """
+    Analiza los resultados de Talent Map y calcula match con perfil de puesto.
+    
+    Args:
+        normalized_scores: Dict con puntajes normalizados (0-100) por competencia
+        selected_job_profile: Nombre del perfil de puesto para comparar (opcional)
+        
+    Returns:
+        Dict con análisis completo: fortalezas, áreas de desarrollo, recomendaciones, match
+    """
+    # Ordenar competencias por puntaje
+    sorted_comps = sorted(normalized_scores.items(), key=lambda x: x[1], reverse=True)
+    strongest = sorted_comps[0]
+    weakest = sorted_comps[-1]
+    
+    # Clasificar competencias por nivel
+    # Alto: >= 75
+    # Medio: 50-74
+    # Bajo: < 50
+    high_comps = [(c, s) for c, s in normalized_scores.items() if s >= 75]
+    medium_comps = [(c, s) for c, s in normalized_scores.items() if 50 <= s < 75]
+    low_comps = [(c, s) for c, s in normalized_scores.items() if s < 50]
+    
+    # Calcular puntaje promedio general
+    avg_score = sum(normalized_scores.values()) / len(normalized_scores)
+    
+    # Generar fortalezas (competencias altas)
+    fortalezas = []
+    for comp, score in high_comps:
+        desc = TALENT_MAP_DESCRIPTIONS[comp]
+        fortalezas.append(f"**{comp}** ({int(score)}/100): {desc['high']}")
+    
+    # Generar áreas de desarrollo (competencias bajas)
+    areas_desarrollo = []
+    for comp, score in low_comps:
+        desc = TALENT_MAP_DESCRIPTIONS[comp]
+        areas_desarrollo.append(f"**{comp}** ({int(score)}/100): {desc['low']}")
+    
+    # Generar recomendaciones generales
+    recomendaciones = []
+    for comp, score in sorted_comps:
+        if score >= 75:
+            level = "high"
+        elif score >= 50:
+            level = "medium"
+        else:
+            level = "low"
+        
+        recs = TALENT_MAP_COMPETENCY_RECOMMENDATIONS[level]
+        recomendaciones.append(f"**{comp}:** {' | '.join(recs)}")
+    
+    # Análisis de match con perfil de puesto (si se especificó)
+    match_analysis = None
+    match_percentage = None
+    match_level = None
+    match_color = None
+    match_label = None
+    match_gaps = []
+    match_strengths = []
+    
+    if selected_job_profile and selected_job_profile in TALENT_MAP_JOB_PROFILES:
+        profile = TALENT_MAP_JOB_PROFILES[selected_job_profile]
+        profile_comps = profile["competencias"]
+        
+        # Calcular diferencias por competencia
+        total_gap = 0
+        max_possible_gap = 0
+        
+        for comp in TALENT_MAP_COMPETENCIES:
+            required = profile_comps.get(comp, 50)
+            actual = normalized_scores.get(comp, 0)
+            gap = required - actual
+            
+            max_possible_gap += required
+            
+            if gap > 15:  # Gap significativo
+                match_gaps.append(f"**{comp}**: Requiere {int(required)}, tiene {int(actual)} (brecha de {int(gap)} puntos)")
+            elif gap < -10:  # Excede significativamente
+                match_strengths.append(f"**{comp}**: Excede requisito ({int(actual)} vs {int(required)} requerido)")
+            
+            # Calcular distancia absoluta para el match
+            total_gap += abs(gap)
+        
+        # Calcular match percentage (inverso de la brecha promedio)
+        # 100% = sin brecha, 0% = brecha máxima
+        avg_gap = total_gap / len(TALENT_MAP_COMPETENCIES)
+        match_percentage = max(0, min(100, 100 - avg_gap))
+        
+        # Determinar nivel de match
+        for level_name, level_info in TALENT_MAP_MATCH_LEVELS.items():
+            if match_percentage >= level_info["min"]:
+                match_level = level_name
+                match_label = level_info["label"]
+                match_color = level_info["color"]
+                match_desc = level_info["descripcion"]
+                break
+        
+        match_analysis = {
+            "job_profile": selected_job_profile,
+            "job_emoji": profile["emoji"],
+            "job_description": profile["descripcion"],
+            "match_percentage": round(match_percentage, 1),
+            "match_level": match_level,
+            "match_label": match_label,
+            "match_color": match_color,
+            "match_desc": match_desc,
+            "match_gaps": match_gaps,
+            "match_strengths": match_strengths,
+            "profile_scores": profile_comps
+        }
+    
+    return {
+        "average_score": round(avg_score, 1),
+        "strongest_competency": strongest[0],
+        "strongest_score": strongest[1],
+        "weakest_competency": weakest[0],
+        "weakest_score": weakest[1],
+        "high_competencies": [c for c, s in high_comps],
+        "medium_competencies": [c for c, s in medium_comps],
+        "low_competencies": [c for c, s in low_comps],
+        "fortalezas": fortalezas,
+        "areas_desarrollo": areas_desarrollo,
+        "recomendaciones": recomendaciones,
+        "match_analysis": match_analysis
+    }
+
+
 # =========================================================================
 # FUNCIONES DE GRÁFICOS
 # =========================================================================
@@ -1676,6 +2161,322 @@ def create_eri_bars(normalized_scores):
     
     # Leyenda
     ax.legend(fontsize=11, loc='lower right', framealpha=0.95)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_talent_map_radar(normalized_scores, job_profile_scores=None):
+    """
+    Crea un gráfico de radar para visualizar las 8 competencias del Talent Map.
+    Opcionalmente muestra overlay con perfil de puesto para comparación.
+    
+    Args:
+        normalized_scores: Dict con puntajes del candidato (0-100) por competencia
+        job_profile_scores: Dict opcional con puntajes del perfil de puesto para comparar
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de radar
+    """
+    # Preparar datos para el radar
+    competencies = TALENT_MAP_COMPETENCIES
+    values = [normalized_scores[comp] for comp in competencies]
+    values_closed = values + [values[0]]  # Cerrar el polígono
+    
+    # Calcular ángulos para cada competencia
+    angles = np.linspace(0, 2 * np.pi, len(competencies), endpoint=False).tolist()
+    angles_closed = angles + [angles[0]]
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(12, 12), subplot_kw=dict(polar=True))
+    
+    # Línea principal del perfil del candidato
+    ax.plot(angles_closed, values_closed, "o-", linewidth=3.5, color="#6366F1", 
+            markersize=12, markerfacecolor="#818CF8", markeredgecolor="white", 
+            markeredgewidth=3, zorder=5, label="Candidato")
+    
+    # Rellenar área del candidato
+    ax.fill(angles_closed, values_closed, alpha=0.2, color="#6366F1")
+    
+    # Si hay perfil de puesto, agregarlo como comparación
+    if job_profile_scores:
+        profile_values = [job_profile_scores[comp] for comp in competencies]
+        profile_values_closed = profile_values + [profile_values[0]]
+        
+        ax.plot(angles_closed, profile_values_closed, "s--", linewidth=2.5, color="#EF4444", 
+                markersize=8, markerfacecolor="#FCA5A5", markeredgecolor="white", 
+                markeredgewidth=2, zorder=4, label="Perfil Requerido", alpha=0.8)
+        ax.fill(angles_closed, profile_values_closed, alpha=0.15, color="#EF4444")
+    
+    # Puntos coloreados por competencia con valores
+    for i, (angle, val) in enumerate(zip(angles, values)):
+        comp = competencies[i]
+        point_color = TALENT_MAP_COLORS[comp]
+        
+        # Punto
+        ax.plot(angle, val, "o", markersize=16, color=point_color, zorder=6, 
+                markeredgecolor='white', markeredgewidth=2.5)
+        # Valor del punto
+        ax.text(angle, val + 6, f"{int(val)}", ha='center', va='center', 
+                fontsize=11, fontweight='bold', color=point_color)
+    
+    # Configurar etiquetas de competencias con ajuste de tamaño
+    ax.set_xticks(angles)
+    labels = []
+    for comp in competencies:
+        # Dividir nombres largos en dos líneas
+        if len(comp) > 15:
+            words = comp.split()
+            if len(words) >= 2:
+                mid = len(words) // 2
+                line1 = " ".join(words[:mid])
+                line2 = " ".join(words[mid:])
+                labels.append(f"{line1}\n{line2}")
+            else:
+                labels.append(comp)
+        else:
+            labels.append(comp)
+    ax.set_xticklabels(labels, fontsize=10, fontweight="bold", color='#1E293B')
+    
+    # Configurar escala radial
+    ax.set_ylim(0, 100)
+    ax.set_yticks([25, 50, 75, 100])
+    ax.set_yticklabels(['25', '50\n(Promedio)', '75', '100'], fontsize=9, color='#94A3B8')
+    
+    # Líneas de referencia
+    ref_levels = [[50] * (len(competencies) + 1), [75] * (len(competencies) + 1)]
+    ax.plot(angles_closed, ref_levels[0], ":", linewidth=1.5, color="#94A3B8", 
+            alpha=0.6, label="Nivel Promedio (50)")
+    ax.plot(angles_closed, ref_levels[1], "--", linewidth=1.5, color="#10B981", 
+            alpha=0.6, label="Nivel Alto (75)")
+    
+    # Zonas de color de fondo
+    theta = np.linspace(0, 2*np.pi, 100)
+    ax.fill_between(theta, 0, 50, alpha=0.05, color='#EF4444')  # zona baja
+    ax.fill_between(theta, 50, 75, alpha=0.05, color='#F59E0B')  # zona media
+    ax.fill_between(theta, 75, 100, alpha=0.08, color='#10B981')  # zona alta
+    
+    # Estilo del gráfico
+    ax.grid(True, alpha=0.3, color='#CBD5E1', linestyle='-', linewidth=0.8)
+    ax.spines["polar"].set_visible(False)
+    ax.set_facecolor('#FAFBFC')
+    fig.patch.set_facecolor('white')
+    
+    # Título y leyenda
+    title = "Mapeo de Competencias y Talentos"
+    if job_profile_scores:
+        title += "\n(Candidato vs. Perfil Requerido)"
+    plt.title(title, fontsize=16, fontweight="bold", pad=40, color='#1E293B')
+    plt.legend(loc="upper right", bbox_to_anchor=(1.35, 1.1), fontsize=11)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_talent_map_bars(normalized_scores, job_profile_scores=None):
+    """
+    Crea un gráfico de barras horizontales para visualizar las competencias del Talent Map.
+    Opcionalmente incluye barras del perfil de puesto para comparación.
+    
+    Args:
+        normalized_scores: Dict con puntajes del candidato (0-100) por competencia
+        job_profile_scores: Dict opcional con puntajes del perfil de puesto
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de barras horizontales
+    """
+    fig, ax = plt.subplots(figsize=(14, 10))
+    fig.patch.set_facecolor('white')
+    
+    competencies = TALENT_MAP_COMPETENCIES
+    values = [normalized_scores[comp] for comp in competencies]
+    
+    # Si hay perfil de puesto, crear barras agrupadas
+    y_positions = np.arange(len(competencies))
+    bar_height = 0.35 if job_profile_scores else 0.7
+    
+    # Colores de barras según nivel
+    colors = []
+    for val in values:
+        if val >= 75:
+            colors.append("#10B981")  # Verde - Alto
+        elif val >= 50:
+            colors.append("#F59E0B")  # Amarillo - Medio
+        else:
+            colors.append("#EF4444")  # Rojo - Bajo
+    
+    # Crear barras del candidato
+    if job_profile_scores:
+        bars1 = ax.barh(y_positions - bar_height/2, values, bar_height, 
+                       color=colors, alpha=0.85, edgecolor='white', 
+                       linewidth=2, label="Candidato")
+        
+        # Barras del perfil requerido
+        profile_values = [job_profile_scores[comp] for comp in competencies]
+        bars2 = ax.barh(y_positions + bar_height/2, profile_values, bar_height, 
+                       color="#94A3B8", alpha=0.7, edgecolor='white', 
+                       linewidth=2, label="Perfil Requerido")
+        
+        # Agregar valores en las barras
+        for bar, val in zip(bars1, values):
+            ax.text(val + 2, bar.get_y() + bar.get_height()/2, f"{int(val)}", 
+                    va='center', fontweight='bold', fontsize=10, color='#1E293B')
+        
+        for bar, val in zip(bars2, profile_values):
+            ax.text(val + 2, bar.get_y() + bar.get_height()/2, f"{int(val)}", 
+                    va='center', fontweight='bold', fontsize=10, color='#64748B')
+    else:
+        bars = ax.barh(y_positions, values, bar_height, color=colors, 
+                      alpha=0.85, edgecolor='white', linewidth=2.5)
+        
+        # Agregar valores y nivel al final de cada barra
+        for i, (bar, val, color) in enumerate(zip(bars, values, colors)):
+            if val >= 75:
+                level_label = "🌟 Alto"
+            elif val >= 50:
+                level_label = "👍 Medio"
+            else:
+                level_label = "📈 En Desarrollo"
+            
+            ax.text(val + 2, bar.get_y() + bar.get_height()/2, 
+                    f"{int(val)}  {level_label}", 
+                    va='center', fontweight='bold', fontsize=11, color=color)
+    
+    # Líneas de referencia verticales
+    ax.axvline(x=50, color="#94A3B8", linestyle=":", alpha=0.6, linewidth=2, 
+               label="Nivel Promedio (50)")
+    ax.axvline(x=75, color="#10B981", linestyle="--", alpha=0.7, linewidth=2, 
+               label="Nivel Alto (75)")
+    
+    # Zonas de color de fondo
+    ax.axvspan(0, 50, alpha=0.05, color='#EF4444')  # Bajo
+    ax.axvspan(50, 75, alpha=0.05, color='#F59E0B')  # Medio
+    ax.axvspan(75, 100, alpha=0.08, color='#10B981')  # Alto
+    
+    # Configuración de ejes
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(competencies, fontsize=11, fontweight='bold', color='#1E293B')
+    ax.set_xlabel('Puntuación (0-100)', fontsize=12, fontweight='bold', color='#475569')
+    ax.set_xlim(0, 110)
+    ax.set_ylim(-0.5, len(competencies) - 0.5)
+    
+    # Título
+    title = "Evaluación de Competencias por Dimensión"
+    if job_profile_scores:
+        title += "\n(Candidato vs. Perfil Requerido)"
+    ax.set_title(title, fontsize=15, fontweight="bold", pad=20, color='#1E293B')
+    
+    # Estilo
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#CBD5E1')
+    ax.spines['left'].set_color('#CBD5E1')
+    ax.set_facecolor('#FAFBFC')
+    ax.tick_params(axis='x', colors='#94A3B8')
+    ax.tick_params(axis='y', colors='#475569')
+    ax.grid(axis='x', alpha=0.2, color='#CBD5E1', linestyle='-')
+    
+    # Leyenda
+    ax.legend(fontsize=11, loc='lower right', framealpha=0.95)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_talent_map_comparison(normalized_scores, job_profile_name, job_profile_scores):
+    """
+    Crea un gráfico de comparación detallada mostrando gaps y strengths vs perfil de puesto.
+    
+    Args:
+        normalized_scores: Dict con puntajes del candidato
+        job_profile_name: Nombre del perfil de puesto
+        job_profile_scores: Dict con puntajes del perfil
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de comparación de gaps
+    """
+    fig, ax = plt.subplots(figsize=(14, 10))
+    fig.patch.set_facecolor('white')
+    
+    competencies = TALENT_MAP_COMPETENCIES
+    gaps = []
+    gap_colors = []
+    
+    # Calcular gaps (positivo = excede, negativo = deficit)
+    for comp in competencies:
+        candidate = normalized_scores[comp]
+        required = job_profile_scores[comp]
+        gap = candidate - required
+        gaps.append(gap)
+        
+        # Color según gap
+        if gap >= 0:
+            gap_colors.append("#10B981")  # Verde - Excede o cumple
+        elif gap >= -15:
+            gap_colors.append("#F59E0B")  # Amarillo - Gap moderado
+        else:
+            gap_colors.append("#EF4444")  # Rojo - Gap significativo
+    
+    # Crear barras de gap
+    y_positions = np.arange(len(competencies))
+    bars = ax.barh(y_positions, gaps, color=gap_colors, alpha=0.85, 
+                   edgecolor='white', linewidth=2.5, height=0.7)
+    
+    # Agregar valores y etiquetas
+    for i, (bar, gap) in enumerate(zip(bars, gaps)):
+        comp = competencies[i]
+        candidate_score = normalized_scores[comp]
+        required_score = job_profile_scores[comp]
+        
+        # Texto del gap
+        gap_text = f"{gap:+.0f}"
+        if gap >= 0:
+            label = f"{gap_text}  ✅ Excede"
+            x_pos = gap + 2
+        elif gap >= -15:
+            label = f"{gap_text}  ⚠️ Gap moderado"
+            x_pos = gap - 2
+        else:
+            label = f"{gap_text}  🚨 Gap crítico"
+            x_pos = gap - 2
+        
+        ha = 'left' if gap >= 0 else 'right'
+        ax.text(x_pos, bar.get_y() + bar.get_height()/2, label, 
+                va='center', ha=ha, fontweight='bold', fontsize=10, 
+                color=gap_colors[i])
+        
+        # Texto de puntajes (candidato vs requerido)
+        score_text = f"Candidato: {candidate_score:.0f}  |  Requerido: {required_score:.0f}"
+        ax.text(-42, bar.get_y() + bar.get_height()/2, score_text, 
+                va='center', ha='left', fontsize=9, color='#64748B', style='italic')
+    
+    # Línea de referencia (gap = 0)
+    ax.axvline(x=0, color='#1E293B', linestyle='-', linewidth=2.5, alpha=0.8)
+    
+    # Configuración de ejes
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(competencies, fontsize=11, fontweight='bold', color='#1E293B')
+    ax.set_xlabel('Gap de Competencia (Candidato - Requerido)', fontsize=12, 
+                  fontweight='bold', color='#475569')
+    
+    # Ajustar límites del eje X
+    max_abs_gap = max(abs(min(gaps)), abs(max(gaps)))
+    ax.set_xlim(-max_abs_gap - 20, max_abs_gap + 20)
+    ax.set_ylim(-0.5, len(competencies) - 0.5)
+    
+    # Título
+    profile_info = TALENT_MAP_JOB_PROFILES[job_profile_name]
+    title = f"Análisis de Brechas vs. {profile_info['emoji']} {job_profile_name}\n{profile_info['descripcion']}"
+    ax.set_title(title, fontsize=14, fontweight="bold", pad=20, color='#1E293B')
+    
+    # Estilo
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#CBD5E1')
+    ax.spines['left'].set_color('#CBD5E1')
+    ax.set_facecolor('#FAFBFC')
+    ax.tick_params(axis='both', colors='#475569')
+    ax.grid(axis='x', alpha=0.2, color='#CBD5E1', linestyle='-')
     
     plt.tight_layout()
     return fig
@@ -2444,6 +3245,290 @@ def generate_eri_pdf(candidate, raw_scores, normalized, radar_fig, session_id, c
     return buffer
 
 
+def generate_talent_map_pdf(candidate, raw_scores, normalized, radar_fig, session_id, completed_at=None, analysis=None, job_profile_name=None, comparison_fig=None):
+    """
+    Genera un PDF con los resultados del Talent Map (Mapeo de Competencias).
+    
+    Args:
+        candidate: Dict con información del candidato
+        raw_scores: Puntajes directos por competencia
+        normalized: Puntajes normalizados (0-100) por competencia
+        radar_fig: Figura matplotlib del radar
+        session_id: ID de la sesión
+        completed_at: Fecha de completación (opcional)
+        analysis: Dict con análisis de competencias (opcional)
+        job_profile_name: Nombre del perfil de puesto para match (opcional)
+        comparison_fig: Figura matplotlib de comparación (opcional)
+        
+    Returns:
+        BytesIO: Buffer con el PDF generado
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=14))
+    styles.add(ParagraphStyle(name="SmallBold", parent=styles["Normal"], 
+                             fontSize=9, leading=12, fontName="Helvetica-Bold"))
+    styles.add(ParagraphStyle(name="Small", parent=styles["Normal"], 
+                             fontSize=9, leading=12))
+    styles.add(ParagraphStyle(name="MatchHighlight", parent=styles["Normal"],
+                             fontSize=13, leading=16, fontName="Helvetica-Bold",
+                             textColor=colors.HexColor("#1E40AF")))
+    
+    story = []
+    
+    # === PÁGINA 1: PORTADA Y RESULTADOS ===
+    story.append(Paragraph("Talent Map - Mapeo de Competencias y Talentos", styles["Title"]))
+    story.append(Paragraph("Evaluación de 8 Competencias Universales", styles["Heading2"]))
+    story.append(Spacer(1, 12))
+    
+    # Información del candidato
+    story.append(Paragraph(f"<b>ID Evaluación:</b> {session_id}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Candidato:</b> {candidate['name']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cédula:</b> {candidate['cedula']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cargo Evaluado:</b> {candidate.get('position', 'N/A')}", styles["Normal"]))
+    
+    # Formatear fecha
+    if completed_at:
+        try:
+            fecha_obj = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+            fecha_str = fecha_obj.strftime('%d/%m/%Y %H:%M')
+        except:
+            fecha_str = completed_at
+    else:
+        fecha_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    story.append(Paragraph(f"<b>Fecha de Presentación:</b> {fecha_str}", styles["Normal"]))
+    story.append(Spacer(1, 16))
+    
+    # Generar análisis si no se proporcionó
+    if analysis is None:
+        profile_scores = TALENT_MAP_JOB_PROFILES[job_profile_name]["competencias"] if job_profile_name else None
+        analysis = analyze_talent_map_match(normalized, job_profile_name)
+    
+    # === RESULTADO GENERAL ===
+    story.append(Paragraph(
+        f"<b>PERFIL DE COMPETENCIAS: Promedio {analysis['average_score']:.1f}/100</b>", 
+        styles["Heading2"]
+    ))
+    story.append(Paragraph(
+        f"<b>Competencia más fuerte:</b> {analysis['strongest_competency']} "
+        f"({int(analysis['strongest_score'])}/100) | "
+        f"<b>Área de mayor desarrollo:</b> {analysis['weakest_competency']} "
+        f"({int(analysis['weakest_score'])}/100)",
+        styles["Normal"]
+    ))
+    story.append(Spacer(1, 12))
+    
+    # === ANÁLISIS DE MATCH (si aplica) ===
+    if analysis.get('match_analysis'):
+        match = analysis['match_analysis']
+        story.append(Paragraph(
+            f"{match['match_label']}: {match['match_percentage']:.1f}%",
+            styles["MatchHighlight"]
+        ))
+        story.append(Paragraph(
+            f"<b>Perfil de Puesto:</b> {match['job_emoji']} {match['job_profile']} - {match['job_description']}",
+            styles["Normal"]
+        ))
+        story.append(Paragraph(
+            f"<b>Evaluación:</b> {match['match_desc']}",
+            styles["Normal"]
+        ))
+        story.append(Spacer(1, 16))
+    else:
+        story.append(Spacer(1, 12))
+    
+    # === TABLA DE COMPETENCIAS ===
+    story.append(Paragraph("Puntajes por Competencia", styles["Heading2"]))
+    story.append(Spacer(1, 8))
+    
+    data = [["Competencia", "Puntaje", "Nivel", "Estado"]]
+    for comp in TALENT_MAP_COMPETENCIES:
+        score = normalized[comp]
+        if score >= 75:
+            nivel = "Alto"
+            estado = "🌟"
+        elif score >= 50:
+            nivel = "Medio"
+            estado = "👍"
+        else:
+            nivel = "En Desarrollo"
+            estado = "📈"
+        
+        data.append([
+            comp,
+            f"{int(score)}/100",
+            nivel,
+            estado
+        ])
+    
+    t = Table(data, colWidths=[140, 70, 90, 50])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1E40AF")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+        ("ALIGN", (0, 0), (0, -1), "LEFT"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 9),
+        ("FONTSIZE", (0, 1), (-1, -1), 8),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 16))
+    
+    # === GRÁFICO RADAR ===
+    if radar_fig:
+        img_buf = BytesIO()
+        radar_fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
+        img_buf.seek(0)
+        story.append(Image(img_buf, width=350, height=350))
+    
+    # === PÁGINA 2: ANÁLISIS DETALLADO ===
+    story.append(PageBreak())
+    story.append(Paragraph("Análisis Detallado de Competencias", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    # === FORTALEZAS ===
+    if analysis.get('fortalezas'):
+        story.append(Paragraph("🌟 FORTALEZAS CLAVE", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for f in analysis['fortalezas']:
+            # Limpiar markdown para PDF
+            f_clean = f.replace("**", "")
+            story.append(Paragraph(f"• {f_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ÁREAS DE DESARROLLO ===
+    if analysis.get('areas_desarrollo'):
+        story.append(Paragraph("📈 ÁREAS DE DESARROLLO", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for a in analysis['areas_desarrollo']:
+            # Limpiar markdown para PDF
+            a_clean = a.replace("**", "")
+            story.append(Paragraph(f"• {a_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ANÁLISIS DE MATCH CON PERFIL (si aplica) ===
+    if analysis.get('match_analysis'):
+        match = analysis['match_analysis']
+        
+        story.append(Paragraph(f"🎯 ANÁLISIS DE MATCH CON {match['job_profile'].upper()}", styles["Heading2"]))
+        story.append(Spacer(1, 8))
+        
+        # Fortalezas del match
+        if match.get('match_strengths'):
+            story.append(Paragraph("<b>✅ Competencias que EXCEDEN el perfil:</b>", styles["SmallBold"]))
+            story.append(Spacer(1, 4))
+            for s in match['match_strengths']:
+                s_clean = s.replace("**", "")
+                story.append(Paragraph(f"• {s_clean}", styles["Small"]))
+            story.append(Spacer(1, 8))
+        
+        # Gaps del match
+        if match.get('match_gaps'):
+            story.append(Paragraph("<b>⚠️ Brechas a cerrar:</b>", styles["SmallBold"]))
+            story.append(Spacer(1, 4))
+            for g in match['match_gaps']:
+                g_clean = g.replace("**", "")
+                story.append(Paragraph(f"• {g_clean}", styles["Small"]))
+            story.append(Spacer(1, 12))
+    
+    # === GRÁFICO DE COMPARACIÓN (si aplica) ===
+    if comparison_fig:
+        story.append(PageBreak())
+        story.append(Paragraph("Análisis de Brechas de Competencia", styles["Heading1"]))
+        story.append(Spacer(1, 12))
+        img_buf = BytesIO()
+        comparison_fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
+        img_buf.seek(0)
+        story.append(Image(img_buf, width=500, height=420))
+    
+    # === PÁGINA 3: RECOMENDACIONES ===
+    story.append(PageBreak())
+    story.append(Paragraph("💼 Recomendaciones y Plan de Desarrollo", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    if analysis.get('recomendaciones'):
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown para PDF
+            r_clean = r.replace("**", "")
+            story.append(Paragraph(f"{r_clean}", styles["Small"]))
+            story.append(Spacer(1, 6))
+    
+    # === DESCRIPCIÓN DE LAS 8 COMPETENCIAS ===
+    story.append(PageBreak())
+    story.append(Paragraph("Descripción de las 8 Competencias Evaluadas", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    for comp in TALENT_MAP_COMPETENCIES:
+        score = normalized[comp]
+        desc_info = TALENT_MAP_DESCRIPTIONS[comp]
+        
+        # Determinar nivel y descripción
+        if score >= 75:
+            level_text = "ALTO 🌟"
+            desc_text = desc_info["high"]
+        elif score >= 50:
+            level_text = "MEDIO 👍"
+            desc_text = desc_info["medium"]
+        else:
+            level_text = "EN DESARROLLO 📈"
+            desc_text = desc_info["low"]
+        
+        story.append(Paragraph(
+            f"<b>{desc_info['title']}</b> - {level_text} ({int(score)}/100)",
+            styles["Heading3"]
+        ))
+        story.append(Paragraph(desc_text, styles["Small"]))
+        story.append(Spacer(1, 8))
+    
+    # === PERFILES DE PUESTOS DISPONIBLES ===
+    story.append(PageBreak())
+    story.append(Paragraph("Perfiles de Puestos de Referencia", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(
+        "El sistema incluye perfiles de referencia (benchmarks) para los siguientes puestos:",
+        styles["Normal"]
+    ))
+    story.append(Spacer(1, 8))
+    
+    for job_name, job_info in TALENT_MAP_JOB_PROFILES.items():
+        story.append(Paragraph(
+            f"<b>{job_info['emoji']} {job_name}:</b> {job_info['descripcion']}",
+            styles["Small"]
+        ))
+        story.append(Spacer(1, 4))
+    
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(
+        "Estos perfiles sirven como referencia para evaluar el ajuste (fit) entre "
+        "las competencias del candidato y los requisitos del puesto.",
+        styles["Small"]
+    ))
+    
+    # === DISCLAIMER ===
+    story.append(Spacer(1, 20))
+    story.append(Paragraph(
+        "<i>Este reporte es generado automáticamente como herramienta de apoyo para "
+        "Recursos Humanos en procesos de selección y desarrollo. Los resultados deben ser "
+        "interpretados por personal capacitado y complementados con entrevistas, evaluaciones "
+        "de desempeño y otras fuentes de información. Las competencias son desarrollables mediante "
+        "capacitación, coaching y experiencia práctica.</i>",
+        styles["Small"]
+    ))
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+
 # =========================================================================
 # HELPER: Load DISC questions
 # =========================================================================
@@ -2575,10 +3660,10 @@ def page_admin_dashboard():
                 st.markdown("---")
                 c3, c4 = st.columns(2)
                 with c3:
-                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri"], 
-                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else "🔐 ERI")))
+                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map"], 
+                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else "🌟 Talent Map"))))
                 with c4:
-                    time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
+                    time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60, 90], index=3, format_func=lambda x: f"{x} minutos")
 
                 create_btn = st.form_submit_button("✅ Crear Evaluación")
                 if create_btn:
@@ -2611,10 +3696,10 @@ def page_admin_dashboard():
                 with st.form("existing_candidate_form"):
                     c3, c4 = st.columns(2)
                     with c3:
-                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri"], 
-                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else "🔐 ERI")))
+                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri", "talent_map"], 
+                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else ("🔐 ERI" if x == "eri" else "🌟 Talent Map"))))
                     with c4:
-                        time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
+                        time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60, 90], index=3, format_func=lambda x: f"{x} minutos")
                     create_btn2 = st.form_submit_button("✅ Asignar Evaluación")
                     if create_btn2:
                         session_id, error = db.create_test_session(candidate["id"], test_type, time_limit, admin["id"])
@@ -2634,8 +3719,8 @@ def page_admin_dashboard():
         # Fila de filtros
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti", "wpi", "eri"], key="filter_type",
-                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI", "eri": "🔐 ERI"}.get(x, x))
+            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti", "wpi", "eri", "talent_map"], key="filter_type",
+                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI", "eri": "🔐 ERI", "talent_map": "🌟 Talent Map"}.get(x, x))
         with c2:
             filter_status = st.selectbox("Filtrar por estado:", ["Todos", "pending", "in_progress", "completed", "expired"], key="filter_status",
                                           format_func=lambda x: {"Todos": "📋 Todos", "pending": "⏳ Pendiente", "in_progress": "▶️ En Progreso", "completed": "✅ Completado", "expired": "⏰ Expirado"}.get(x, x))
@@ -2767,6 +3852,8 @@ def page_admin_dashboard():
                                 show_wpi_results_admin(results, candidate, sess)
                             elif sess["test_type"] == "eri":
                                 show_eri_results_admin(results, candidate, sess)
+                            elif sess["test_type"] == "talent_map":
+                                show_talent_map_results_admin(results, candidate, sess)
                         else:
                             st.warning("Resultados no disponibles.")
 
@@ -3379,6 +4466,459 @@ def show_eri_results_admin(results, candidate, session):
         )
 
 
+def page_talent_map_test():
+    """
+    Página del test Talent Map (Mapeo de Competencias) - 80 preguntas con escala Likert 1-5.
+    """
+    session = st.session_state.get("test_session")
+    candidate = st.session_state.get("candidate")
+    
+    if not session or not candidate:
+        nav("candidate_login")
+        st.rerun()
+        return
+
+    session = db.get_session_by_id(session["id"])
+    if not session or session["status"] not in ("in_progress",):
+        if session and session["status"] == "expired":
+            st.error("⏰ El tiempo de esta evaluación ha expirado.")
+            if st.button("Volver"):
+                nav("candidate_select_test")
+                st.rerun()
+            return
+        nav("candidate_select_test")
+        st.rerun()
+        return
+
+    # Verificar tiempo restante
+    remaining = db.check_session_time(session)
+    if remaining == -1:
+        st.error("⏰ El tiempo de esta evaluación ha expirado.")
+        if st.button("Volver"):
+            nav("candidate_select_test")
+            st.rerun()
+        return
+
+    # Mostrar timer
+    deadline_ts = db.get_session_deadline_timestamp(session)
+    if deadline_ts:
+        render_timer(deadline_ts, session["id"])
+
+    st.markdown(f"### 🎯 Talent Map - Mapeo de Competencias y Talentos")
+    st.caption(f"Candidato: {candidate['name']} | ID: {session['id']}")
+    
+    # Cargar preguntas si no están en session_state
+    if "tm_questions" not in st.session_state:
+        all_questions = load_talent_map_questions()
+        # Mezclar preguntas de manera consistente por sesión
+        rng = random.Random(session["id"])
+        rng.shuffle(all_questions)
+        st.session_state.tm_questions = all_questions
+        db.update_session_questions(session["id"], all_questions)
+
+    # Inicializar respuestas
+    if "tm_responses" not in st.session_state:
+        st.session_state.tm_responses = [None] * len(st.session_state.tm_questions)
+
+    # Inicializar página
+    if "tm_page" not in st.session_state:
+        st.session_state.tm_page = 0
+
+    questions = st.session_state.tm_questions
+    total = len(questions)
+    questions_per_page = 10  # 10 preguntas por página
+    page = st.session_state.tm_page
+    q_start = page * questions_per_page
+    q_end = min(q_start + questions_per_page, total)
+
+    # Barra de progreso
+    progress = q_end / total
+    st.progress(progress)
+    st.markdown(f"**Preguntas {q_start + 1} - {q_end} de {total}**")
+
+    # Instrucciones
+    st.info("""
+    **Instrucciones:** Responde con HONESTIDAD sobre cómo te comportas habitualmente en situaciones laborales.
+    
+    Escala:
+    - **5** = Totalmente de acuerdo (Siempre me describe)
+    - **4** = De acuerdo (Frecuentemente me describe)
+    - **3** = Neutral / A veces (Depende de la situación)
+    - **2** = En desacuerdo (Raramente me describe)
+    - **1** = Totalmente en desacuerdo (Nunca me describe)
+    
+    💡 No hay respuestas correctas o incorrectas. Este test evalúa tu perfil de competencias.
+    """)
+
+    # Mostrar preguntas de la página actual
+    all_answered = True
+    
+    for i in range(q_start, q_end):
+        q = questions[i]
+        q_text = q["question"]
+        comp = q["competency"]
+        
+        # Crear tarjeta visual para cada pregunta con colores de Talent Map
+        st.markdown(
+            f"""
+            <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+                        border-radius: 12px; padding: 20px; margin: 15px 0;
+                        border-left: 4px solid {TALENT_MAP_COLORS.get(comp, '#3b82f6')};">
+                <div style="margin-bottom: 8px;">
+                    <span style="background: {TALENT_MAP_COLORS.get(comp, '#3b82f6')}; color: white; 
+                                padding: 4px 12px; border-radius: 20px; 
+                                font-size: 0.85em; font-weight: bold;">
+                        Pregunta {i + 1} - {comp}
+                    </span>
+                </div>
+                <p style="color: #e2e8f0; font-size: 1.1em; margin: 12px 0;">
+                    {q_text}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Radio buttons para la respuesta
+        response_key = f"tm_q_{i}"
+        
+        # Inicializar desde respuestas guardadas
+        if response_key not in st.session_state and st.session_state.tm_responses[i] is not None:
+            st.session_state[response_key] = st.session_state.tm_responses[i]
+        
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            response = st.radio(
+                f"Respuesta {i + 1}",
+                options=[1, 2, 3, 4, 5],
+                format_func=lambda x: {
+                    1: "1 - Totalmente en desacuerdo",
+                    2: "2 - En desacuerdo",
+                    3: "3 - Neutral",
+                    4: "4 - De acuerdo",
+                    5: "5 - Totalmente de acuerdo"
+                }[x],
+                key=response_key,
+                horizontal=False,
+                index=None if response_key not in st.session_state else st.session_state[response_key] - 1
+            )
+        
+        with col2:
+            st.markdown("<br>" * 2, unsafe_allow_html=True)
+            if response is not None:
+                st.success("✅")
+                st.session_state.tm_responses[i] = response
+            else:
+                st.warning("⚠️")
+                all_answered = False
+
+    # Navegación
+    st.markdown("---")
+    col_prev, col_space, col_next = st.columns([1, 4, 1])
+
+    with col_prev:
+        if page > 0:
+            if st.button("⬅️ Anterior", key="tm_prev"):
+                st.session_state.tm_page -= 1
+                st.rerun()
+
+    with col_next:
+        is_last = q_end >= total
+        btn_label = "✅ Finalizar Evaluación" if is_last else "Siguiente ➡️"
+        if st.button(btn_label, key="tm_next", disabled=not all_answered):
+            # Verificar tiempo nuevamente
+            remaining = db.check_session_time(db.get_session_by_id(session["id"]))
+            if remaining == -1:
+                st.error("⏰ El tiempo ha expirado.")
+                return
+
+            if is_last:
+                # Verificar que todas las preguntas estén respondidas
+                if None in st.session_state.tm_responses:
+                    st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
+                else:
+                    # Calcular resultados
+                    responses = st.session_state.tm_responses
+                    raw, normalized, percentages = calculate_talent_map_results(responses, questions)
+
+                    # Guardar respuestas
+                    answer_records = []
+                    for i in range(total):
+                        answer_records.append({
+                            "question_index": i,
+                            "question_text": questions[i]["question"],
+                            "answer_value": responses[i],
+                            "answer_b_value": None,  # No aplica para Talent Map
+                        })
+                    db.save_answers(session["id"], answer_records)
+
+                    # Guardar resultados
+                    results = {
+                        "raw": raw,
+                        "normalized": normalized,
+                        "percentages": percentages
+                    }
+                    db.save_results(session["id"], results)
+                    db.complete_test_session(session["id"])
+
+                    # Limpiar session state
+                    for key in ["tm_questions", "tm_responses", "tm_page", "test_session"]:
+                        st.session_state.pop(key, None)
+
+                    nav("candidate_done")
+                    st.rerun()
+            else:
+                st.session_state.tm_page += 1
+                st.rerun()
+
+
+def show_talent_map_results_admin(results, candidate, session):
+    """
+    Muestra los resultados del Talent Map en el panel de administración.
+    
+    Args:
+        results: Dict con raw, normalized, percentages
+        candidate: Dict con información del candidato
+        session: Dict con información de la sesión o str con session_id
+    """
+    raw = results.get("raw", {})
+    normalized = results.get("normalized", {})
+    percentages = results.get("percentages", {})
+    
+    # Selector de perfil de puesto para comparación
+    st.markdown("### 🎯 Comparación con Perfil de Puesto")
+    
+    job_profile_name = st.selectbox(
+        "Selecciona un perfil de puesto para comparar competencias:",
+        options=["(Sin comparación)"] + list(TALENT_MAP_JOB_PROFILES.keys()),
+        key="tm_job_profile_selector"
+    )
+    
+    # Análisis de competencias con o sin match
+    if job_profile_name and job_profile_name != "(Sin comparación)":
+        analysis = analyze_talent_map_match(normalized, job_profile_name)
+    else:
+        analysis = analyze_talent_map_match(normalized, None)
+    
+    # === BANNER DE RESULTADO GENERAL ===
+    avg_color = "#10B981" if analysis['average_score'] >= 75 else ("#F59E0B" if analysis['average_score'] >= 50 else "#EF4444")
+    
+    st.markdown(f"""
+    <div style="background: {avg_color}22; border-left: 5px solid {avg_color};
+                padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: {avg_color};">
+            🎯 Perfil de Competencias — Promedio: {analysis['average_score']:.1f}/100
+        </h3>
+        <p style="margin: 5px 0 0 0; color: #374151;">
+            <b>Competencia más fuerte:</b> {analysis['strongest_competency']} ({int(analysis['strongest_score'])}/100) | 
+            <b>Área de mayor desarrollo:</b> {analysis['weakest_competency']} ({int(analysis['weakest_score'])}/100)
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # === ANÁLISIS DE MATCH (si aplica) ===
+    if analysis.get('match_analysis'):
+        match = analysis['match_analysis']
+        match_color = match['match_color']
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
+                    padding: 20px; border-radius: 12px; margin-bottom: 20px; color: white;">
+            <h4 style="margin: 0 0 5px 0;">📊 Match con {match['job_emoji']} {match['job_profile']}</h4>
+            <h2 style="margin: 0; color: {match_color};">{match['match_label']}: {match['match_percentage']:.1f}%</h2>
+            <p style="margin: 8px 0 0 0; opacity: 0.9;">{match['match_desc']}</p>
+            <p style="margin: 8px 0 0 0; font-size: 0.9em; opacity: 0.85;">{match['job_description']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # === MÉTRICAS POR COMPETENCIA ===
+    st.markdown("### 📊 Puntajes por Competencia")
+    
+    # Crear columnas para las 8 competencias
+    cols = st.columns(4)
+    for idx, comp in enumerate(TALENT_MAP_COMPETENCIES):
+        with cols[idx % 4]:
+            score = normalized.get(comp, 0)
+            if score >= 75:
+                nivel = "🌟 Alto"
+                delta_color = "normal"
+            elif score >= 50:
+                nivel = "👍 Medio"
+                delta_color = "off"
+            else:
+                nivel = "📈 Desarrollo"
+                delta_color = "inverse"
+            
+            st.metric(
+                label=comp,
+                value=f"{int(score)}/100",
+                delta=nivel,
+                delta_color=delta_color
+            )
+    
+    st.markdown("---")
+    
+    # === GRÁFICOS ===
+    # Si hay perfil de puesto seleccionado, crear gráficos con comparación
+    if job_profile_name and job_profile_name != "(Sin comparación)":
+        job_profile_scores = TALENT_MAP_JOB_PROFILES[job_profile_name]["competencias"]
+        
+        col_radar = st.container()
+        with col_radar:
+            st.markdown("#### 🎯 Perfil de Competencias (Candidato vs. Perfil Requerido)")
+            radar_fig = create_talent_map_radar(normalized, job_profile_scores)
+            st.pyplot(radar_fig)
+        
+        st.markdown("---")
+        
+        col_bars = st.container()
+        with col_bars:
+            st.markdown("#### 📊 Comparación de Competencias")
+            bar_fig = create_talent_map_bars(normalized, job_profile_scores)
+            st.pyplot(bar_fig)
+        
+        st.markdown("---")
+        
+        col_comparison = st.container()
+        with col_comparison:
+            st.markdown("#### 📈 Análisis de Brechas de Competencia")
+            comparison_fig = create_talent_map_comparison(normalized, job_profile_name, job_profile_scores)
+            st.pyplot(comparison_fig)
+    else:
+        col_radar, col_bars = st.columns(2)
+        
+        with col_radar:
+            st.markdown("#### 🎯 Perfil de Competencias (Radar)")
+            radar_fig = create_talent_map_radar(normalized)
+            st.pyplot(radar_fig)
+        
+        with col_bars:
+            st.markdown("#### 📊 Puntajes por Competencia")
+            bar_fig = create_talent_map_bars(normalized)
+            st.pyplot(bar_fig)
+        
+        comparison_fig = None
+    
+    st.markdown("---")
+    
+    # === ANÁLISIS POR COMPETENCIA ===
+    st.markdown("### 📋 Análisis Detallado por Competencia")
+    
+    sorted_scores = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    
+    for comp, score in sorted_scores:
+        desc_info = TALENT_MAP_DESCRIPTIONS[comp]
+        
+        # Determinar nivel
+        if score >= 75:
+            level = "🌟 Alto"
+            text = desc_info["high"]
+            color = "#10B981"
+        elif score >= 50:
+            level = "👍 Medio"
+            text = desc_info["medium"]
+            color = "#F59E0B"
+        else:
+            level = "📈 En Desarrollo"
+            text = desc_info["low"]
+            color = "#EF4444"
+        
+        st.markdown(f"""
+        <div style="background: {color}15; border-left: 3px solid {color}; 
+                    padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+            <b style="color: {color};">{desc_info['title']}</b> — {level} ({int(score)}/100)
+            <br><span style="color: #374151;">{text}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # === FORTALEZAS ===
+    if analysis.get('fortalezas'):
+        st.markdown("### 💚 Fortalezas Clave")
+        for f in analysis['fortalezas']:
+            # Limpiar markdown
+            f_clean = f.replace("**", "")
+            st.markdown(f"- ✅ {f_clean}")
+        st.markdown("")
+    
+    # === ÁREAS DE DESARROLLO ===
+    if analysis.get('areas_desarrollo'):
+        st.markdown("### 📈 Áreas de Desarrollo")
+        for a in analysis['areas_desarrollo']:
+            # Limpiar markdown
+            a_clean = a.replace("**", "")
+            st.markdown(f"- 🔵 {a_clean}")
+        st.markdown("")
+    
+    # === GAPS Y STRENGTHS DE MATCH (si aplica) ===
+    if analysis.get('match_analysis'):
+        match = analysis['match_analysis']
+        
+        # Strengths del match
+        if match.get('match_strengths'):
+            st.markdown("### ✅ Competencias que Exceden el Perfil")
+            for s in match['match_strengths']:
+                s_clean = s.replace("**", "")
+                st.markdown(f"- ✨ {s_clean}")
+            st.markdown("")
+        
+        # Gaps del match
+        if match.get('match_gaps'):
+            st.markdown("### ⚠️ Brechas a Cerrar")
+            for g in match['match_gaps']:
+                g_clean = g.replace("**", "")
+                st.markdown(f"- 📊 {g_clean}")
+            st.markdown("")
+    
+    # === RECOMENDACIONES ===
+    if analysis.get('recomendaciones'):
+        with st.expander("💼 Ver Recomendaciones y Plan de Desarrollo"):
+            for r in analysis['recomendaciones']:
+                # Limpiar markdown (pero mantener bullets internos)
+                r_clean = r.replace("**", "")
+                st.markdown(f"{r_clean}")
+    
+    st.markdown("---")
+    
+    # === DESCARGA DE REPORTES ===
+    st.markdown("### 📥 Descargar Reportes")
+    
+    session_id = session if isinstance(session, str) else session.get("id")
+    completed_at = session.get("completed_at") if isinstance(session, dict) else None
+    
+    # Generar PDF (con o sin comparación de perfil)
+    if job_profile_name and job_profile_name != "(Sin comparación)":
+        pdf_buffer = generate_talent_map_pdf(
+            candidate, raw, normalized, radar_fig, session_id, 
+            completed_at, analysis, job_profile_name, comparison_fig
+        )
+    else:
+        pdf_buffer = generate_talent_map_pdf(
+            candidate, raw, normalized, radar_fig, session_id, 
+            completed_at, analysis
+        )
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button(
+            label="📄 Descargar Reporte PDF Completo",
+            data=pdf_buffer,
+            file_name=f"talent_map_{candidate['cedula']}_{session_id}.pdf",
+            mime="application/pdf",
+            key=f"pdf_tm_{session_id}"
+        )
+    
+    with col2:
+        st.download_button(
+            label="📊 Descargar Datos JSON",
+            data=json.dumps(results, indent=2, ensure_ascii=False),
+            file_name=f"talent_map_{candidate['cedula']}_{session_id}.json",
+            mime="application/json",
+            key=f"json_tm_{session_id}"
+        )
+
+
 # -------------------------------------------------------------------------
 # CANDIDATE: LOGIN
 # -------------------------------------------------------------------------
@@ -3451,6 +4991,9 @@ def page_candidate_select_test():
         elif sess["test_type"] == "eri":
             test_emoji = "🔐"
             test_name = "ERI - Evaluación de Riesgo e Integridad"
+        elif sess["test_type"] == "talent_map":
+            test_emoji = "🌟"
+            test_name = "Talent Map - Mapeo de Competencias"
         else:
             test_emoji = "📝"
             test_name = "Evaluación"
@@ -3488,6 +5031,8 @@ def page_candidate_select_test():
                         nav("wpi_test")
                     elif sess["test_type"] == "eri":
                         nav("eri_test")
+                    elif sess["test_type"] == "talent_map":
+                        nav("talent_map_test")
                     st.rerun()
 
     st.markdown("---")
@@ -3496,7 +5041,8 @@ def page_candidate_select_test():
                     "disc_questions", "disc_page", "disc_answers", 
                     "valanti_responses", "valanti_page",
                     "wpi_questions", "wpi_responses", "wpi_page",
-                    "eri_questions", "eri_responses", "eri_page"]:
+                    "eri_questions", "eri_responses", "eri_page",
+                    "tm_questions", "tm_responses", "tm_page"]:
             st.session_state.pop(key, None)
         nav("home")
         st.rerun()
@@ -4290,6 +5836,7 @@ PAGE_MAP = {
     "valanti_test": page_valanti_test,
     "wpi_test": page_wpi_test,
     "eri_test": page_eri_test,
+    "talent_map_test": page_talent_map_test,
     "candidate_done": page_candidate_done,
 }
 

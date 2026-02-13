@@ -29,7 +29,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar archivos de la aplicación
 COPY app.py database.py ./
-COPY questions_es.json questions.json questions_wpi.json questions_eri.json ./
+COPY questions_es.json questions.json questions_wpi.json questions_eri.json questions_talent_map.json ./
 COPY disc_descriptions_es.json disc_descriptions.json ./
 COPY streangths.json ./
 
