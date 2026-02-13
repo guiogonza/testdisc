@@ -1,0 +1,362 @@
+[
+    {
+        "dimension": "Honestidad",
+        "question": "Es aceptable llevarse material de oficina para uso personal si es de poco valor.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Nunca he mentido en mi vida.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Si encontrara dinero en el trabajo, lo reportaría inmediatamente.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "He pensado en tomar cosas del trabajo sin permiso.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Es normal exagerar un poco en el currículum para conseguir trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Nunca he hecho trampa en ninguna situación.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "He devuelto siempre el dinero que he encontrado.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Si veo a un compañero robando, lo reportaría.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Todos roban algo de vez en cuando, es parte de trabajar.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Honestidad",
+        "question": "Nunca me he llevado nada que no sea mío.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "He faltado al trabajo por motivos que no eran realmente importantes.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Siempre llego puntual a todos mis compromisos.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Cuando digo que haré algo, siempre lo cumplo.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "A veces invento excusas para no ir a trabajar.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "He fingido estar enfermo para no asistir al trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Nunca he llegado tarde a ninguna cita.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Mis compañeros pueden contar conmigo para cumplir mis compromisos.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Es comprensible faltar al trabajo si uno no tiene ganas de ir.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "He abandonado responsabilidades cuando me he aburrido de ellas.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Confiabilidad",
+        "question": "Siempre he cumplido absolutamente todas mis promesas.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "He consumido alcohol antes de ir a trabajar.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "Nunca he probado ninguna droga ilegal en mi vida.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "El consumo ocasional de drogas no afecta el desempeño laboral.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "He trabajado bajo los efectos del alcohol.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "Conozco personas que consumen drogas en el trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "Nunca he consumido alcohol en mi vida.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "El consumo de sustancias es un problema que debe prevenirse en el trabajo.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "He usado medicamentos no recetados para mejorar mi rendimiento laboral.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "Es aceptable tomar una copa durante el almuerzo en día laboral.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Consumo de Sustancias",
+        "question": "Reportaría a un compañero si lo viera consumir drogas en el trabajo.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Me es difícil controlar mi temperamento cuando me frustro.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Nunca he sentido impulsos violentos hacia otra persona.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "He gritado o insultado a compañeros de trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "A veces hago cosas impulsivas de las que luego me arrepiento.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "He dañado propiedades cuando estoy enojado.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Siempre mantengo la calma sin importar la situación.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Pienso antes de actuar, incluso cuando estoy molesto.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "He amenazado a alguien cuando he estado muy enojado.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Es normal perder el control de vez en cuando.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Control de Impulsos",
+        "question": "Nunca he perdido los estribos en toda mi vida.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Las reglas están para romperse si uno tiene una buena razón.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Siempre sigo todas las reglas al pie de la letra.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Es importante respetar las normas y procedimientos en el trabajo.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "He ignorado políticas de la empresa cuando me parecen innecesarias.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Las reglas de seguridad a veces son exageradas.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Nunca he desobedecido ninguna regla en mi vida.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Respeto la autoridad de mis superiores.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "He tomado atajos que violan procedimientos para terminar más rápido.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Es aceptable saltarse reglas si nadie se da cuenta.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Actitud hacia Normas",
+        "question": "Siempre sigo instrucciones exactamente como se me indican.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "He sentido deseos de hacer daño a un compañero de trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "Nunca he sentido enojo hacia ninguna persona.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "He hablado mal de compañeros a sus espaldas.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "A veces trato de sabotear el trabajo de otros si me caen mal.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "He intimidado o acosado a compañeros de trabajo.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "Siempre trato a todos con respeto sin excepción.",
+        "reverse": false,
+        "validity_check": true
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "Mantengo relaciones positivas con todos mis compañeros.",
+        "reverse": true,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "He mentido para perjudicar a un compañero.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "Es justificable vengarse de alguien que te ha hecho daño.",
+        "reverse": false,
+        "validity_check": false
+    },
+    {
+        "dimension": "Hostilidad Laboral",
+        "question": "Nunca he dicho nada negativo sobre nadie.",
+        "reverse": false,
+        "validity_check": true
+    }
+]

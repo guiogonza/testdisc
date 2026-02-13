@@ -204,6 +204,158 @@ WPI_RECOMMENDATIONS = {
 
 
 # =========================================================================
+# CONSTANTES ERI (Evaluación de Riesgo e Integridad)
+# =========================================================================
+
+# Dimensiones del ERI - Evaluación de Riesgo e Integridad
+ERI_DIMENSIONS = [
+    "Honestidad",
+    "Confiabilidad",
+    "Consumo de Sustancias",
+    "Control de Impulsos",
+    "Actitud hacia Normas",
+    "Hostilidad Laboral"
+]
+
+# Colores para cada dimensión ERI (Verde = bajo riesgo, Amarillo = medio, Rojo = alto)
+ERI_COLORS = {
+    "Honestidad": "#10B981",           # Verde
+    "Confiabilidad": "#3B82F6",        # Azul
+    "Consumo de Sustancias": "#F59E0B", # Naranja
+    "Control de Impulsos": "#EF4444",  # Rojo
+    "Actitud hacia Normas": "#8B5CF6", # Púrpura
+    "Hostilidad Laboral": "#EC4899"    # Rosa
+}
+
+# Descripciones de cada dimensión según nivel de riesgo
+ERI_DESCRIPTIONS = {
+    "Honestidad": {
+        "title": "🔐 Honestidad",
+        "low_risk": "Alta integridad, transparente en sus acciones, reporta irregularidades.",
+        "medium_risk": "Generalmente honesto, puede tener comportamientos cuestionables ocasionales.",
+        "high_risk": "⚠️ ALERTA: Indicadores de deshonestidad, riesgo de robo o fraude."
+    },
+    "Confiabilidad": {
+        "title": "✅ Confiabilidad",
+        "low_risk": "Alta consistencia, cumple compromisos, asistencia puntual y constante.",
+        "medium_risk": "Confiable en general, ocasionalmente puede faltar a compromisos.",
+        "high_risk": "⚠️ ALERTA: Patrón de incumplimiento, ausentismo, falta de constancia."
+    },
+    "Consumo de Sustancias": {
+        "title": "🚫 Consumo de Sustancias",
+        "low_risk": "Sin indicadores de consumo problemático, actitud preventiva.",
+        "medium_risk": "Consumo ocasional reportado, puede afectar desempeño ocasionalmente.",
+        "high_risk": "⚠️ ALERTA: Indicadores de consumo problemático, riesgo para seguridad laboral."
+    },
+    "Control de Impulsos": {
+        "title": "🧘 Control de Impulsos",
+        "low_risk": "Excelente autocontrol, maneja frustración adecuadamente, pensante antes de actuar.",
+        "medium_risk": "Control moderado, puede tener reacciones impulsivas ocasionales bajo presión.",
+        "high_risk": "⚠️ ALERTA: Indicadores de comportamiento agresivo, riesgo de violencia laboral."
+    },
+    "Actitud hacia Normas": {
+        "title": "📋 Actitud hacia Normas",
+        "low_risk": "Respeta reglas y procedimientos, valora la autoridad y estructura.",
+        "medium_risk": "Cumple normas básicas, puede cuestionar o saltarse reglas menores.",
+        "high_risk": "⚠️ ALERTA: Desafío a la autoridad, desprecio por normas, riesgo de incumplimiento."
+    },
+    "Hostilidad Laboral": {
+        "title": "🤝 Relaciones Laborales",
+        "low_risk": "Relaciones positivas, respeta a compañeros, sin indicadores de hostilidad.",
+        "medium_risk": "Ocasionalmente conflictivo, puede tener problemas interpersonales menores.",
+        "high_risk": "⚠️ ALERTA: Indicadores de acoso, intimidación, riesgo de ambiente tóxico."
+    }
+}
+
+# Umbrales de riesgo para cada dimensión (puntuaciones invertidas: más bajo = más riesgo)
+# Los scores se normalizan a 0-100, donde:
+# 0-40 = ALTO RIESGO (Rojo)
+# 41-65 = RIESGO MODERADO (Amarillo)
+# 66-100 = BAJO RIESGO (Verde)
+ERI_RISK_THRESHOLDS = {
+    "low_risk": 66,     # >= 66 = Bajo riesgo (Verde)
+    "medium_risk": 41,  # 41-65 = Riesgo moderado (Amarillo)
+    "high_risk": 0      # 0-40 = Alto riesgo (Rojo)
+}
+
+# Número de preguntas de validez en el test (aproximadamente el 20-25% de las preguntas)
+ERI_VALIDITY_QUESTIONS_COUNT = 12
+
+# Umbral de inconsistencias para invalidar el test
+# Si el candidato responde 5 o más con falta extrema de honestidad en preguntas de validez (ej: "Nunca he mentido")
+ERI_VALIDITY_THRESHOLD = 5
+
+# Recomendaciones por nivel de riesgo en cada dimensión
+ERI_RECOMMENDATIONS = {
+    "Honestidad": {
+        "low_risk": ["Excelente para roles de manejo de efectivo o activos", "Apto para posiciones de confianza", "Bajo riesgo de robo o fraude"],
+        "medium_risk": ["Supervisión estándar recomendada", "Entrevista profunda sobre valores éticos", "Monitoreo en período de prueba"],
+        "high_risk": ["⚠️ NO RECOMENDADO para roles con acceso a dinero o activos", "Riesgo elevado de pérdidas por deshonestidad", "Considerar descarte del candidato"]
+    },
+    "Confiabilidad": {
+        "low_risk": ["Excelente para roles que requieren autonomía", "Bajo riesgo de ausentismo", "Ideal para trabajos sin supervisión directa"],
+        "medium_risk": ["Sistemas de seguimiento recomendados", "Puede requerir recordatorios de compromisos", "Adecuado con supervisión regular"],
+        "high_risk": ["⚠️ Alto riesgo de ausentismo y rotación", "Requiere supervisión constante", "Considerar para roles de bajo impacto solamente"]
+    },
+    "Consumo de Sustancias": {
+        "low_risk": ["Apto para roles de seguridad crítica", "Sin riesgos relacionados con sustancias", "Excelente para operación de maquinaria"],
+        "medium_risk": ["Evaluar con pruebas adicionales si el rol es crítico", "Considerar política de pruebas aleatorias", "Entrevista sobre hábitos"],
+        "high_risk": ["⚠️ NO RECOMENDADO para roles de seguridad o conducción", "Riesgo grave de accidentes", "Requiere evaluación de adicciones profesional"]
+    },
+    "Control de Impulsos": {
+        "low_risk": ["Apto para roles de alta presión", "Bajo riesgo de conflictos violentos", "Excelente para atención al cliente difícil"],
+        "medium_risk": ["Capacitación en manejo de emociones recomendada", "Evitar roles de muy alta tensión", "Monitoreo de comportamiento"],
+        "high_risk": ["⚠️ Riesgo de violencia laboral", "NO RECOMENDADO para roles de atención al público", "Requiere evaluación psicológica profesional"]
+    },
+    "Actitud hacia Normas": {
+        "low_risk": ["Excelente para roles regulados o compliance", "Respeta procedimientos de seguridad", "Ideal para ambientes estructurados"],
+        "medium_risk": ["Comunicar claramente expectativas y consecuencias", "Supervisión de cumplimiento de normas", "Puede funcionar con autonomía limitada"],
+        "high_risk": ["⚠️ Riesgo de incumplimiento de seguridad y normativas", "NO RECOMENDADO para roles regulados", "Puede generar sanciones legales a la empresa"]
+    },
+    "Hostilidad Laboral": {
+        "low_risk": ["Excelente para trabajo en equipo", "Contribuye a clima laboral positivo", "Bajo riesgo de demandas por acoso"],
+        "medium_risk": ["Capacitación en relaciones interpersonales", "Monitoreo de interacciones con equipo", "Puede requerir mediación ocasional"],
+        "high_risk": ["⚠️ Alto riesgo de acoso laboral y demandas", "Puede crear ambiente tóxico", "Considerar descarte para proteger al equipo"]
+    }
+}
+
+# Recomendaciones de contratación según perfil de riesgo general
+ERI_HIRING_RECOMMENDATIONS = {
+    "low_risk": {
+        "decision": "✅ RECOMENDADO PARA CONTRATACIÓN",
+        "resumen": "Perfil de bajo riesgo en integridad y comportamiento laboral. Candidato confiable.",
+        "acciones": [
+            "Proceso de contratación estándar",
+            "Supervisión normal según el puesto",
+            "Buen prospecto para desarrollo a largo plazo"
+        ]
+    },
+    "medium_risk": {
+        "decision": "⚠️ CONTRATAR CON PRECAUCIONES",
+        "resumen": "Perfil con señales de alerta moderadas. Requiere medidas preventivas.",
+        "acciones": [
+            "Entrevista profunda sobre dimensiones de riesgo identificadas",
+            "Referencias laborales exhaustivas",
+            "Período de prueba extendido con supervisión cercana",
+            "Evaluaciones de desempeño frecuentes (30-60-90 días)",
+            "Capacitación específica en áreas de riesgo"
+        ]
+    },
+    "high_risk": {
+        "decision": "🚫 NO RECOMENDADO PARA CONTRATACIÓN",
+        "resumen": "Perfil de alto riesgo. Contratación representa riesgo significativo para la organización.",
+        "acciones": [
+            "⚠️ Considerar seriamente descartar al candidato",
+            "Si se decide contratar: rol de muy bajo impacto y alta supervisión",
+            "Evaluación psicológica profesional obligatoria",
+            "Políticas estrictas de monitoreo y consecuencias claras",
+            "Documentación exhaustiva de comportamiento"
+        ]
+    }
+}
+
+
+# =========================================================================
 # ANÁLISIS DE APTITUD Y RECOMENDACIONES
 # =========================================================================
 
@@ -783,6 +935,257 @@ def calculate_wpi_results(responses, questions):
     return raw_scores, normalized_scores, percentages
 
 
+def load_eri_questions():
+    """Carga las preguntas del ERI desde el archivo JSON."""
+    qfile = os.path.join(os.path.dirname(__file__), "questions_eri.json")
+    with open(qfile, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def calculate_eri_results(responses, questions):
+    """
+    Calcula los resultados del ERI (Evaluación de Riesgo e Integridad).
+    
+    IMPORTANTE: En ERI, las puntuaciones altas indican BAJO riesgo, puntuaciones bajas indican ALTO riesgo.
+    - Escala Likert: 1 = Totalmente de acuerdo, 5 = Totalmente en desacuerdo
+    - Preguntas normales (riesgo): respuesta 1 = riesgo, respuesta 5 = seguro
+    - Preguntas reversas (positivas): respuesta 5 = riesgo, respuesta 1 = seguro
+    - Preguntas de validez: detectan respuestas poco sinceras (ej: "Nunca he mentido" = sospechoso si responde 1)
+    
+    Args:
+        responses: Lista de respuestas (1-5) del candidato
+        questions: Lista de preguntas con dimension, reverse, y validity_check flags
+        
+    Returns:
+        tuple: (raw_scores, normalized_scores, percentages, validity_score, validity_flags)
+            - raw_scores: Puntajes directos por dimensión
+            - normalized_scores: Puntajes normalizados 0-100 (100 = bajo riesgo, 0 = alto riesgo)
+            - percentages: Porcentajes relativos entre dimensiones
+            - validity_score: Número de respuestas válidas/sospechosas en preguntas de validez
+            - validity_flags: Lista de alertas de validez
+    """
+    # Contar preguntas por dimensión
+    questions_per_dim = {}
+    for q in questions:
+        dim = q["dimension"]
+        questions_per_dim[dim] = questions_per_dim.get(dim, 0) + 1
+    
+    # Calcular puntajes directos por dimensión
+    raw_scores = {dim: 0 for dim in ERI_DIMENSIONS}
+    
+    # Validez: contar respuestas sospechosas en preguntas de validez
+    validity_suspicious = 0
+    validity_flags = []
+    
+    for i, q in enumerate(questions):
+        if i < len(responses) and responses[i] is not None:
+            dim = q["dimension"]
+            answer = responses[i]
+            
+            # Detectar respuestas de validez (perfeccionismo poco realista)
+            if q.get("validity_check", False):
+                # Preguntas de validez son afirmaciones perfectas poco realistas:
+                # "Nunca he mentido", "Siempre llego puntual", "Nunca he sentido enojo"
+                # Si responde 1 o 2 (de acuerdo), es sospechoso
+                if answer <= 2:
+                    validity_suspicious += 1
+                    validity_flags.append(f"Respuesta poco realista en pregunta {i+1}: '{q['question'][:60]}...'")
+            
+            # Normalizar respuesta a escala de riesgo:
+            # Para preguntas normales (reverse=False, comportamiento de riesgo):
+            #   respuesta 1 (de acuerdo) = alto riesgo = puntaje bajo
+            #   respuesta 5 (en desacuerdo) = bajo riesgo = puntaje alto
+            # Para preguntas reversas (reverse=True, comportamiento positivo):
+            #   respuesta 5 (en desacuerdo con lo positivo) = alto riesgo = puntaje bajo
+            #   respuesta 1 (de acuerdo con lo positivo) = bajo riesgo = puntaje alto
+            
+            if q.get("reverse", False):
+                # Pregunta positiva: mantener directo (1=bueno=5pts, 5=malo=1pt)
+                risk_score = answer
+            else:
+                # Pregunta de riesgo: invertir (1=riesgo=1pt, 5=seguro=5pts)
+                risk_score = 6 - answer
+            
+            raw_scores[dim] += risk_score
+    
+    # Normalizar a escala 0-100 (100 = bajo riesgo, 0 = alto riesgo)
+    normalized_scores = {}
+    for dim in ERI_DIMENSIONS:
+        num_questions = questions_per_dim.get(dim, 10)
+        min_possible = num_questions * 1  # Peor caso: todas respuestas de alto riesgo
+        max_possible = num_questions * 5  # Mejor caso: todas respuestas de bajo riesgo
+        raw = raw_scores[dim]
+        
+        # Normalizar a 0-100
+        if max_possible > min_possible:
+            normalized = ((raw - min_possible) / (max_possible - min_possible)) * 100
+        else:
+            normalized = 50.0
+        
+        normalized_scores[dim] = round(max(0, min(normalized, 100)), 1)
+    
+    # Calcular porcentajes relativos (suma = 100%)
+    total = sum(normalized_scores.values())
+    percentages = {}
+    if total > 0:
+        for dim in ERI_DIMENSIONS:
+            percentages[dim] = round((normalized_scores[dim] / total) * 100, 1)
+    else:
+        for dim in ERI_DIMENSIONS:
+            percentages[dim] = 16.67  # 100% / 6 dimensiones
+    
+    # Validez del test: si hay 5 o más respuestas sospechosas, test no confiable
+    validity_score = ERI_VALIDITY_QUESTIONS_COUNT - validity_suspicious
+    
+    return raw_scores, normalized_scores, percentages, validity_score, validity_flags
+
+
+def analyze_eri_aptitude(normalized, validity_score, validity_flags):
+    """
+    Analiza los resultados ERI y genera recomendaciones de contratación según nivel de riesgo.
+    
+    Args:
+        normalized: Dict con puntajes normalizados (0-100) por dimensión (100 = bajo riesgo)
+        validity_score: Puntaje de validez del test (0-12)
+        validity_flags: Lista de alertas de validez
+        
+    Returns:
+        Dict con análisis completo: nivel de riesgo, decisión, fortalezas, alertas, recomendaciones
+    """
+    # VALIDEZ: Verificar si el test es confiable
+    test_valid = validity_score >= (ERI_VALIDITY_QUESTIONS_COUNT - ERI_VALIDITY_THRESHOLD)
+    validity_warning = None
+    
+    if not test_valid:
+        validity_warning = f"⚠️ TEST POCO CONFIABLE: {ERI_VALIDITY_QUESTIONS_COUNT - validity_score} respuestas sospechosas detectadas. El candidato puede estar respondiendo de manera poco sincera o tratando de presentarse de forma irrealmente perfecta."
+    
+    # Ordenar dimensiones por puntaje (mayor = menos riesgo)
+    sorted_dims = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    safest = sorted_dims[0]
+    riskiest = sorted_dims[-1]
+    
+    # Clasificar dimensiones por nivel de riesgo
+    # Bajo riesgo: >= 66 (Verde)
+    # Riesgo moderado: 41-65 (Amarillo)
+    # Alto riesgo: 0-40 (Rojo)
+    low_risk_dims = [d for d, s in normalized.items() if s >= ERI_RISK_THRESHOLDS["low_risk"]]
+    medium_risk_dims = [d for d, s in normalized.items() if ERI_RISK_THRESHOLDS["medium_risk"] <= s < ERI_RISK_THRESHOLDS["low_risk"]]
+    high_risk_dims = [d for d, s in normalized.items() if s < ERI_RISK_THRESHOLDS["medium_risk"]]
+    critical_risk_dims = [d for d, s in normalized.items() if s < 25]  # Riesgo crítico muy alto
+    
+    # Calcular puntaje promedio general
+    avg_score = sum(normalized.values()) / len(normalized)
+    
+    # Determinar perfil de riesgo general
+    if not test_valid:
+        risk_profile = "high_risk"
+        risk_level = "🚫 ALTO RIESGO - TEST NO CONFIABLE"
+        risk_color = "#EF4444"
+        risk_emoji = "🚫"
+        risk_desc = validity_warning
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["high_risk"]["decision"]
+    elif len(critical_risk_dims) > 0 or len(high_risk_dims) >= 3:
+        risk_profile = "high_risk"
+        risk_level = "🚫 ALTO RIESGO"
+        risk_color = "#EF4444"
+        risk_emoji = "🚫"
+        risk_desc = f"Múltiples indicadores de riesgo significativo en: {', '.join(high_risk_dims + critical_risk_dims)}. Contratación NO recomendada."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["high_risk"]["decision"]
+    elif len(high_risk_dims) >= 1 or len(medium_risk_dims) >= 3:
+        risk_profile = "medium_risk"
+        risk_level = "⚠️ RIESGO MODERADO"
+        risk_color = "#F59E0B"
+        risk_emoji = "⚠️"
+        all_risk_dims = high_risk_dims + medium_risk_dims
+        risk_desc = f"Señales de alerta en: {', '.join(all_risk_dims)}. Requiere evaluación adicional y medidas preventivas."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["medium_risk"]["decision"]
+    elif avg_score >= 70:
+        risk_profile = "low_risk"
+        risk_level = "✅ BAJO RIESGO"
+        risk_color = "#10B981"
+        risk_emoji = "✅"
+        risk_desc = f"Perfil de integridad sobresaliente. Sin indicadores significativos de riesgo. Candidato confiable."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["low_risk"]["decision"]
+    else:
+        risk_profile = "medium_risk"
+        risk_level = "⚠️ RIESGO MODERADO"
+        risk_color = "#F59E0B"
+        risk_emoji = "⚠️"
+        risk_desc = "Perfil dentro de parámetros aceptables con algunas áreas de atención."
+        hiring_decision = ERI_HIRING_RECOMMENDATIONS["medium_risk"]["decision"]
+    
+    # Generar fortalezas (dimensiones de bajo riesgo)
+    fortalezas = []
+    for dim, score in sorted_dims:
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            desc = ERI_DESCRIPTIONS[dim]
+            fortalezas.append(f"**{dim}** ({int(score)}/100 - Bajo Riesgo): {desc['low_risk']}")
+    
+    # Generar alertas (dimensiones de riesgo)
+    alertas = []
+    if validity_warning:
+        alertas.append(validity_warning)
+    
+    for dim, score in sorted_dims:
+        desc = ERI_DESCRIPTIONS[dim]
+        if score < ERI_RISK_THRESHOLDS["medium_risk"]:
+            alertas.append(f"🚨 **{dim}** ({int(score)}/100 - ALTO RIESGO): {desc['high_risk']}")
+        elif score < ERI_RISK_THRESHOLDS["low_risk"]:
+            alertas.append(f"⚠️ **{dim}** ({int(score)}/100 - Riesgo Moderado): {desc['medium_risk']}")
+    
+    # Generar recomendaciones específicas por dimensión
+    recomendaciones = []
+    hiring_recommendations = ERI_HIRING_RECOMMENDATIONS[risk_profile]
+    
+    # Agregar recomendaciones de contratación general
+    recomendaciones.append(f"**Decisión Recomendada:** {hiring_recommendations['decision']}")
+    recomendaciones.append(f"**Resumen:** {hiring_recommendations['resumen']}")
+    recomendaciones.append("**Acciones:**")
+    for action in hiring_recommendations['acciones']:
+        recomendaciones.append(f"  • {action}")
+    
+    # Agregar recomendaciones específicas por dimensión de riesgo
+    recomendaciones.append("\n**Recomendaciones por Dimensión:**")
+    for dim, score in sorted_dims:
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            level = "low_risk"
+        elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            level = "medium_risk"
+        else:
+            level = "high_risk"
+        
+        # Solo incluir recomendaciones para dimensiones con algún riesgo
+        if score < ERI_RISK_THRESHOLDS["low_risk"]:
+            recs = ERI_RECOMMENDATIONS[dim][level]
+            recomendaciones.append(f"**{dim}:** {' | '.join(recs)}")
+    
+    return {
+        "risk_score": round(avg_score, 1),
+        "risk_profile": risk_profile,
+        "risk_level": risk_level,
+        "risk_color": risk_color,
+        "risk_emoji": risk_emoji,
+        "risk_desc": risk_desc,
+        "hiring_decision": hiring_decision,
+        "safest_dimension": safest[0],
+        "safest_score": safest[1],
+        "riskiest_dimension": riskiest[0],
+        "riskiest_score": riskiest[1],
+        "low_risk_dimensions": low_risk_dims,
+        "medium_risk_dimensions": medium_risk_dims,
+        "high_risk_dimensions": high_risk_dims,
+        "critical_risk_dimensions": critical_risk_dims,
+        "average_score": round(avg_score, 1),
+        "fortalezas": fortalezas,
+        "alertas": alertas,
+        "recomendaciones": recomendaciones,
+        "test_valid": test_valid,
+        "validity_score": validity_score,
+        "validity_warning": validity_warning,
+        "validity_flags": validity_flags,
+    }
+
+
 # =========================================================================
 # FUNCIONES DE GRÁFICOS
 # =========================================================================
@@ -1081,6 +1484,198 @@ def create_wpi_bars(normalized_scores):
     
     # Leyenda
     ax.legend(fontsize=10, loc='lower right', framealpha=0.95)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_eri_radar(normalized_scores):
+    """
+    Crea un gráfico de radar para visualizar las 6 dimensiones del ERI.
+    IMPORTANTE: Valores altos = BAJO riesgo (verde), valores bajos = ALTO riesgo (rojo)
+    
+    Args:
+        normalized_scores: Dict con puntajes normalizados (0-100) por dimensión (100 = bajo riesgo)
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de radar
+    """
+    # Preparar datos para el radar
+    dimensions = ERI_DIMENSIONS
+    values = [normalized_scores[dim] for dim in dimensions]
+    values_closed = values + [values[0]]  # Cerrar el polígono
+    
+    # Calcular ángulos para cada dimensión
+    angles = np.linspace(0, 2 * np.pi, len(dimensions), endpoint=False).tolist()
+    angles_closed = angles + [angles[0]]
+    
+    # Colores para cada dimensión
+    dim_colors = [ERI_COLORS[dim] for dim in dimensions]
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
+    
+    # Línea principal del perfil
+    ax.plot(angles_closed, values_closed, "o-", linewidth=3, color="#6366F1", 
+            markersize=10, markerfacecolor="#818CF8", markeredgecolor="white", 
+            markeredgewidth=2.5, zorder=5)
+    
+    # Rellenar área
+    ax.fill(angles_closed, values_closed, alpha=0.2, color="#6366F1")
+    
+    # Puntos coloreados por dimensión con valores
+    for i, (angle, val, color) in enumerate(zip(angles, values, dim_colors)):
+        # Determinar riesgo por color del punto
+        if val >= ERI_RISK_THRESHOLDS["low_risk"]:
+            point_color = "#10B981"  # Verde - Bajo riesgo
+        elif val >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            point_color = "#F59E0B"  # Amarillo - Riesgo moderado
+        else:
+            point_color = "#EF4444"  # Rojo - Alto riesgo
+        
+        # Punto
+        ax.plot(angle, val, "o", markersize=18, color=point_color, zorder=6, 
+                markeredgecolor='white', markeredgewidth=3)
+        # Valor del punto
+        ax.text(angle, val + 7, f"{int(val)}", ha='center', va='center', 
+                fontsize=12, fontweight='bold', color=point_color)
+    
+    # Configurar etiquetas de dimensiones con ajuste de tamaño
+    ax.set_xticks(angles)
+    labels = []
+    for dim in dimensions:
+        # Dividir nombres largos en dos líneas
+        if len(dim) > 15:
+            words = dim.split()
+            if len(words) >= 2:
+                mid = len(words) // 2
+                line1 = " ".join(words[:mid])
+                line2 = " ".join(words[mid:])
+                labels.append(f"{line1}\n{line2}")
+            else:
+                labels.append(dim)
+        else:
+            labels.append(dim)
+    ax.set_xticklabels(labels, fontsize=10, fontweight="bold", color='#1E293B')
+    
+    # Configurar escala radial
+    ax.set_ylim(0, 100)
+    ax.set_yticks([20, 40, 66, 80, 100])
+    ax.set_yticklabels(['20', '40', '66\n(Umbral)', '80', '100'], fontsize=9, color='#94A3B8')
+    
+    # Líneas de referencia (umbrales de riesgo)
+    ref_low_risk = [ERI_RISK_THRESHOLDS["low_risk"]] * (len(dimensions) + 1)
+    ref_medium_risk = [ERI_RISK_THRESHOLDS["medium_risk"]] * (len(dimensions) + 1)
+    
+    ax.plot(angles_closed, ref_low_risk, "-", linewidth=2, color="#10B981", 
+            alpha=0.7, label="Bajo Riesgo (≥66)")
+    ax.plot(angles_closed, ref_medium_risk, "--", linewidth=2, color="#F59E0B", 
+            alpha=0.7, label="Riesgo Moderado (≥41)")
+    
+    # Zonas de color de fondo (invertidas: alto score = bajo riesgo)
+    theta = np.linspace(0, 2*np.pi, 100)
+    ax.fill_between(theta, 0, ERI_RISK_THRESHOLDS["medium_risk"], 
+                     alpha=0.08, color='#EF4444')  # zona alto riesgo (rojo)
+    ax.fill_between(theta, ERI_RISK_THRESHOLDS["medium_risk"], ERI_RISK_THRESHOLDS["low_risk"], 
+                     alpha=0.06, color='#F59E0B')  # zona riesgo moderado (amarillo)
+    ax.fill_between(theta, ERI_RISK_THRESHOLDS["low_risk"], 100, 
+                     alpha=0.08, color='#10B981')  # zona bajo riesgo (verde)
+    
+    # Estilo del gráfico
+    ax.grid(True, alpha=0.3, color='#CBD5E1', linestyle='-', linewidth=0.8)
+    ax.spines["polar"].set_visible(False)
+    ax.set_facecolor('#FAFBFC')
+    fig.patch.set_facecolor('white')
+    
+    # Título y leyenda
+    plt.title("Perfil de Riesgo e Integridad - ERI\n(Puntajes altos = BAJO riesgo)", 
+              fontsize=16, fontweight="bold", pad=35, color='#1E293B')
+    plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1), fontsize=10)
+    
+    plt.tight_layout()
+    return fig
+
+
+def create_eri_bars(normalized_scores):
+    """
+    Crea un gráfico de barras horizontales para visualizar las dimensiones del ERI con zonas de riesgo.
+    IMPORTANTE: Valores altos = BAJO riesgo (verde), valores bajos = ALTO riesgo (rojo)
+    
+    Args:
+        normalized_scores: Dict con puntajes normalizados (0-100) por dimensión (100 = bajo riesgo)
+        
+    Returns:
+        matplotlib.figure.Figure: Gráfico de barras horizontales
+    """
+    fig, ax = plt.subplots(figsize=(12, 8))
+    fig.patch.set_facecolor('white')
+    
+    dimensions = ERI_DIMENSIONS
+    values = [normalized_scores[dim] for dim in dimensions]
+    
+    # Colores de barras según nivel de riesgo
+    colors = []
+    for val in values:
+        if val >= ERI_RISK_THRESHOLDS["low_risk"]:
+            colors.append("#10B981")  # Verde - Bajo riesgo
+        elif val >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            colors.append("#F59E0B")  # Amarillo - Riesgo moderado
+        else:
+            colors.append("#EF4444")  # Rojo - Alto riesgo
+    
+    # Crear barras horizontales (de abajo hacia arriba)
+    y_positions = np.arange(len(dimensions))
+    bars = ax.barh(y_positions, values, color=colors, alpha=0.85, 
+                   edgecolor='white', linewidth=2.5, height=0.7)
+    
+    # Agregar valores al final de cada barra con etiqueta de riesgo
+    for i, (bar, val, color) in enumerate(zip(bars, values, colors)):
+        if val >= ERI_RISK_THRESHOLDS["low_risk"]:
+            risk_label = "✅ Bajo Riesgo"
+        elif val >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            risk_label = "⚠️ Moderado"
+        else:
+            risk_label = "🚨 Alto Riesgo"
+        
+        ax.text(val + 2, bar.get_y() + bar.get_height()/2, f"{int(val)}  {risk_label}", 
+                va='center', fontweight='bold', fontsize=11, color=color)
+    
+    # Líneas de referencia verticales (umbrales)
+    ax.axvline(x=ERI_RISK_THRESHOLDS["low_risk"], color="#10B981", linestyle="-", 
+               alpha=0.8, linewidth=2.5, label="Bajo Riesgo (≥66)")
+    ax.axvline(x=ERI_RISK_THRESHOLDS["medium_risk"], color="#F59E0B", linestyle="--", 
+               alpha=0.8, linewidth=2.5, label="Riesgo Moderado (≥41)")
+    
+    # Zonas de color de fondo
+    ax.axvspan(0, ERI_RISK_THRESHOLDS["medium_risk"], alpha=0.08, color='#EF4444')  # Alto riesgo
+    ax.axvspan(ERI_RISK_THRESHOLDS["medium_risk"], ERI_RISK_THRESHOLDS["low_risk"], 
+               alpha=0.06, color='#F59E0B')  # Riesgo moderado
+    ax.axvspan(ERI_RISK_THRESHOLDS["low_risk"], 100, alpha=0.08, color='#10B981')  # Bajo riesgo
+    
+    # Configuración de ejes
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(dimensions, fontsize=11, fontweight='bold', color='#1E293B')
+    ax.set_xlabel('Puntaje (0-100) - Mayor puntaje = MENOR riesgo', fontsize=12, 
+                  fontweight='bold', color='#475569')
+    ax.set_xlim(0, 110)
+    ax.set_ylim(-0.5, len(dimensions) - 0.5)
+    
+    # Título
+    ax.set_title("Evaluación de Riesgo e Integridad por Dimensión", fontsize=15, 
+                 fontweight="bold", pad=20, color='#1E293B')
+    
+    # Estilo
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#CBD5E1')
+    ax.spines['left'].set_color('#CBD5E1')
+    ax.set_facecolor('#FAFBFC')
+    ax.tick_params(axis='x', colors='#94A3B8')
+    ax.tick_params(axis='y', colors='#475569')
+    ax.grid(axis='x', alpha=0.2, color='#CBD5E1', linestyle='-')
+    
+    # Leyenda
+    ax.legend(fontsize=11, loc='lower right', framealpha=0.95)
     
     plt.tight_layout()
     return fig
@@ -1544,6 +2139,311 @@ def generate_wpi_pdf(candidate, raw_scores, normalized, radar_fig, session_id, c
     return buffer
 
 
+def generate_eri_pdf(candidate, raw_scores, normalized, radar_fig, session_id, completed_at=None, analysis=None, validity_score=None, validity_flags=None):
+    """
+    Genera un PDF con los resultados del ERI (Evaluación de Riesgo e Integridad).
+    
+    Args:
+        candidate: Dict con información del candidato
+        raw_scores: Puntajes directos por dimensión
+        normalized: Puntajes normalizados (0-100) por dimensión (100 = bajo riesgo)
+        radar_fig: Figura matplotlib del radar
+        session_id: ID de la sesión
+        completed_at: Fecha de completación (opcional)
+        analysis: Dict con análisis de riesgo (opcional, se genera si no se proporciona)
+        validity_score: Puntaje de validez del test (0-12)
+        validity_flags: Lista de alertas de validez
+        
+    Returns:
+        BytesIO: Buffer con el PDF generado
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="Justify", alignment=4, leading=14))
+    styles.add(ParagraphStyle(name="SmallBold", parent=styles["Normal"], 
+                             fontSize=9, leading=12, fontName="Helvetica-Bold"))
+    styles.add(ParagraphStyle(name="Small", parent=styles["Normal"], 
+                             fontSize=9, leading=12))
+    styles.add(ParagraphStyle(name="AlertBold", parent=styles["Normal"],
+                             fontSize=11, leading=14, fontName="Helvetica-Bold",
+                             textColor=colors.HexColor("#DC2626")))
+    
+    story = []
+    
+    # === PÁGINA 1: PORTADA Y RESULTADOS ===
+    story.append(Paragraph("ERI - Evaluación de Riesgo e Integridad", styles["Title"]))
+    story.append(Paragraph("Screening de Confiabilidad y Comportamiento Laboral", styles["Heading2"]))
+    story.append(Spacer(1, 12))
+    
+    # Información del candidato
+    story.append(Paragraph(f"<b>ID Evaluación:</b> {session_id}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Candidato:</b> {candidate['name']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cédula:</b> {candidate['cedula']}", styles["Normal"]))
+    story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position', 'N/A')}", styles["Normal"]))
+    
+    # Formatear fecha
+    if completed_at:
+        try:
+            fecha_obj = datetime.strptime(completed_at, "%Y-%m-%d %H:%M:%S")
+            fecha_str = fecha_obj.strftime('%d/%m/%Y %H:%M')
+        except:
+            fecha_str = completed_at
+    else:
+        fecha_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    story.append(Paragraph(f"<b>Fecha de Presentación:</b> {fecha_str}", styles["Normal"]))
+    story.append(Spacer(1, 16))
+    
+    # Generar análisis si no se proporcionó
+    if analysis is None:
+        if validity_score is None:
+            validity_score = ERI_VALIDITY_QUESTIONS_COUNT
+        if validity_flags is None:
+            validity_flags = []
+        analysis = analyze_eri_aptitude(normalized, validity_score, validity_flags)
+    
+    # === BANNER DE VALIDEZ (si aplica) ===
+    if analysis.get('validity_warning'):
+        story.append(Paragraph("⚠️ ALERTA DE VALIDEZ DEL TEST", styles["AlertBold"]))
+        story.append(Paragraph(analysis['validity_warning'], styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === RESULTADO DE RIESGO ===
+    risk_color_map = {
+        "#10B981": "✅ BAJO RIESGO",
+        "#F59E0B": "⚠️ RIESGO MODERADO",
+        "#EF4444": "🚫 ALTO RIESGO"
+    }
+    risk_banner = risk_color_map.get(analysis['risk_color'], analysis['risk_level'])
+    
+    story.append(Paragraph(
+        f"<b>RESULTADO: {risk_banner} ({analysis['risk_score']:.1f}/100)</b>", 
+        styles["Heading2"]
+    ))
+    story.append(Paragraph(f"{analysis['risk_desc']}", styles["Normal"]))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        f"<b>Dimensión de menor riesgo:</b> {analysis['safest_dimension']} "
+        f"({int(analysis['safest_score'])}/100) | "
+        f"<b>Dimensión de mayor riesgo:</b> {analysis['riskiest_dimension']} "
+        f"({int(analysis['riskiest_score'])}/100)",
+        styles["Normal"]
+    ))
+    story.append(Paragraph(
+        f"<b>Promedio de riesgo:</b> {analysis['average_score']:.1f}/100 "
+        f"(Puntajes altos = BAJO riesgo)",
+        styles["Normal"]
+    ))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        f"<b>Decisión Recomendada:</b> {analysis['hiring_decision']}",
+        styles["Heading3"]
+    ))
+    story.append(Spacer(1, 16))
+    
+    # === TABLA DE PUNTAJES ===
+    story.append(Paragraph("Puntajes por Dimensión de Riesgo", styles["Heading2"]))
+    story.append(Spacer(1, 8))
+    
+    data = [["Dimensión", "Puntaje", "Nivel de Riesgo", "Estado"]]
+    for dim in ERI_DIMENSIONS:
+        score = normalized[dim]
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            nivel = "Bajo Riesgo"
+            estado = "✅"
+        elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            nivel = "Riesgo Moderado"
+            estado = "⚠️"
+        else:
+            nivel = "Alto Riesgo"
+            estado = "🚨"
+        
+        data.append([
+            dim,
+            f"{int(score)}/100",
+            nivel,
+            estado
+        ])
+    
+    t = Table(data, colWidths=[140, 70, 110, 50])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#DC2626")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+        ("ALIGN", (0, 0), (0, -1), "LEFT"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 9),
+        ("FONTSIZE", (0, 1), (-1, -1), 8),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 16))
+    
+    # === GRÁFICO RADAR ===
+    if radar_fig:
+        img_buf = BytesIO()
+        radar_fig.savefig(img_buf, format="png", dpi=150, bbox_inches="tight")
+        img_buf.seek(0)
+        story.append(Image(img_buf, width=350, height=350))
+    
+    # === PÁGINA 2: ANÁLISIS DETALLADO ===
+    story.append(PageBreak())
+    story.append(Paragraph("Análisis Detallado y Recomendaciones de Contratación", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    # === FORTALEZAS ===
+    if analysis.get('fortalezas'):
+        story.append(Paragraph("✅ ASPECTOS POSITIVOS (Bajo Riesgo)", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for f in analysis['fortalezas']:
+            # Limpiar markdown para PDF
+            f_clean = f.replace("**", "")
+            story.append(Paragraph(f"• {f_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === ALERTAS ===
+    if analysis.get('alertas'):
+        story.append(Paragraph("🚨 SEÑALES DE ALERTA Y FACTORES DE RIESGO", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for a in analysis['alertas']:
+            # Limpiar markdown para PDF
+            a_clean = a.replace("**", "").replace("⚠️ ", "").replace("🚨 ", "")
+            story.append(Paragraph(f"• {a_clean}", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === RECOMENDACIONES ===
+    if analysis.get('recomendaciones'):
+        story.append(Paragraph("💼 RECOMENDACIONES DE CONTRATACIÓN", styles["Heading2"]))
+        story.append(Spacer(1, 6))
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown para PDF
+            r_clean = r.replace("**", "")
+            story.append(Paragraph(f"{r_clean}", styles["Small"]))
+        story.append(Spacer(1, 8))
+    
+    # === FLAGS DE VALIDEZ ===
+    if validity_flags and len(validity_flags) > 0:
+        story.append(PageBreak())
+        story.append(Paragraph("⚠️ DETALLES DE VALIDEZ DEL TEST", styles["Heading2"]))
+        story.append(Spacer(1, 8))
+        story.append(Paragraph(
+            f"Se detectaron {len(validity_flags)} respuestas poco realistas en preguntas de validez. "
+            "Esto puede indicar que el candidato está tratando de presentarse de forma irrealmente perfecta.",
+            styles["Small"]
+        ))
+        story.append(Spacer(1, 8))
+        story.append(Paragraph("Ejemplos de respuestas sospechosas:", styles["SmallBold"]))
+        story.append(Spacer(1, 4))
+        for flag in validity_flags[:5]:  # Mostrar máximo 5 ejemplos
+            story.append(Paragraph(f"• {flag}", styles["Small"]))
+        if len(validity_flags) > 5:
+            story.append(Paragraph(f"... y {len(validity_flags) - 5} más.", styles["Small"]))
+        story.append(Spacer(1, 12))
+    
+    # === DESCRIPCIÓN DE DIMENSIONES ===
+    story.append(PageBreak())
+    story.append(Paragraph("Descripción de las Dimensiones del ERI", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    for dim in ERI_DIMENSIONS:
+        score = normalized[dim]
+        desc_info = ERI_DESCRIPTIONS[dim]
+        
+        # Determinar nivel y descripción (invertido: alto score = bajo riesgo)
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            level_text = "BAJO RIESGO ✅"
+            desc_text = desc_info["low_risk"]
+        elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            level_text = "RIESGO MODERADO ⚠️"
+            desc_text = desc_info["medium_risk"]
+        else:
+            level_text = "ALTO RIESGO 🚨"
+            desc_text = desc_info["high_risk"]
+        
+        story.append(Paragraph(
+            f"<b>{desc_info['title']}</b> - {level_text} ({int(score)}/100)",
+            styles["Heading3"]
+        ))
+        story.append(Paragraph(desc_text, styles["Small"]))
+        story.append(Spacer(1, 8))
+    
+    # === INTERPRETACIÓN DE UMBRALES ===
+    story.append(PageBreak())
+    story.append(Paragraph("Interpretación de Umbrales de Riesgo", styles["Heading1"]))
+    story.append(Spacer(1, 12))
+    
+    story.append(Paragraph("<b>✅ BAJO RIESGO (66-100 puntos):</b>", styles["Heading3"]))
+    story.append(Paragraph(
+        "Sin indicadores significativos de riesgo. El candidato muestra actitudes y comportamientos "
+        "compatibles con un desempeño confiable y ético en el entorno laboral.",
+        styles["Small"]
+    ))
+    story.append(Spacer(1, 8))
+    
+    story.append(Paragraph("<b>⚠️ RIESGO MODERADO (41-65 puntos):</b>", styles["Heading3"]))
+    story.append(Paragraph(
+        "Señales de alerta moderadas. Se recomienda profundizar con entrevistas enfocadas, "
+        "referencias laborales exhaustivas y período de prueba con supervisión cercana.",
+        styles["Small"]
+    ))
+    story.append(Spacer(1, 8))
+    
+    story.append(Paragraph("<b>🚨 ALTO RIESGO (0-40 puntos):</b>", styles["Heading3"]))
+    story.append(Paragraph(
+        "Múltiples indicadores de riesgo significativo. La contratación representa riesgo elevado "
+        "para la organización en términos de pérdidas, conflictos, accidentes o incumplimiento normativo. "
+        "Se recomienda NO CONTRATAR o requerir evaluación psicológica profesional adicional.",
+        styles["Small"]
+    ))
+    story.append(Spacer(1, 12))
+    
+    # === LIMITACIONES Y DISCLAIMERS ===
+    story.append(Paragraph("Limitaciones y Consideraciones Importantes", styles["Heading2"]))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        "• Este test es una herramienta de SCREENING, no un diagnóstico psicológico definitivo.",
+        styles["Small"]
+    ))
+    story.append(Paragraph(
+        "• Los resultados deben complementarse con: entrevistas conductuales (STAR), "
+        "referencias laborales verificables, verificación de antecedentes penales y laborales.",
+        styles["Small"]
+    ))
+    story.append(Paragraph(
+        "• Ningún test psicométrico predice el comportamiento futuro con 100% de certeza.",
+        styles["Small"]
+    ))
+    story.append(Paragraph(
+        "• En casos de alto riesgo en dimensiones críticas (violencia, sustancias, deshonestidad), "
+        "se recomienda evaluación por psicólogo organizacional certificado.",
+        styles["Small"]
+    ))
+    story.append(Paragraph(
+        "• Este reporte es CONFIDENCIAL y debe manejarse según políticas de protección de datos.",
+        styles["Small"]
+    ))
+    story.append(Spacer(1, 20))
+    
+    # === FOOTER ===
+    story.append(Paragraph(
+        "<i>Este reporte es generado automáticamente como herramienta de apoyo para "
+        "Recursos Humanos en procesos de selección. Los resultados deben ser interpretados "
+        "por personal capacitado y complementados con otras fuentes de información.</i>",
+        styles["Small"]
+    ))
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+
 # =========================================================================
 # HELPER: Load DISC questions
 # =========================================================================
@@ -1675,8 +2575,8 @@ def page_admin_dashboard():
                 st.markdown("---")
                 c3, c4 = st.columns(2)
                 with c3:
-                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi"], 
-                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else "💼 WPI"))
+                    test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri"], 
+                                            format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else "🔐 ERI")))
                 with c4:
                     time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
 
@@ -1711,8 +2611,8 @@ def page_admin_dashboard():
                 with st.form("existing_candidate_form"):
                     c3, c4 = st.columns(2)
                     with c3:
-                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi"], 
-                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else "💼 WPI"))
+                        test_type = st.selectbox("Tipo de Evaluación", ["disc", "valanti", "wpi", "eri"], 
+                                                format_func=lambda x: "🎯 DISC" if x == "disc" else ("🧭 VALANTI" if x == "valanti" else ("💼 WPI" if x == "wpi" else "🔐 ERI")))
                     with c4:
                         time_limit = st.selectbox("Tiempo Límite", [15, 20, 30, 45, 60], index=2, format_func=lambda x: f"{x} minutos")
                     create_btn2 = st.form_submit_button("✅ Asignar Evaluación")
@@ -1734,8 +2634,8 @@ def page_admin_dashboard():
         # Fila de filtros
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti"], key="filter_type",
-                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI"}.get(x, x))
+            filter_type = st.selectbox("Filtrar por tipo:", ["Todos", "disc", "valanti", "wpi", "eri"], key="filter_type",
+                                        format_func=lambda x: {"Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI", "eri": "🔐 ERI"}.get(x, x))
         with c2:
             filter_status = st.selectbox("Filtrar por estado:", ["Todos", "pending", "in_progress", "completed", "expired"], key="filter_status",
                                           format_func=lambda x: {"Todos": "📋 Todos", "pending": "⏳ Pendiente", "in_progress": "▶️ En Progreso", "completed": "✅ Completado", "expired": "⏰ Expirado"}.get(x, x))
@@ -1779,7 +2679,18 @@ def page_admin_dashboard():
         else:
             for sess in sessions:
                 status_emoji = {"pending": "⏳", "in_progress": "▶️", "completed": "✅", "expired": "⏰"}.get(sess["status"], "❓")
-                test_emoji = "🎯" if sess["test_type"] == "disc" else "🧭"
+                
+                # Determinar emoji del test
+                if sess["test_type"] == "disc":
+                    test_emoji = "🎯"
+                elif sess["test_type"] == "valanti":
+                    test_emoji = "🧭"
+                elif sess["test_type"] == "wpi":
+                    test_emoji = "💼"
+                elif sess["test_type"] == "eri":
+                    test_emoji = "🔐"
+                else:
+                    test_emoji = "📝"
                 
                 # Agregar indicador de aptitud al título si está completada
                 aptitud_tag = ""
@@ -1854,6 +2765,8 @@ def page_admin_dashboard():
                                 show_valanti_results_admin(results, candidate, sess)
                             elif sess["test_type"] == "wpi":
                                 show_wpi_results_admin(results, candidate, sess)
+                            elif sess["test_type"] == "eri":
+                                show_eri_results_admin(results, candidate, sess)
                         else:
                             st.warning("Resultados no disponibles.")
 
@@ -2256,6 +3169,216 @@ def show_wpi_results_admin(results, candidate, session):
         )
 
 
+def show_eri_results_admin(results, candidate, session):
+    """
+    Muestra los resultados del ERI en el panel de administración.
+    
+    Args:
+        results: Dict con raw, normalized, percentages, validity_score, validity_flags
+        candidate: Dict con información del candidato
+        session: Dict con información de la sesión o str con session_id
+    """
+    raw = results.get("raw", {})
+    normalized = results.get("normalized", {})
+    percentages = results.get("percentages", {})
+    validity_score = results.get("validity_score", ERI_VALIDITY_QUESTIONS_COUNT)
+    validity_flags = results.get("validity_flags", [])
+    
+    # Análisis de riesgo
+    analysis = analyze_eri_aptitude(normalized, validity_score, validity_flags)
+    
+    # === BANNER DE VALIDEZ (si aplica) ===
+    if analysis.get('validity_warning'):
+        st.markdown(f"""
+        <div style="background: #FEF2F2; border-left: 5px solid #DC2626;
+                    padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #FCA5A5;">
+            <h4 style="margin: 0; color: #DC2626;">
+                ⚠️ ALERTA DE VALIDEZ DEL TEST
+            </h4>
+            <p style="margin: 5px 0 0 0; color: #991B1B;">{analysis['validity_warning']}</p>
+            <p style="margin: 5px 0 0 0; color: #7F1D1D; font-size: 0.9em;">
+                El test detectó {len(validity_flags)} respuestas poco realistas. Considerar entrevista profunda adicional.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # === BANNER DE RIESGO ===
+    st.markdown(f"""
+    <div style="background: {analysis['risk_color']}22; border-left: 5px solid {analysis['risk_color']};
+                padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: {analysis['risk_color']};">
+            {analysis['risk_emoji']} {analysis['risk_level']} — Puntaje: {analysis['risk_score']:.1f}/100
+        </h3>
+        <p style="margin: 5px 0 0 0; color: #374151;">{analysis['risk_desc']}</p>
+        <p style="margin: 5px 0 0 0; color: #6B7280;">
+            <b>Dimensión de menor riesgo:</b> {analysis['safest_dimension']} ({int(analysis['safest_score'])}/100) | 
+            <b>Dimensión de mayor riesgo:</b> {analysis['riskiest_dimension']} ({int(analysis['riskiest_score'])}/100) |
+            <b>Promedio:</b> {analysis['average_score']:.1f}/100
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # === DECISIÓN DE CONTRATACIÓN ===
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
+                padding: 20px; border-radius: 12px; margin-bottom: 20px; color: white;">
+        <h4 style="margin: 0 0 10px 0;">📋 Decisión Recomendada de Contratación</h4>
+        <h2 style="margin: 0; color: {analysis['risk_color']};">{analysis['hiring_decision']}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # === MÉTRICAS POR DIMENSIÓN ===
+    st.markdown("### 📊 Puntajes por Dimensión de Riesgo")
+    st.caption("⚠️ Recuerda: Puntajes más ALTOS = MENOR riesgo (Verde ✅), puntajes más BAJOS = MAYOR riesgo (Rojo 🚨)")
+    
+    # Crear 6 columnas para las 6 dimensiones
+    cols = st.columns(3)
+    for idx, dim in enumerate(ERI_DIMENSIONS):
+        with cols[idx % 3]:
+            score = normalized.get(dim, 0)
+            if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+                nivel = "✅ Bajo Riesgo"
+                delta_color = "normal"
+            elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+                nivel = "⚠️ Moderado"
+                delta_color = "off"
+            else:
+                nivel = "🚨 Alto Riesgo"
+                delta_color = "inverse"
+            
+            st.metric(
+                label=dim,
+                value=f"{int(score)}/100",
+                delta=nivel,
+                delta_color=delta_color
+            )
+    
+    st.markdown("---")
+    
+    # === GRÁFICOS ===
+    col_radar, col_bars = st.columns(2)
+    
+    with col_radar:
+        st.markdown("#### 🎯 Perfil de Riesgo (Radar)")
+        radar_fig = create_eri_radar(normalized)
+        st.pyplot(radar_fig)
+    
+    with col_bars:
+        st.markdown("#### 📊 Puntajes por Dimensión")
+        bar_fig = create_eri_bars(normalized)
+        st.pyplot(bar_fig)
+    
+    st.markdown("---")
+    
+    # === ANÁLISIS POR DIMENSIÓN ===
+    st.markdown("### 📋 Análisis Detallado por Dimensión")
+    
+    sorted_scores = sorted(normalized.items(), key=lambda x: x[1], reverse=False)  # Menor a mayor (más riesgo primero)
+    
+    for dim, score in sorted_scores:
+        desc_info = ERI_DESCRIPTIONS[dim]
+        
+        # Determinar nivel de riesgo
+        if score >= ERI_RISK_THRESHOLDS["low_risk"]:
+            level = "✅ Bajo Riesgo"
+            text = desc_info["low_risk"]
+            color = "#10B981"
+        elif score >= ERI_RISK_THRESHOLDS["medium_risk"]:
+            level = "⚠️ Riesgo Moderado"
+            text = desc_info["medium_risk"]
+            color = "#F59E0B"
+        else:
+            level = "🚨 Alto Riesgo"
+            text = desc_info["high_risk"]
+            color = "#EF4444"
+        
+        st.markdown(f"""
+        <div style="background: {color}15; border-left: 3px solid {color}; 
+                    padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+            <b style="color: {color};">{desc_info['title']}</b> — {level} ({int(score)}/100)
+            <br><span style="color: #374151;">{text}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # === ASPECTOS POSITIVOS ===
+    if analysis.get('fortalezas'):
+        st.markdown("### 💚 Aspectos Positivos (Bajo Riesgo)")
+        for f in analysis['fortalezas']:
+            # Limpiar markdown
+            f_clean = f.replace("**", "")
+            st.markdown(f"- ✅ {f_clean}")
+        st.markdown("")
+    
+    # === SEÑALES DE ALERTA ===
+    if analysis.get('alertas'):
+        st.markdown("### 🚨 Señales de Alerta y Factores de Riesgo")
+        for a in analysis['alertas']:
+            # Limpiar markdown
+            a_clean = a.replace("**", "").replace("⚠️ ", "").replace("🚨 ", "")
+            st.markdown(f"- 🔴 {a_clean}")
+        st.markdown("")
+    
+    # === RECOMENDACIONES DE CONTRATACIÓN ===
+    if analysis.get('recomendaciones'):
+        st.markdown("### 💼 Recomendaciones de Contratación")
+        for r in analysis['recomendaciones']:
+            # Limpiar markdown (pero mantener bullets internos)
+            r_clean = r.replace("**", "")
+            st.markdown(f"{r_clean}")
+        st.markdown("")
+    
+    # === DETALLES DE VALIDEZ ===
+    if validity_flags and len(validity_flags) > 0:
+        with st.expander(f"⚠️ Ver Detalles de Validez del Test ({len(validity_flags)} respuestas sospechosas)"):
+            st.markdown(f"""
+            Se detectaron **{len(validity_flags)}** respuestas poco realistas en preguntas de validez.
+            
+            Esto puede indicar:
+            - El candidato está tratando de presentarse de forma irrealmente perfecta
+            - Falta de sinceridad en las respuestas
+            - No comprendió las instrucciones
+            
+            **Recomendación:** Explorar estos aspectos en entrevista personal.
+            """)
+            
+            st.markdown("**Ejemplos de respuestas sospechosas:**")
+            for flag in validity_flags[:10]:  # Mostrar máximo 10
+                st.markdown(f"- {flag}")
+            if len(validity_flags) > 10:
+                st.caption(f"... y {len(validity_flags) - 10} respuestas más.")
+    
+    st.markdown("---")
+    
+    # === DESCARGA DE REPORTES ===
+    st.markdown("### 📥 Descargar Reportes")
+    
+    session_id = session if isinstance(session, str) else session.get("id")
+    completed_at = session.get("completed_at") if isinstance(session, dict) else None
+    
+    # Generar PDF
+    pdf_buffer = generate_eri_pdf(candidate, raw, normalized, radar_fig, session_id, completed_at, analysis, validity_score, validity_flags)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button(
+            "📑 Descargar PDF Completo",
+            data=pdf_buffer.getvalue(),
+            file_name=f"eri_{candidate['cedula']}_{session_id}.pdf",
+            mime="application/pdf",
+            key=f"pdf_eri_{session_id}"
+        )
+    with col2:
+        st.download_button(
+            "📄 Descargar JSON",
+            data=json.dumps(results, indent=2, ensure_ascii=False),
+            file_name=f"eri_{candidate['cedula']}_{session_id}.json",
+            mime="application/json",
+            key=f"json_eri_{session_id}"
+        )
+
+
 # -------------------------------------------------------------------------
 # CANDIDATE: LOGIN
 # -------------------------------------------------------------------------
@@ -2325,6 +3448,9 @@ def page_candidate_select_test():
         elif sess["test_type"] == "wpi":
             test_emoji = "💼"
             test_name = "WPI - Work Personality Index"
+        elif sess["test_type"] == "eri":
+            test_emoji = "🔐"
+            test_name = "ERI - Evaluación de Riesgo e Integridad"
         else:
             test_emoji = "📝"
             test_name = "Evaluación"
@@ -2360,6 +3486,8 @@ def page_candidate_select_test():
                         nav("valanti_test")
                     elif sess["test_type"] == "wpi":
                         nav("wpi_test")
+                    elif sess["test_type"] == "eri":
+                        nav("eri_test")
                     st.rerun()
 
     st.markdown("---")
@@ -2367,7 +3495,8 @@ def page_candidate_select_test():
         for key in ["candidate", "pending_sessions", "test_session", 
                     "disc_questions", "disc_page", "disc_answers", 
                     "valanti_responses", "valanti_page",
-                    "wpi_questions", "wpi_responses", "wpi_page"]:
+                    "wpi_questions", "wpi_responses", "wpi_page",
+                    "eri_questions", "eri_responses", "eri_page"]:
             st.session_state.pop(key, None)
         nav("home")
         st.rerun()
@@ -2887,13 +4016,221 @@ def page_wpi_test():
                     db.complete_test_session(session["id"])
 
                     # Limpiar session state
-                    for key in ["wpi_questions", "wpi_responses", "wpi_page", "test_session"]:
+                    for key in ["wpi_questions", "wpi_responses", "wpi_page", "eri_questions", "eri_responses", "eri_page", "test_session"]:
                         st.session_state.pop(key, None)
 
                     nav("candidate_done")
                     st.rerun()
             else:
                 st.session_state.wpi_page += 1
+                st.rerun()
+
+
+def page_eri_test():
+    """
+    Página del test ERI (Evaluación de Riesgo e Integridad) - 60 preguntas con escala Likert 1-5.
+    """
+    session = st.session_state.get("test_session")
+    candidate = st.session_state.get("candidate")
+    
+    if not session or not candidate:
+        nav("candidate_login")
+        st.rerun()
+        return
+
+    session = db.get_session_by_id(session["id"])
+    if not session or session["status"] not in ("in_progress",):
+        if session and session["status"] == "expired":
+            st.error("⏰ El tiempo de esta evaluación ha expirado.")
+            if st.button("Volver"):
+                nav("candidate_select_test")
+                st.rerun()
+            return
+        nav("candidate_select_test")
+        st.rerun()
+        return
+
+    # Verificar tiempo restante
+    remaining = db.check_session_time(session)
+    if remaining == -1:
+        st.error("⏰ El tiempo de esta evaluación ha expirado.")
+        if st.button("Volver"):
+            nav("candidate_select_test")
+            st.rerun()
+        return
+
+    # Mostrar timer
+    deadline_ts = db.get_session_deadline_timestamp(session)
+    if deadline_ts:
+        render_timer(deadline_ts, session["id"])
+
+    st.markdown(f"### 🔐 ERI - Evaluación de Riesgo e Integridad")
+    st.caption(f"Candidato: {candidate['name']} | ID: {session['id']}")
+    
+    # Cargar preguntas si no están en session_state
+    if "eri_questions" not in st.session_state:
+        all_questions = load_eri_questions()
+        # Mezclar preguntas de manera consistente por sesión
+        rng = random.Random(session["id"])
+        rng.shuffle(all_questions)
+        st.session_state.eri_questions = all_questions
+        db.update_session_questions(session["id"], all_questions)
+
+    # Inicializar respuestas
+    if "eri_responses" not in st.session_state:
+        st.session_state.eri_responses = [None] * len(st.session_state.eri_questions)
+
+    # Inicializar página
+    if "eri_page" not in st.session_state:
+        st.session_state.eri_page = 0
+
+    questions = st.session_state.eri_questions
+    total = len(questions)
+    questions_per_page = 10  # 10 preguntas por página
+    page = st.session_state.eri_page
+    q_start = page * questions_per_page
+    q_end = min(q_start + questions_per_page, total)
+
+    # Barra de progreso
+    progress = q_end / total
+    st.progress(progress)
+    st.markdown(f"**Preguntas {q_start + 1} - {q_end} de {total}**")
+
+    # Instrucciones
+    st.info("""
+    **Instrucciones:** Responde con la máxima SINCERIDAD a cada afirmación. No hay respuestas correctas o incorrectas.
+    
+    Escala:
+    - **1** = Totalmente de acuerdo
+    - **2** = De acuerdo
+    - **3** = Neutral / No estoy seguro
+    - **4** = En desacuerdo
+    - **5** = Totalmente en desacuerdo
+    
+    ⚠️ **IMPORTANTE:** Esta evaluación detecta patrones de respuesta poco sinceros. Por favor, responde honestamente.
+    """)
+
+    # Mostrar preguntas de la página actual
+    all_answered = True
+    
+    for i in range(q_start, q_end):
+        q = questions[i]
+        q_text = q["question"]
+        dim = q["dimension"]
+        
+        # Crear tarjeta visual para cada pregunta con colores de ERI
+        st.markdown(
+            f"""
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                        border-radius: 12px; padding: 20px; margin: 15px 0;
+                        border-left: 4px solid {ERI_COLORS.get(dim, '#3b82f6')};">
+                <div style="margin-bottom: 8px;">
+                    <span style="background: {ERI_COLORS.get(dim, '#3b82f6')}; color: white; 
+                                padding: 4px 12px; border-radius: 20px; 
+                                font-size: 0.85em; font-weight: bold;">
+                        Pregunta {i + 1} - {dim}
+                    </span>
+                </div>
+                <p style="color: #e2e8f0; font-size: 1.1em; margin: 12px 0;">
+                    {q_text}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Radio buttons para la respuesta
+        response_key = f"eri_q_{i}"
+        
+        # Inicializar desde respuestas guardadas
+        if response_key not in st.session_state and st.session_state.eri_responses[i] is not None:
+            st.session_state[response_key] = st.session_state.eri_responses[i]
+        
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            response = st.radio(
+                f"Respuesta {i + 1}",
+                options=[1, 2, 3, 4, 5],
+                format_func=lambda x: {
+                    1: "1 - Totalmente de acuerdo",
+                    2: "2 - De acuerdo",
+                    3: "3 - Neutral",
+                    4: "4 - En desacuerdo",
+                    5: "5 - Totalmente en desacuerdo"
+                }[x],
+                key=response_key,
+                horizontal=False,
+                index=None if response_key not in st.session_state else st.session_state[response_key] - 1
+            )
+        
+        with col2:
+            st.markdown("<br>" * 2, unsafe_allow_html=True)
+            if response is not None:
+                st.success("✅")
+                st.session_state.eri_responses[i] = response
+            else:
+                st.warning("⚠️")
+                all_answered = False
+
+    # Navegación
+    st.markdown("---")
+    col_prev, col_space, col_next = st.columns([1, 4, 1])
+
+    with col_prev:
+        if page > 0:
+            if st.button("⬅️ Anterior", key="eri_prev"):
+                st.session_state.eri_page -= 1
+                st.rerun()
+
+    with col_next:
+        is_last = q_end >= total
+        btn_label = "✅ Finalizar Evaluación" if is_last else "Siguiente ➡️"
+        if st.button(btn_label, key="eri_next", disabled=not all_answered):
+            # Verificar tiempo nuevamente
+            remaining = db.check_session_time(db.get_session_by_id(session["id"]))
+            if remaining == -1:
+                st.error("⏰ El tiempo ha expirado.")
+                return
+
+            if is_last:
+                # Verificar que todas las preguntas estén respondidas
+                if None in st.session_state.eri_responses:
+                    st.warning("⚠️ Hay preguntas sin responder. Revisa las páginas anteriores.")
+                else:
+                    # Calcular resultados
+                    responses = st.session_state.eri_responses
+                    raw, normalized, percentages, validity_score, validity_flags = calculate_eri_results(responses, questions)
+
+                    # Guardar respuestas
+                    answer_records = []
+                    for i in range(total):
+                        answer_records.append({
+                            "question_index": i,
+                            "question_text": questions[i]["question"],
+                            "answer_value": responses[i],
+                            "answer_b_value": None,  # No aplica para ERI
+                        })
+                    db.save_answers(session["id"], answer_records)
+
+                    # Guardar resultados
+                    results = {
+                        "raw": raw,
+                        "normalized": normalized,
+                        "percentages": percentages,
+                        "validity_score": validity_score,
+                        "validity_flags": validity_flags
+                    }
+                    db.save_results(session["id"], results)
+                    db.complete_test_session(session["id"])
+
+                    # Limpiar session state
+                    for key in ["eri_questions", "eri_responses", "eri_page", "test_session"]:
+                        st.session_state.pop(key, None)
+
+                    nav("candidate_done")
+                    st.rerun()
+            else:
+                st.session_state.eri_page += 1
                 st.rerun()
 
 
@@ -2927,7 +4264,8 @@ def page_candidate_done():
             for key in ["candidate", "pending_sessions", "test_session", 
                        "disc_questions", "disc_page", "disc_answers", 
                        "valanti_responses", "valanti_page",
-                       "wpi_questions", "wpi_responses", "wpi_page"]:
+                       "wpi_questions", "wpi_responses", "wpi_page",
+                       "eri_questions", "eri_responses", "eri_page"]:
                 st.session_state.pop(key, None)
             nav("home")
             st.rerun()
@@ -2951,6 +4289,7 @@ PAGE_MAP = {
     "disc_test": page_disc_test,
     "valanti_test": page_valanti_test,
     "wpi_test": page_wpi_test,
+    "eri_test": page_eri_test,
     "candidate_done": page_candidate_done,
 }
 
