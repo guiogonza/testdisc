@@ -3,7 +3,7 @@ FROM python:3.11-slim
 
 # Metadatos
 LABEL maintainer="Recursos Humanos"
-LABEL description="Plataforma de Evaluaciones Psicométricas (DISC y VALANTI)"
+LABEL description="Plataforma de Evaluaciones Psicométricas (DISC, VALANTI y WPI)"
 
 # Variables de entorno para Python
 ENV PYTHONUNBUFFERED=1 \
@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar archivos de la aplicación
 COPY app.py database.py ./
-COPY questions_es.json questions.json ./
+COPY questions_es.json questions.json questions_wpi.json ./
 COPY disc_descriptions_es.json disc_descriptions.json ./
 COPY streangths.json ./
 
