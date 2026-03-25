@@ -22,6 +22,9 @@ from constants import *
 from calculations import (
     normalize_disc_scores,
     calculate_disc_results,
+    calculate_behavioral_styles,
+    get_disc_temperament,
+    generate_disc_mega_summary,
     calculate_valanti_results,
     calculate_wpi_results,
     load_eri_questions,
@@ -131,6 +134,62 @@ def create_disc_plot(normalized_score):
     
     fig.patch.set_facecolor('white')
     plt.tight_layout()
+    return fig
+
+
+def create_behavioral_styles_chart(behavioral_styles):
+    """
+    Crea un gráfico de barras horizontales para los 9 estilos conductuales
+    derivados del perfil DISC, con sus 4 sub-dimensiones cada uno.
+    Inspirado en el modelo de reporte THT.
+    """
+    style_names = list(behavioral_styles.keys())
+    disc_colors = {"D": "#EF4444", "I": "#F59E0B", "S": "#10B981", "C": "#3B82F6"}
+    sub_order = ["D", "I", "S", "C"]  # orden estándar de sub-dimensiones
+
+    # Mapeo de sub-dimensión → estilo DISC para colorear
+    sub_to_disc_idx = {0: "D", 1: "I", 2: "S", 3: "C"}
+
+    n_styles = len(style_names)
+    fig, axes = plt.subplots(n_styles, 1, figsize=(12, n_styles * 1.6 + 1))
+    fig.patch.set_facecolor('white')
+    fig.suptitle("Estilos Conductuales Derivados del Perfil DISC", fontsize=14,
+                 fontweight='bold', color='#1E293B', y=1.01)
+
+    for ax_idx, (style_name, style_data) in enumerate(behavioral_styles.items()):
+        ax = axes[ax_idx]
+        subs = style_data["subs"]
+        sub_names = list(subs.keys())
+        sub_values = list(subs.values())
+        colors = [disc_colors[sub_to_disc_idx[i]] for i in range(len(sub_names))]
+
+        bars = ax.barh(sub_names, sub_values, color=colors, height=0.55,
+                       edgecolor='white', linewidth=1.2)
+
+        for bar, val, color in zip(bars, sub_values, colors):
+            ax.text(min(val + 2, 102), bar.get_y() + bar.get_height() / 2,
+                    f"{val}", va='center', fontweight='bold', fontsize=9, color=color)
+
+        ax.set_xlim(0, 110)
+        ax.axvline(x=50, color='#CBD5E1', linestyle='--', alpha=0.6, linewidth=0.8)
+
+        # Fondo de la fila con color alternado
+        ax.set_facecolor('#F8FAFC' if ax_idx % 2 == 0 else '#FFFFFF')
+
+        # Título del estilo a la izquierda como etiqueta del eje y
+        ax.set_title(f"  {ax_idx + 1}. {style_name}", fontsize=10, fontweight='bold',
+                     color='#1E293B', loc='left', pad=4)
+
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['bottom'].set_color('#E2E8F0')
+        ax.spines['left'].set_color('#E2E8F0')
+        ax.tick_params(axis='y', labelsize=8.5, colors='#475569')
+        ax.tick_params(axis='x', labelsize=7, colors='#94A3B8')
+        ax.set_xticks([0, 25, 50, 75, 100])
+        ax.set_xticklabels(['0', '25', '50', '75', '100'])
+
+    plt.tight_layout(pad=1.2)
     return fig
 
 
@@ -1035,7 +1094,8 @@ def render_timer(deadline_ts, session_id):
 # PDF GENERATION
 # =========================================================================
 
-def generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at=None, analysis=None):
+def generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at=None, analysis=None,
+                      behavioral_styles=None, temperament=None, mega_summary=None, styles_fig=None):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
     styles = getSampleStyleSheet()
@@ -1129,7 +1189,81 @@ def generate_disc_pdf(candidate, normalized, relative, fig, session_id, complete
         story.append(Paragraph("PRECAUCIÓN EN ROLES DE", styles["Heading2"]))
         for r in analysis['cuidado_en']:
             story.append(Paragraph(f"• {r}", styles["Small"]))
-    
+
+    # ── MEGA RESUMEN CONDUCTUAL ──────────────────────────────────────────
+    if mega_summary:
+        story.append(PageBreak())
+        story.append(Paragraph("Resumen Conductual Detallado", styles["Heading1"]))
+        story.append(Spacer(1, 8))
+        if temperament:
+            story.append(Paragraph(
+                f"<b>Temperamento:</b> {temperament['label'].capitalize()} — {temperament['description']}",
+                styles["Normal"]
+            ))
+            story.append(Spacer(1, 8))
+        data_rows = [["Dimensión", "Descripción Conductual"]]
+        for label, text in mega_summary.items():
+            data_rows.append([label, text])
+        t_sum = Table(data_rows, colWidths=[130, 360])
+        t_sum.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1e40af")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, 0), 9),
+            ("FONTSIZE", (0, 1), (-1, -1), 8),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#CBD5E1")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#F8FAFC"), colors.white]),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
+            ("TEXTCOLOR", (0, 1), (0, -1), colors.HexColor("#1e40af")),
+        ]))
+        story.append(t_sum)
+
+    # ── ESTILOS CONDUCTUALES ─────────────────────────────────────────────
+    if behavioral_styles:
+        story.append(PageBreak())
+        story.append(Paragraph("9 Estilos Conductuales Derivados", styles["Heading1"]))
+        story.append(Spacer(1, 6))
+        story.append(Paragraph(
+            "Puntajes derivados matemáticamente del perfil DISC. Cada estilo presenta 4 sub-dimensiones "
+            "mapeadas a Dominancia (D), Influencia (I), Estabilidad (S) y Cumplimiento (C).",
+            styles["Small"]
+        ))
+        story.append(Spacer(1, 10))
+
+        if styles_fig:
+            try:
+                styles_buf = BytesIO()
+                styles_fig.savefig(styles_buf, format="png", dpi=130, bbox_inches="tight")
+                styles_buf.seek(0)
+                story.append(Image(styles_buf, width=480, height=len(behavioral_styles) * 55 + 30))
+            except Exception:
+                pass
+        
+        story.append(Spacer(1, 12))
+        for style_name, style_data in behavioral_styles.items():
+            story.append(Paragraph(f"<b>{style_name}</b>", styles["Heading3"]))
+            sub_data = [["Sub-dimensión", "Puntaje", "Descripción"]]
+            for sub_name, sub_val in style_data["subs"].items():
+                sub_data.append([sub_name, str(sub_val), style_data["desc"][sub_name]])
+            t_sub = Table(sub_data, colWidths=[110, 45, 335])
+            t_sub.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#374151")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+                ("ALIGN", (1, 0), (1, -1), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#CBD5E1")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#F9FAFB"), colors.white]),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(t_sub)
+            story.append(Spacer(1, 8))
+
     story.append(Spacer(1, 20))
     story.append(Paragraph("<i>Este reporte es generado automáticamente como herramienta de apoyo para Recursos Humanos. Los resultados deben complementarse con entrevistas y otras evaluaciones.</i>", styles["Small"]))
     
@@ -2707,7 +2841,12 @@ def show_disc_results_admin(results, candidate, session):
 
     # Análisis de aptitud
     analysis = analyze_disc_aptitude(normalized, relative)
-    
+
+    # Estilos conductuales, temperamento y mega resumen (nuevas funcionalidades THT-inspired)
+    behavioral_styles = calculate_behavioral_styles(normalized)
+    temperament = get_disc_temperament(normalized)
+    mega_summary = generate_disc_mega_summary(normalized)
+
     # Banner de aptitud
     st.markdown(f"""
     <div style="background: {analysis['aptitude_color']}22; border-left: 5px solid {analysis['aptitude_color']};
@@ -2715,18 +2854,76 @@ def show_disc_results_admin(results, candidate, session):
         <h3 style="margin: 0; color: {analysis['aptitude_color']};">{analysis['aptitude_emoji']} {analysis['aptitude_level']} — Puntaje: {analysis['aptitude_score']}/100</h3>
         <p style="margin: 5px 0 0 0; color: #374151;">{analysis['aptitude_desc']}</p>
         <p style="margin: 5px 0 0 0; color: #6B7280;"><b>Perfil:</b> {analysis['profile_name']} ({analysis['dominant_name']} + {analysis['secondary_name']})</p>
+        <p style="margin: 5px 0 0 0; color: #6B7280;"><b>Temperamento:</b> {temperament['label']}</p>
     </div>
     """, unsafe_allow_html=True)
 
     cols = st.columns(4)
+    disc_colors = {"D": "#EF4444", "I": "#F59E0B", "S": "#10B981", "C": "#3B82F6"}
+    disc_names = {"D": "Dominancia", "I": "Influencia", "S": "Estabilidad", "C": "Cumplimiento"}
     for idx, style in enumerate("DISC"):
         with cols[idx]:
-            st.metric(style, f"{normalized.get(style, 0):.1f}%", f"Rel: {relative.get(style, 0):.1f}%")
+            st.metric(f"{style} — {disc_names[style]}", f"{normalized.get(style, 0):.1f}%",
+                      f"Rel: {relative.get(style, 0):.1f}%")
 
     fig = create_disc_plot(normalized)
     st.pyplot(fig)
-    
-    # Fortalezas, alertas y recomendaciones
+
+    # ── MEGA RESUMEN ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 📋 Resumen Conductual")
+    st.caption("Descripción detallada del perfil conductual en 16 dimensiones, derivada del resultado DISC.")
+
+    cols_summary = st.columns(2)
+    items = list(mega_summary.items())
+    half = len(items) // 2
+    for col, chunk in zip(cols_summary, [items[:half], items[half:]]):
+        with col:
+            for label, text in chunk:
+                st.markdown(f"""
+                <div style="background:#F8FAFC; border-left:3px solid #3B82F6; padding:10px 14px;
+                            border-radius:6px; margin-bottom:8px;">
+                    <b style="color:#1E40AF; font-size:0.85em;">{label}</b><br>
+                    <span style="color:#374151; font-size:0.92em;">{text}</span>
+                </div>""", unsafe_allow_html=True)
+
+    # ── 9 ESTILOS CONDUCTUALES ────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 🎯 Estilos Conductuales Derivados")
+    st.caption("9 estilos con 4 sub-dimensiones cada uno, inferidos matemáticamente del perfil DISC (metodología THT).")
+
+    styles_fig = create_behavioral_styles_chart(behavioral_styles)
+    st.pyplot(styles_fig)
+
+    # Detalle expandible de cada estilo
+    with st.expander("🔍 Ver descripción detallada de cada sub-dimensión"):
+        for style_name, style_data in behavioral_styles.items():
+            st.markdown(f"**{style_name}**")
+            for sub_name, sub_val in style_data["subs"].items():
+                desc = style_data["desc"][sub_name]
+                bar_w = int(sub_val)
+                color = "#EF4444" if sub_name in ["Franqueza", "Control", "Insistencia", "Por Resultados",
+                                                  "Resolución", "Confrontación", "Priorización",
+                                                  "Pragmatismo"] else (
+                        "#F59E0B" if sub_name in ["Expresividad", "Inspiración", "Optimismo", "Por Inspiración",
+                                                  "Positivismo", "Apasionamiento", "Entusiasmo",
+                                                  "Extroversión", "Persuasión"] else (
+                        "#10B981" if sub_name in ["Autoregulación", "Moderación", "Focalización", "Democrático",
+                                                  "Resistencia", "Inalterabilidad", "Pausa", "Autocontrol",
+                                                  "Calma"] else "#3B82F6"))
+                st.markdown(f"""
+                <div style="display:flex; align-items:center; gap:10px; margin:4px 0;">
+                    <span style="min-width:140px; font-size:0.85em; color:#374151;">{sub_name}</span>
+                    <div style="flex:1; background:#E2E8F0; border-radius:4px; height:14px; position:relative;">
+                        <div style="width:{bar_w}%; background:{color}; border-radius:4px; height:14px;"></div>
+                    </div>
+                    <span style="font-weight:bold; color:{color}; min-width:30px;">{bar_w}</span>
+                    <span style="font-size:0.75em; color:#94A3B8; flex:1;">{desc}</span>
+                </div>""", unsafe_allow_html=True)
+            st.markdown("")
+
+    # ── FORTALEZAS Y ALERTAS ──────────────────────────────────────────────
+    st.markdown("---")
     col_f, col_a = st.columns(2)
     with col_f:
         st.markdown("#### 💪 Fortalezas")
@@ -2736,22 +2933,24 @@ def show_disc_results_admin(results, candidate, session):
         st.markdown("#### ⚠️ Alertas")
         for a in analysis['alertas']:
             st.markdown(f"- 🔸 {a}")
-    
+
     st.markdown("#### 📋 Recomendaciones para el Candidato")
     for r in analysis['recomendaciones']:
         st.markdown(f"- 💡 {r}")
-    
+
     if analysis['ideal_para']:
         st.markdown("#### 🎯 Ideal para roles de")
         st.markdown(", ".join([f"**{r}**" for r in analysis['ideal_para']]))
-    
+
     if analysis['cuidado_en']:
         st.markdown("#### ⛔ Tener cuidado en")
         st.markdown(", ".join([f"*{r}*" for r in analysis['cuidado_en']]))
 
     session_id = session if isinstance(session, str) else session.get("id")
     completed_at = session.get("completed_at") if isinstance(session, dict) else None
-    pdf = generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at, analysis)
+    pdf = generate_disc_pdf(candidate, normalized, relative, fig, session_id, completed_at, analysis,
+                            behavioral_styles=behavioral_styles, temperament=temperament,
+                            mega_summary=mega_summary, styles_fig=styles_fig)
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📑 Descargar PDF", data=pdf.getvalue(), file_name=f"disc_{candidate['cedula']}.pdf", mime="application/pdf", key=f"pdf_disc_{session_id}")

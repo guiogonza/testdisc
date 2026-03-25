@@ -1,0 +1,56 @@
+# Acceso por IP pública con prefijo de ruta /evaluacionesrh
+# URL: http://164.68.118.86/evaluacionesrh
+#
+# Estrategia:
+#   - Reescribe /evaluacionesrh/* → /* antes de pasar al upstream (Streamlit en :8505)
+#   - Proxy adicional para los paths internos de Streamlit (_stcore, static, media)
+#     para que el navegador pueda cargar JS/WebSocket desde la URL con IP.
+
+server {
+    listen 80;
+    server_name 164.68.118.86;
+
+    client_max_body_size 50M;
+
+    # Redirigir raíz al prefijo de la aplicación
+    location = / {
+        return 302 /evaluacionesrh/;
+    }
+
+    # Normalizar /evaluacionesrh sin slash final
+    location = /evaluacionesrh {
+        return 301 /evaluacionesrh/;
+    }
+
+    # ── Aplicación principal ───────────────────────────────────────────────────
+    # Reescribe /evaluacionesrh/<path> → /<path> antes de llegar a Streamlit
+    location /evaluacionesrh/ {
+        rewrite ^/evaluacionesrh/(.*)$ /$1 break;
+        proxy_pass http://127.0.0.1:8505;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    # ── Paths internos de Streamlit ────────────────────────────────────────────
+    # El HTML generado por Streamlit referencia /_stcore/, /static/, etc. con
+    # rutas absolutas. Hay que proxearlas también para que el navegador las
+    # resuelva sobre la IP sin prefijo.
+    location ~ ^/(_stcore|static|media|component)(/.*)?$ {
+        proxy_pass http://127.0.0.1:8505;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+}

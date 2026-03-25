@@ -43,6 +43,390 @@ def calculate_disc_results(answers_list, questions):
     return raw, normalized, relative
 
 
+def calculate_behavioral_styles(normalized):
+    """
+    Deriva 9 estilos conductuales a partir de los puntajes DISC normalizados.
+    Cada estilo tiene 4 sub-dimensiones mapeadas a D, I, S, C respectivamente.
+    Inspirado en la metodología THT de perfilamiento conductual.
+    """
+    D = normalized.get('D', 50)
+    I = normalized.get('I', 50)
+    S = normalized.get('S', 50)
+    C = normalized.get('C', 50)
+
+    # El complemento (100 - S) representa el grado de aceleración / baja resistencia
+    # El complemento (100 - I) representa introversión relativa
+    styles = {
+        "Comunicación": {
+            "subs": {
+                "Franqueza": round(D),           # Decir las cosas sin rodeos
+                "Expresividad": round(I),         # Compartir ideas con entusiasmo
+                "Autoregulación": round(S),       # Controlar lo que se dice
+                "Formalidad": round(C),           # Prudencia y moderación al hablar
+            },
+            "desc": {
+                "Franqueza": "Sinceridad y dirección al comunicarse",
+                "Expresividad": "Facilidad para dar a conocer ideas con optimismo",
+                "Autoregulación": "Capacidad de controlar lo que se dice",
+                "Formalidad": "Comportamiento prudente y moderado al expresarse",
+            }
+        },
+        "Delegación": {
+            "subs": {
+                "Control": round(D),              # Comprobar e inspeccionar todo
+                "Inspiración": round(I),          # Motivar a otros para trabajar
+                "Moderación": round(S),           # Dar instrucciones y esperar sin presionar
+                "Exigencia": round(C),            # Demandar altos estándares de calidad
+            },
+            "desc": {
+                "Control": "Tendencia a comprobar e inspeccionar a su alrededor",
+                "Inspiración": "Capacidad para motivar a otros en sus tareas",
+                "Moderación": "Tendencia a dar instrucciones y esperar sin presionar",
+                "Exigencia": "Tendencia a demandar altos estándares de calidad",
+            }
+        },
+        "Emprendimiento": {
+            "subs": {
+                "Insistencia": round(D),          # Actuar por encima de obstáculos
+                "Optimismo": round(I),            # Ver el aspecto más favorable
+                "Focalización": round(S),         # Centrarse en pocas tareas sistemáticamente
+                "Planificación": round(C),        # Acometer proyectos con control del riesgo
+            },
+            "desc": {
+                "Insistencia": "Capacidad para actuar por encima de los obstáculos",
+                "Optimismo": "Tendencia a ver el aspecto más favorable de las cosas",
+                "Focalización": "Tendencia a centrarse en pocas tareas de forma sistemática",
+                "Planificación": "Facilidad para iniciar proyectos con control del riesgo",
+            }
+        },
+        "Liderazgo": {
+            "subs": {
+                "Por Resultados": round(D),       # Movilizar por logros
+                "Por Inspiración": round(I),      # Movilizar por ideas inspiradoras
+                "Democrático": round(S),          # Movilizar por confianza y participación
+                "Conservador": round(C),          # Movilizar por acciones seguras
+            },
+            "desc": {
+                "Por Resultados": "Tendencia a movilizar al grupo en función de logros",
+                "Por Inspiración": "Tendencia a movilizar por ideas inspiradoras",
+                "Democrático": "Tendencia a movilizar por confianza y participación",
+                "Conservador": "Tendencia a movilizar por acciones seguras y demostradas",
+            }
+        },
+        "Adaptación al Cambio": {
+            "subs": {
+                "Resolución": round(D),           # Actuar con determinación ante el cambio
+                "Positivismo": round(I),          # Pensar que lo mejor puede suceder
+                "Resistencia": round(100 - S),    # Permanecer igual, evitando cambiar (invertido)
+                "Consistencia": round(C),         # Pensar y actuar siempre de la misma manera
+            },
+            "desc": {
+                "Resolución": "Tendencia a actuar con determinación al aceptar el cambio",
+                "Positivismo": "Tendencia a pensar que lo mejor puede suceder en el nuevo entorno",
+                "Resistencia": "Tendencia a resistir el cambio hasta que sea inevitable",
+                "Consistencia": "Tendencia a pensar y actuar siempre de la misma manera",
+            }
+        },
+        "Manejo del Conflicto": {
+            "subs": {
+                "Confrontación": round(D),        # Debatir y argumentar su punto de vista
+                "Apasionamiento": round(I),       # Expresarse elocuentemente
+                "Inalterabilidad": round(S),      # Retener reacciones cuando se le presiona
+                "Severidad": round(C),            # Exigencia y rigor para que las cosas se hagan
+            },
+            "desc": {
+                "Confrontación": "Tendencia a debatir y argumentar su punto de vista",
+                "Apasionamiento": "Tendencia a expresarse de forma elocuente sobre lo que importa",
+                "Inalterabilidad": "Tendencia a retener reacciones cuando se le presiona",
+                "Severidad": "Tendencia a actuar con exigencia y rigor para que las cosas se hagan bien",
+            }
+        },
+        "Manejo del Tiempo": {
+            "subs": {
+                "Priorización": round(D),         # Dirigir atención hacia mejores resultados
+                "Entusiasmo": round(I),           # Trabajar con motivación en tareas de interés
+                "Pausa": round(S),                # Actuar de forma recatada y moderada
+                "Precisión": round(C),            # Cumplir tiempos establecidos con precisión
+            },
+            "desc": {
+                "Priorización": "Tendencia a dirigir la atención hacia los asuntos de mayor impacto",
+                "Entusiasmo": "Tendencia a trabajar con motivación en tareas de interés",
+                "Pausa": "Tendencia a actuar de forma tranquila y moderada",
+                "Precisión": "Tendencia a cumplir los tiempos establecidos de forma precisa",
+            }
+        },
+        "Manejo Emocional": {
+            "subs": {
+                "Franqueza": round(D),            # Decir las cosas por su nombre
+                "Extroversión": round(I),         # Manifestar sentimientos con entusiasmo
+                "Autocontrol": round(S),          # Controlar o regular su propia conducta
+                "Reflexibilidad": round(C),       # Pensar detenidamente las cosas
+            },
+            "desc": {
+                "Franqueza": "Capacidad para decir las cosas por su nombre",
+                "Extroversión": "Facilidad para manifestar sentimientos o pensamientos con entusiasmo",
+                "Autocontrol": "Capacidad para controlar o regular su propia conducta",
+                "Reflexibilidad": "Tendencia a pensar detenidamente las cosas antes de actuar",
+            }
+        },
+        "Negociación": {
+            "subs": {
+                "Pragmatismo": round(D),          # Valorar utilidad y valor práctico
+                "Persuasión": round(I),           # Convencer a través de argumentos positivos
+                "Calma": round(S),                # Autocontrolar reacciones y esperar el momento
+                "Rigidez": round(C),              # Actuar de manera rigurosa e inflexible
+            },
+            "desc": {
+                "Pragmatismo": "Tendencia a valorar la utilidad y el valor práctico de las cosas",
+                "Persuasión": "Facilidad para convencer o disuadir con argumentos positivos",
+                "Calma": "Tendencia a autocontrolar reacciones y esperar el momento oportuno",
+                "Rigidez": "Propensión a actuar de manera rigurosa, severa e inflexible",
+            }
+        },
+    }
+    return styles
+
+
+def get_disc_temperament(normalized):
+    """
+    Determina el temperamento dominante basado en los puntajes DISC.
+    Mapeo clásico: D=Colérico, I=Sanguíneo, S=Flemático, C=Melancólico.
+    """
+    D = normalized.get('D', 50)
+    I = normalized.get('I', 50)
+    S = normalized.get('S', 50)
+    C = normalized.get('C', 50)
+
+    temperament_map = {
+        'Colérico': {'score': D, 'style': 'D', 'adj': 'colérico',
+                     'desc': 'activo, decidido, orientado a resultados y con fuerte impulso de liderazgo'},
+        'Sanguíneo': {'score': I, 'style': 'I', 'adj': 'sanguíneo',
+                      'desc': 'optimista, sociable, entusiasta y con facilidad para relacionarse'},
+        'Flemático': {'score': S, 'style': 'S', 'adj': 'flemático',
+                      'desc': 'tranquilo, estable, constante y orientado al equipo'},
+        'Melancólico': {'score': C, 'style': 'C', 'adj': 'melancólico',
+                        'desc': 'perfeccionista, analítico, organizado y orientado a la calidad'},
+    }
+
+    sorted_temps = sorted(temperament_map.items(), key=lambda x: x[1]['score'], reverse=True)
+    primary_name, primary_data = sorted_temps[0]
+    secondary_name, secondary_data = sorted_temps[1]
+
+    return {
+        'primary': primary_name,
+        'secondary': secondary_name,
+        'primary_score': primary_data['score'],
+        'secondary_score': secondary_data['score'],
+        'label': f"predominantemente {primary_data['adj']} y {secondary_data['adj']}",
+        'description': f"{primary_data['desc']}; con rasgos {secondary_data['adj']}s de {secondary_data['desc']}",
+    }
+
+
+def generate_disc_mega_summary(normalized):
+    """
+    Genera un resumen conductual de 16 puntos basado en el perfil DISC.
+    Inspirado en la metodología de reporte de 32 frases de THT.
+    """
+    D = normalized.get('D', 50)
+    I = normalized.get('I', 50)
+    S = normalized.get('S', 50)
+    C = normalized.get('C', 50)
+
+    def level(score):
+        if score >= 70: return 'high'
+        if score >= 40: return 'mid'
+        return 'low'
+
+    lD, lI, lS, lC = level(D), level(I), level(S), level(C)
+
+    phrases = {
+        'como_es': {
+            ('high','high','low','low'): "Persona decidida, entusiasta, carismática y orientada a la acción.",
+            ('high','low','low','high'): "Persona confrontante, rigurosa, realista e inquieta.",
+            ('high','low','low','low'): "Persona confrontante, dominante, directa y orientada a resultados.",
+            ('low','high','high','low'): "Persona cálida, sociable, paciente y empática.",
+            ('low','low','high','high'): "Persona metódica, paciente, detallista y estable.",
+            ('low','high','low','high'): "Persona persuasiva, organizada, analítica y relacional.",
+        },
+        'que_busca': {
+            'high_D': "Tener el control, la excelencia y actuar de forma expedita.",
+            'high_I': "Conectar con las personas, inspirar y ser reconocido.",
+            'high_S': "Mantener la armonía, estabilidad y un entorno predecible.",
+            'high_C': "La precisión, la calidad y cumplir con los estándares establecidos.",
+        },
+        'ambiente_ideal': {
+            'high_D': "Entorno libre de control excesivo, con privacidad, autonomía y dinamismo.",
+            'high_I': "Entorno social, colaborativo y con reconocimiento constante.",
+            'high_S': "Entorno estable, predecible y con relaciones duraderas.",
+            'high_C': "Entorno estructurado, con procesos claros y altos estándares.",
+        },
+        'gran_limitante': {
+            'high_D': "Podría ser poco diplomático, parca, incrédulo y fácilmente irritable.",
+            'high_I': "Puede distraerse, desorganizarse y prometer más de lo que cumple.",
+            'high_S': "Puede resistirse al cambio y evitar confrontaciones necesarias.",
+            'high_C': "Puede ser demasiado crítico, perfeccionista e inflexible.",
+        },
+    }
+
+    # Determinar el estilo dominante para las frases
+    dominant = max({'D': D, 'I': I, 'S': S, 'C': C}.items(), key=lambda x: x[1])
+    secondary = sorted({'D': D, 'I': I, 'S': S, 'C': C}.items(), key=lambda x: x[1], reverse=True)[1]
+
+    dom_key = f"high_{dominant[0]}"
+    sec_key = f"high_{secondary[0]}"
+
+    # Construir mega resumen
+    summary = {
+        "Cómo es": _pick_como_es(lD, lI, lS, lC),
+        "Qué busca": phrases['que_busca'].get(dom_key, phrases['que_busca']['high_D']),
+        "Ambiente ideal": phrases['ambiente_ideal'].get(dom_key, phrases['ambiente_ideal']['high_D']),
+        "Gran limitante": phrases['gran_limitante'].get(dom_key, phrases['gran_limitante']['high_D']),
+        "Cómo lidera": _describe_leadership(D, I, S, C),
+        "Cómo decide": _describe_decision(D, I, S, C),
+        "Cómo negocia": _describe_negotiation(D, I, S, C),
+        "Cómo maneja el conflicto": _describe_conflict(D, I, S, C),
+        "Cómo se relaciona": _describe_relations(D, I, S, C),
+        "Qué le motiva": _describe_motivation(D, I, S, C),
+        "Qué le desmotiva": _describe_demotivation(D, I, S, C),
+        "Valor para el equipo": _describe_team_value(D, I, S, C),
+        "Cómo bajo presión": _describe_under_pressure(D, I, S, C),
+        "Cómo entrenarle": _describe_training(D, I, S, C),
+        "Cómo darle feedback": _describe_feedback(D, I, S, C),
+        "Recomendación clave": _describe_recommendation(D, I, S, C),
+    }
+    return summary
+
+
+def _pick_como_es(lD, lI, lS, lC):
+    key = (lD, lI, lS, lC)
+    options = {
+        ('high','high','low','low'): "Persona decidida, entusiasta, carismática y orientada a la acción.",
+        ('high','high','low','mid'): "Persona dinámica, decidida, entusiasta y con capacidad de análisis.",
+        ('high','low','low','high'): "Persona confrontante, rigurosa, realista e inquieta.",
+        ('high','mid','low','high'): "Persona confrontante, rigurosa, realista e inquieta, con capacidad de influencia.",
+        ('high','low','low','mid'): "Persona directa, analítica, orientada a resultados y exigente.",
+        ('high','low','mid','high'): "Persona exigente, rigurosa, metódica y orientada a la calidad con alto dinamismo.",
+        ('high','low','low','low'): "Persona confrontante, dominante, directa y orientada a resultados.",
+        ('low','high','high','low'): "Persona cálida, sociable, paciente y empática con su entorno.",
+        ('low','low','high','high'): "Persona metódica, paciente, detallista y orientada a la estabilidad.",
+        ('low','high','low','high'): "Persona persuasiva, organizada, analítica con habilidad relacional.",
+        ('low','mid','high','high'): "Persona estable, analítica, consistente y orientada a la calidad.",
+        ('mid','mid','mid','mid'): "Persona versátil con un perfil conductual equilibrado y adaptable.",
+        ('high','mid','low','mid'): "Persona activa, decidida, directa y con habilidad de influencia moderada.",
+        ('mid','high','mid','low'): "Persona entusiasta, sociable, dinámica y orientada a las relaciones.",
+        ('low','low','mid','high'): "Persona analítica, tranquila, rigurosa y orientada al detalle.",
+    }
+    # Primero busca match exacto
+    if key in options:
+        return options[key]
+    # Si no, describe según el estilo dominante
+    dominant = max({'D': lD, 'I': lI, 'S': lS, 'C': lC}.items(), key=lambda x: ['low','mid','high'].index(x[1]))
+    fallbacks = {
+        'D': "Persona decidida, dominante, orientada a resultados y directa en su comunicación.",
+        'I': "Persona optimista, sociable, entusiasta y orientada a las relaciones interpersonales.",
+        'S': "Persona tranquila, estable, paciente y orientada al apoyo del equipo.",
+        'C': "Persona analítica, detallista, rigurosa y orientada a la calidad y los estándares.",
+    }
+    return fallbacks.get(dominant[0], "Persona con perfil conductual equilibrado y versátil.")
+
+
+def _describe_leadership(D, I, S, C):
+    if D >= 70 and C >= 70: return "Moviliza a los demás con pragmatismo, exigiendo, validando cada paso y ejecutando con celeridad."
+    if D >= 70 and I >= 70: return "Lidera con carisma y determinación, inspirando con energía y tomando decisiones ágiles."
+    if I >= 70 and S >= 70: return "Lidera por inspiración y confianza, creando ambientes de colaboración y motivación."
+    if S >= 70 and C >= 70: return "Lidera de forma conservadora y metódica, asegurando procesos sólidos y confiables."
+    if D >= 70: return "Lidera por resultados, movilizando al equipo hacia logros concretos y de alto impacto."
+    if I >= 70: return "Lidera con entusiasmo e inspiración, motivando a otros con ideas y visión positiva."
+    if S >= 70: return "Lidera de forma democrática, construyendo confianza y fomentando la participación."
+    return "Lidera de manera conservadora, con acciones demostradas y planificación cuidadosa."
+
+
+def _describe_decision(D, I, S, C):
+    if D >= 70 and C >= 70: return "Resuelve con determinación, analizando hasta el último detalle y actuando con cautela sin demoras."
+    if D >= 70: return "Decide rápidamente y con firmeza, priorizando la acción sobre el análisis exhaustivo."
+    if C >= 70: return "Analiza minuciosamente antes de decidir, asegurándose de contar con toda la información."
+    if I >= 70: return "Decide con intuición y entusiasmo, buscando el apoyo de otros antes de actuar."
+    return "Decide de forma equilibrada, considerando los hechos y el impacto en el equipo."
+
+
+def _describe_negotiation(D, I, S, C):
+    if D >= 70 and C >= 70: return "Llega a acuerdos defendiendo con fuerza sus intereses, gestionando la información y explicando rápidamente."
+    if D >= 70: return "Negocia con firmeza y orientación a resultados, cediendo poco y cerrando rápido."
+    if I >= 70: return "Negocia con persuasión y entusiasmo, buscando acuerdos que beneficien a todas las partes."
+    if S >= 70: return "Negocia con calma y paciencia, prefiriendo consensos y evitando confrontaciones."
+    return "Negocia de forma rigurosa y planificada, basándose en datos y estándares claros."
+
+
+def _describe_conflict(D, I, S, C):
+    if D >= 70: return "Reacciona debatiendo directamente, buscando justicia y actuando de inmediato."
+    if I >= 70: return "Busca resolver el conflicto con entusiasmo y persuasión, apelando a las relaciones."
+    if S >= 70: return "Tiende a evitar el conflicto, buscando armonía y conciliación entre las partes."
+    return "Analiza el conflicto con detalle antes de reaccionar, buscando una solución lógica."
+
+
+def _describe_relations(D, I, S, C):
+    if D >= 70 and C >= 70: return "Interactúa de forma contundente, fría, avisada y diligente."
+    if I >= 70 and S >= 70: return "Se relaciona de forma cálida, abierta y con genuino interés por los demás."
+    if D >= 70: return "Se relaciona de forma directa y asertiva, valorando la eficiencia sobre lo social."
+    if I >= 70: return "Se relaciona de forma entusiasta y sociable, construyendo redes con facilidad."
+    if S >= 70: return "Se relaciona de forma leal y estable, manteniendo vínculos duraderos."
+    return "Se relaciona de forma correcta y estructurada, respetando límites y roles."
+
+
+def _describe_motivation(D, I, S, C):
+    if D >= 70: return "Le estimulan los grandes retos, la información clara, la discreción y la interactividad."
+    if I >= 70: return "Le motiva el reconocimiento, la sociabilidad, los ambientes creativos y la libertad de expresión."
+    if S >= 70: return "Le motiva la estabilidad, el trabajo en equipo, la lealtad y un entorno predecible."
+    return "Le motiva la precisión, los sistemas, la calidad del trabajo y el cumplimiento de estándares."
+
+
+def _describe_demotivation(D, I, S, C):
+    if D >= 70: return "Le desaniman la falta de resultados, el desorden, las promesas incumplidas y la inactividad."
+    if I >= 70: return "Le desmotiva la repetición, la rigidez, la falta de reconocimiento y el trabajo en solitario."
+    if S >= 70: return "Le desmotiva la inestabilidad, los cambios abruptos y los ambientes de alta presión."
+    return "Le desmotiva el trabajo impreciso, los errores tolerados y la falta de estructura."
+
+
+def _describe_team_value(D, I, S, C):
+    if D >= 70: return "Aporta metas ambiciosas, control del riesgo, planes de contingencia y vitalidad."
+    if I >= 70: return "Aporta entusiasmo, ideas innovadoras, conexión interpersonal y motivación al grupo."
+    if S >= 70: return "Aporta estabilidad, lealtad, escucha activa y soporte constante al equipo."
+    return "Aporta rigor, calidad, análisis profundo y sistemas de trabajo eficientes."
+
+
+def _describe_under_pressure(D, I, S, C):
+    if D >= 70: return "Tiende a reaccionar de manera impositiva, salvando responsabilidades y de forma reactiva."
+    if I >= 70: return "Puede volverse impulsivo, disperso o buscar validación externa ante la presión."
+    if S >= 70: return "Puede bloquearse, evitar decisiones y necesitar más tiempo del usual para actuar."
+    return "Puede volverse hipercrítico, perfeccionista en exceso y paralizado por el análisis."
+
+
+def _describe_training(D, I, S, C):
+    if D >= 70: return "Aprende mejor con actividades competitivas, instrucciones detalladas, casos prácticos y tareas dinámicas."
+    if I >= 70: return "Aprende mejor con dinámicas grupales, role-playing, feedforward y ambientes creativos."
+    if S >= 70: return "Aprende mejor con procesos paso a paso, mentorías estables y ambientes seguros de práctica."
+    return "Aprende mejor con documentación detallada, análisis de casos y tiempo para reflexionar."
+
+
+def _describe_feedback(D, I, S, C):
+    if D >= 70 and C >= 70: return "Argumentar con franqueza total rigurosidad, validar todo lo que va a decir y centrarse rápidamente en lo que se debe mejorar."
+    if D >= 70: return "Ser directo y concreto con hechos y datos, evitar rodeos y ofrecer soluciones inmediatas."
+    if I >= 70: return "Iniciar con lo positivo, usar un tono motivador y reconocer sus esfuerzos antes de señalar mejoras."
+    if S >= 70: return "Hacerlo en privado, con calma, con tiempo suficiente y reforzando la relación de confianza."
+    return "Presentar datos concretos, dar tiempo para procesar y enfocarse en el proceso más que en la persona."
+
+
+def _describe_recommendation(D, I, S, C):
+    if D >= 70 and C >= 70: return "Es clave que potencie su capacidad natural para hacer que las cosas sucedan, ser exigente con la calidad, aterrizar las ideas y moverse con prontitud."
+    if D >= 70 and I >= 70: return "Es clave canalizar su energía y entusiasmo hacia objetivos concretos, aprendiendo a delegar y escuchar más."
+    if I >= 70 and S >= 70: return "Es clave aprovechar su calidez y sociabilidad para construir equipos sólidos, desarrollando asertividad cuando sea necesario."
+    if S >= 70 and C >= 70: return "Es clave aprovechar su rigor y estabilidad para ser un referente de calidad, trabajando en mayor flexibilidad y toma de decisiones ágiles."
+    if D >= 70: return "Es clave aprender a escuchar más, tolerar el ritmo de otros y construir relaciones de confianza."
+    if I >= 70: return "Es clave desarrollar disciplina de seguimiento, organización y cumplimiento de compromisos."
+    if S >= 70: return "Es clave desarrollar mayor asertividad y comodidad con el cambio y la toma de decisiones rápidas."
+    return "Es clave aprender a tomar decisiones con información incompleta y a aceptar los errores como parte del proceso."
+
+
 # =========================================================================
 # CÁLCULOS VALANTI
 # =========================================================================

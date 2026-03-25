@@ -1,0 +1,103 @@
+server {
+    listen 80;
+    server_name 164.68.118.86;
+
+    client_max_body_size 100M;
+    access_log /var/log/nginx/gitea_access.log;
+    error_log /var/log/nginx/gitea_error.log;
+
+    location /acuarela2 {
+        proxy_pass http://127.0.0.1:8503;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+        proxy_buffering off;
+    }
+
+    # ── Torneo de Ajedrez ────────────────────────────────
+    location = /chess {
+        return 301 /chess/;
+    }
+
+    location /chess/ {
+        rewrite ^/chess/(.*)$ /$1 break;
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+        proxy_buffering off;
+    }
+
+
+    # -- Geotab GPS Tracker -----------------------------------------------
+    location = /geotab {
+        return 301 /geotab/;
+    }
+
+    location /geotab/ {
+        rewrite ^/geotab(/.*)$ $1 break;
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+
+        proxy_redirect / /geotab/;
+
+        sub_filter_once off;
+        sub_filter 'href="/' 'href="/geotab/';
+        sub_filter "'/api/" "'/geotab/api/";
+        sub_filter '`/api/' '`/geotab/api/';
+    }
+
+    # ── EvaluacionesRH por IP con prefijo ────────────────────────────────
+    location = /evaluacionesrh {
+        return 301 /evaluacionesrh/;
+    }
+
+    location /evaluacionesrh/ {
+        rewrite ^/evaluacionesrh/(.*)$ /$1 break;
+        proxy_pass http://127.0.0.1:8505;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    # Streamlit: assets internos referenciados con ruta absoluta
+    # (_stcore = runtime JS/WS, static = recursos estáticos)
+    location ~ ^/(_stcore|static|media|component)(/.*)?$ {
+        proxy_pass http://127.0.0.1:8505;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    location = / {
+        return 301 /acuarela2;
+    }
+}
