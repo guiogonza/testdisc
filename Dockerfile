@@ -35,6 +35,8 @@ COPY constants.py calculations.py analysis.py utils.py ./
 COPY questions_es.json questions.json questions_wpi.json questions_eri.json questions_talent_map.json ./
 COPY disc_descriptions_es.json disc_descriptions.json ./
 COPY streangths.json ./
+# Copiar logo
+COPY logo.png ./
 
 # Crear directorio para la base de datos
 RUN mkdir -p /app/data

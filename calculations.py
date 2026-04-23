@@ -737,3 +737,216 @@ def calculate_desempeno_results(rendimiento_scores, potencial_scores, iniciativa
         "requiere_iniciativas": requiere_iniciativas,
         "iniciativas": iniciativas if iniciativas else []
     }
+
+
+# =========================================================================
+# CÁLCULOS DESEMPEÑO LÍDERES (FO-GH-41)
+# =========================================================================
+
+def calculate_desempeno_lider_results(competencias_scores, rendimiento_scores, potencial_scores,
+                                      nivel_cargo=None, iniciativas=None):
+    """
+    Calcula resultados de evaluación de desempeño para líderes.
+    competencias_scores: {comp_id (1-7): nivel (1-6)}
+    rendimiento_scores:  {obj_id (1-6): puntaje (1-5)}
+    potencial_scores:    {dim_id (1-5): nivel (0-3)}
+    nivel_cargo:         str (ej. "LIDER", "GERENTE") para comparar contra niveles requeridos
+    """
+    from constants import (
+        COMPETENCIAS_ORGANIZACIONALES, COMPETENCIAS_NIVEL_REQUERIDO,
+        DESEMPENO_LIDER_CLASIFICACION_COMP,
+        DESEMPENO_OBJETIVOS, DESEMPENO_ESCALA_RENDIMIENTO,
+        DESEMPENO_DIMENSIONES, DESEMPENO_CLASIFICACION,
+    )
+
+    # --- Competencias ---
+    promedio_competencias = sum(competencias_scores.values()) / len(competencias_scores) if competencias_scores else 0
+
+    nivel_requerido_info = COMPETENCIAS_NIVEL_REQUERIDO.get(nivel_cargo.upper() if nivel_cargo else "", None)
+    brechas_competencias = []
+    fortalezas_competencias = []
+    for comp in COMPETENCIAS_ORGANIZACIONALES:
+        cid = comp["id"]
+        score = competencias_scores.get(cid, 0)
+        req = nivel_requerido_info["niveles"][cid - 1] if nivel_requerido_info else None
+        brecha = score - req if req is not None else None
+        item = {"nombre": comp["nombre"], "score": score, "requerido": req, "brecha": brecha}
+        if brecha is not None and brecha < 0:
+            brechas_competencias.append(item)
+        elif score >= 4:
+            fortalezas_competencias.append(item)
+
+    # Clasificación de competencias
+    clasificacion_comp = None
+    for nivel, info in sorted(DESEMPENO_LIDER_CLASIFICACION_COMP.items(), key=lambda x: x[1]["min"], reverse=True):
+        if promedio_competencias >= info["min"]:
+            clasificacion_comp = {"nivel": nivel, **info}
+            break
+
+    # --- Rendimiento (igual que operativo) ---
+    promedio_rendimiento = sum(rendimiento_scores.values()) / len(rendimiento_scores) if rendimiento_scores else 0
+    fortalezas_rendimiento = []
+    areas_mejora_rendimiento = []
+    for obj_id, score in rendimiento_scores.items():
+        objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
+        item = {"titulo": objetivo["titulo"], "score": score, "label": DESEMPENO_ESCALA_RENDIMIENTO[score]["label"]}
+        if score >= 4:
+            fortalezas_rendimiento.append(item)
+        elif score <= 2:
+            areas_mejora_rendimiento.append(item)
+
+    # --- Potencial (igual que operativo) ---
+    promedio_potencial = sum(potencial_scores.values()) / len(potencial_scores) if potencial_scores else 0
+    fortalezas_potencial = []
+    areas_desarrollo_potencial = []
+    for dim_id, score in potencial_scores.items():
+        dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+        item = {"nombre": dimension["nombre"], "score": score, "nivel": f"Nivel {score}"}
+        if score >= 2:
+            fortalezas_potencial.append(item)
+        else:
+            areas_desarrollo_potencial.append(item)
+
+    # --- Puntaje Global (ponderado) ---
+    potencial_normalizado = (promedio_potencial / 3) * 5
+    comp_normalizado = (promedio_competencias / 6) * 5
+    puntaje_global = (comp_normalizado * 0.35) + (promedio_rendimiento * 0.40) + (potencial_normalizado * 0.25)
+
+    clasificacion = None
+    for nivel, info in sorted(DESEMPENO_CLASIFICACION.items(), key=lambda x: x[1]["min"], reverse=True):
+        if puntaje_global >= info["min"]:
+            clasificacion = {"nivel": nivel, "label": info["label"], "color": info["color"],
+                             "descripcion": info["descripcion"]}
+            break
+
+    recomendaciones = []
+    if puntaje_global >= 4.5:
+        recomendaciones.append("Líder con desempeño excepcional. Candidato para promociones o proyectos estratégicos.")
+        recomendaciones.append("Puede actuar como mentor y multiplicador de cultura.")
+    elif puntaje_global >= 3.5:
+        recomendaciones.append("Líder con desempeño destacado. Fortalecer competencias estratégicas de mayor nivel.")
+        recomendaciones.append("Identificar oportunidades de stretch assignments para maximizar su potencial.")
+    elif puntaje_global >= 2.5:
+        recomendaciones.append("Líder con desempeño satisfactorio. Definir plan de desarrollo en competencias con brecha.")
+        recomendaciones.append("Establecer mentoring o coaching para las competencias con mayor gap.")
+    else:
+        recomendaciones.append("Requiere plan de mejoramiento inmediato con metas claras.")
+        recomendaciones.append("Seguimiento mensual y evaluación de competencias en 90 días.")
+
+    if brechas_competencias:
+        nombres = ", ".join([b["nombre"] for b in brechas_competencias[:3]])
+        recomendaciones.append(f"Competencias con brecha vs. nivel requerido: {nombres}.")
+
+    requiere_iniciativas = promedio_rendimiento < 3 or promedio_potencial < 2
+
+    return {
+        "promedio_competencias": round(promedio_competencias, 2),
+        "clasificacion_comp": clasificacion_comp,
+        "fortalezas_competencias": fortalezas_competencias,
+        "brechas_competencias": brechas_competencias,
+        "promedio_rendimiento": round(promedio_rendimiento, 2),
+        "promedio_potencial": round(promedio_potencial, 2),
+        "puntaje_global": round(puntaje_global, 2),
+        "clasificacion": clasificacion,
+        "fortalezas_rendimiento": fortalezas_rendimiento,
+        "areas_mejora_rendimiento": areas_mejora_rendimiento,
+        "fortalezas_potencial": fortalezas_potencial,
+        "areas_desarrollo_potencial": areas_desarrollo_potencial,
+        "recomendaciones": recomendaciones,
+        "requiere_iniciativas": requiere_iniciativas,
+        "iniciativas": iniciativas if iniciativas else [],
+        "nivel_cargo": nivel_cargo,
+    }
+
+
+# =========================================================================
+# CÁLCULOS PERÍODO DE PRUEBA (FO-GH-46)
+# =========================================================================
+
+def calculate_periodo_prueba_results(actuaciones_scores, calificaciones_scores,
+                                     aprobo, llamados_atencion, conocimiento_adecuado,
+                                     observaciones=""):
+    """
+    Calcula resultados de la Evaluación de Período de Prueba.
+    actuaciones_scores:    {idx (0-17): valor (1-4)}  → Nunca=1, AlgunasVeces=2, CasiSiempre=3, Siempre=4
+    calificaciones_scores: {idx (0-4):  valor (1-5)}  → Insuficiente=1 … Excelente=5
+    aprobo:                bool
+    llamados_atencion:     bool
+    conocimiento_adecuado: bool
+    """
+    from constants import (
+        PERIODO_PRUEBA_ACTUACIONES, PERIODO_PRUEBA_CALIFICACIONES,
+        PERIODO_PRUEBA_ESCALA_ACTUACIONES, PERIODO_PRUEBA_ESCALA_CALIFICACIONES,
+        PERIODO_PRUEBA_CLASIFICACION,
+    )
+
+    promedio_actuaciones = sum(actuaciones_scores.values()) / len(actuaciones_scores) if actuaciones_scores else 0
+    promedio_calificaciones = sum(calificaciones_scores.values()) / len(calificaciones_scores) if calificaciones_scores else 0
+
+    # Normalizar a escala 1-4 para combinar (calificaciones max=5 → proporcional a 4)
+    cal_normalizado = (promedio_calificaciones / 5) * 4
+    promedio_general = (promedio_actuaciones * 0.6) + (cal_normalizado * 0.4)
+
+    # Clasificación
+    clasificacion = None
+    for nivel, info in sorted(PERIODO_PRUEBA_CLASIFICACION.items(), key=lambda x: x[1]["min"], reverse=True):
+        if promedio_general >= info["min"]:
+            clasificacion = {"nivel": nivel, "label": info["label"], "color": info["color"],
+                             "descripcion": info["descripcion"]}
+            break
+
+    # Ítems destacados y con observación
+    actuaciones_destacadas = [
+        {"nombre": PERIODO_PRUEBA_ACTUACIONES[idx], "valor": v,
+         "label": PERIODO_PRUEBA_ESCALA_ACTUACIONES[v]["label"]}
+        for idx, v in actuaciones_scores.items() if v >= 3
+    ]
+    actuaciones_observacion = [
+        {"nombre": PERIODO_PRUEBA_ACTUACIONES[idx], "valor": v,
+         "label": PERIODO_PRUEBA_ESCALA_ACTUACIONES[v]["label"]}
+        for idx, v in actuaciones_scores.items() if v <= 2
+    ]
+    calificaciones_detalle = [
+        {"nombre": PERIODO_PRUEBA_CALIFICACIONES[idx], "valor": v,
+         "label": PERIODO_PRUEBA_ESCALA_CALIFICACIONES[v]["label"],
+         "color": PERIODO_PRUEBA_ESCALA_CALIFICACIONES[v]["color"]}
+        for idx, v in calificaciones_scores.items()
+    ]
+
+    # Recomendaciones
+    recomendaciones = []
+    if aprobo:
+        recomendaciones.append("El colaborador aprobó el período de prueba satisfactoriamente.")
+        if promedio_general >= 3.5:
+            recomendaciones.append("Desempeño sobresaliente. Integrar formalmente con plan de desarrollo.")
+        elif promedio_general >= 2.8:
+            recomendaciones.append("Buen inicio. Continuar con onboarding y acompañamiento durante los primeros meses.")
+        else:
+            recomendaciones.append("Aprobó con observaciones. Implementar plan de seguimiento en los próximos 60 días.")
+    else:
+        recomendaciones.append("El colaborador NO aprobó el período de prueba.")
+        recomendaciones.append("Evaluar si aplica extensión del período o desvinculación.")
+        recomendaciones.append("Documentar las razones específicas del no cumplimiento.")
+
+    if llamados_atencion:
+        recomendaciones.append("Se presentaron llamados de atención durante el período. Registrar en hoja de vida.")
+    if not conocimiento_adecuado:
+        recomendaciones.append("El conocimiento/capacidad no se adecua completamente al perfil del cargo. Considerar capacitación adicional.")
+    if actuaciones_observacion:
+        nombres = ", ".join([a["nombre"] for a in actuaciones_observacion[:3]])
+        recomendaciones.append(f"Comportamientos a reforzar: {nombres}.")
+
+    return {
+        "promedio_actuaciones": round(promedio_actuaciones, 2),
+        "promedio_calificaciones": round(promedio_calificaciones, 2),
+        "promedio_general": round(promedio_general, 2),
+        "clasificacion": clasificacion,
+        "aprobo": aprobo,
+        "llamados_atencion": llamados_atencion,
+        "conocimiento_adecuado": conocimiento_adecuado,
+        "observaciones": observaciones,
+        "actuaciones_destacadas": actuaciones_destacadas,
+        "actuaciones_observacion": actuaciones_observacion,
+        "calificaciones_detalle": calificaciones_detalle,
+        "recomendaciones": recomendaciones,
+    }

@@ -3,7 +3,13 @@ import hashlib
 import uuid
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+_TZ_GMT5 = timezone(timedelta(hours=-5))
+
+def _now_gmt5():
+    """Retorna la fecha/hora actual en GMT-5 como string."""
+    return datetime.now(_TZ_GMT5).strftime("%Y-%m-%d %H:%M:%S")
 
 # Ruta de la base de datos - usa /app/data en Docker, directorio local en desarrollo
 if os.path.exists('/app/data'):
@@ -41,7 +47,7 @@ def init_db():
             codigo TEXT UNIQUE NOT NULL,
             nombre TEXT NOT NULL,
             activa INTEGER DEFAULT 1,
-            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            created_at TEXT DEFAULT (datetime('now', '-5 hours'))
         );
 
         CREATE TABLE IF NOT EXISTS candidates (
@@ -58,7 +64,7 @@ def init_db():
             jefe_inmediato TEXT,
             nivel_cargo TEXT,
             invitar TEXT DEFAULT 'SI',
-            created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            created_at TEXT DEFAULT (datetime('now', '-5 hours')),
             FOREIGN KEY (empresa_id) REFERENCES empresas(id)
         );
 
@@ -72,7 +78,7 @@ def init_db():
             started_at TEXT,
             completed_at TEXT,
             created_by INTEGER,
-            created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            created_at TEXT DEFAULT (datetime('now', '-5 hours')),
             FOREIGN KEY (candidate_id) REFERENCES candidates(id),
             FOREIGN KEY (created_by) REFERENCES admins(id)
         );
@@ -98,6 +104,18 @@ def init_db():
     # Migrar: agregar columna role si no existe
     try:
         c.execute("ALTER TABLE admins ADD COLUMN role TEXT DEFAULT 'admin'")
+    except sqlite3.OperationalError:
+        pass  # La columna ya existe
+
+    # Migrar: agregar columna evaluador_cedula a test_sessions
+    try:
+        c.execute("ALTER TABLE test_sessions ADD COLUMN evaluador_cedula TEXT")
+    except sqlite3.OperationalError:
+        pass  # La columna ya existe
+
+    # Migrar: agregar columna evaluador_nombre a test_sessions
+    try:
+        c.execute("ALTER TABLE test_sessions ADD COLUMN evaluador_nombre TEXT")
     except sqlite3.OperationalError:
         pass  # La columna ya existe
 
@@ -209,17 +227,30 @@ def update_candidate(candidate_id, name, age, sex, education, position):
     conn.close()
 
 
+def update_empleado(candidate_id, name, age, sex, education, position,
+                    correo=None, jefe_inmediato=None, nivel_cargo=None, regional=None):
+    """Actualiza todos los campos editables de un candidato/empleado."""
+    conn = get_connection()
+    conn.execute(
+        """UPDATE candidates SET name=?, age=?, sex=?, education=?, position=?,
+           correo=?, jefe_inmediato=?, nivel_cargo=?, regional=? WHERE id=?""",
+        (name, age, sex, education, position,
+         correo, jefe_inmediato, nivel_cargo, regional, candidate_id),
+    )
+    conn.commit()
+    conn.close()
+
+
 # =========================================================================
 # TEST SESSION OPERATIONS
 # =========================================================================
 
-def create_test_session(candidate_id, test_type, time_limit_minutes, created_by, questions_data=None):
+def create_test_session(candidate_id, test_type, time_limit_minutes, created_by, questions_data=None, evaluador_cedula=None, evaluador_nombre=None):
     conn = get_connection()
 
-    # Check if candidate already has an ACTIVE session for this test type (pending or in progress)
-    # Allow new sessions if previous ones are completed
+    # Check if candidate already has an ACTIVE session for this test type
     existing = conn.execute(
-        "SELECT id, status FROM test_sessions WHERE candidate_id = ? AND test_type = ? AND status IN ('pending', 'in_progress')",
+        "SELECT id, status FROM test_sessions WHERE candidate_id = ? AND test_type = ? AND status IN ('pending', 'in_progress', 'employee_done')",
         (candidate_id, test_type),
     ).fetchone()
 
@@ -231,8 +262,8 @@ def create_test_session(candidate_id, test_type, time_limit_minutes, created_by,
     questions_json = json.dumps(questions_data, ensure_ascii=False) if questions_data else None
 
     conn.execute(
-        "INSERT INTO test_sessions (id, candidate_id, test_type, status, time_limit_minutes, questions_data, created_by) VALUES (?, ?, ?, 'pending', ?, ?, ?)",
-        (session_id, candidate_id, test_type, time_limit_minutes, questions_json, created_by),
+        "INSERT INTO test_sessions (id, candidate_id, test_type, status, time_limit_minutes, questions_data, created_by, evaluador_cedula, evaluador_nombre) VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?)",
+        (session_id, candidate_id, test_type, time_limit_minutes, questions_json, created_by, evaluador_cedula, evaluador_nombre),
     )
     conn.commit()
     conn.close()
@@ -258,7 +289,7 @@ def get_session_by_id(session_id):
 
 def start_test_session(session_id):
     conn = get_connection()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = _now_gmt5()
     conn.execute(
         "UPDATE test_sessions SET status = 'in_progress', started_at = ? WHERE id = ?",
         (now, session_id),
@@ -269,7 +300,7 @@ def start_test_session(session_id):
 
 def complete_test_session(session_id):
     conn = get_connection()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = _now_gmt5()
     conn.execute(
         "UPDATE test_sessions SET status = 'completed', completed_at = ? WHERE id = ?",
         (now, session_id),
@@ -278,9 +309,44 @@ def complete_test_session(session_id):
     conn.close()
 
 
+def set_employee_done_status(session_id):
+    """Marca la sesión como completada por el empleado, esperando evaluación del jefe."""
+    conn = get_connection()
+    now = _now_gmt5()
+    conn.execute(
+        "UPDATE test_sessions SET status = 'employee_done', completed_at = ? WHERE id = ?",
+        (now, session_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_sessions_for_evaluador(evaluador_cedula):
+    """Retorna sesiones asignadas al evaluador según flujo:
+    - desempeño operativo: el evaluador puede completarla desde pending
+    - desempeño líderes / periodo prueba: aparecen cuando el empleado ya completó (employee_done)
+    """
+    conn = get_connection()
+    sessions = conn.execute(
+        """SELECT ts.*, c.cedula, c.name as candidate_name
+           FROM test_sessions ts
+           JOIN candidates c ON ts.candidate_id = c.id
+           WHERE ts.evaluador_cedula = ?
+             AND (
+                (ts.test_type = 'desempeno' AND ts.status = 'pending')
+                OR
+                (ts.test_type IN ('desempeno_lider', 'periodo_prueba') AND ts.status = 'employee_done')
+             )
+           ORDER BY ts.created_at DESC""",
+        (evaluador_cedula,),
+    ).fetchall()
+    conn.close()
+    return [dict(s) for s in sessions]
+
+
 def expire_test_session(session_id):
     conn = get_connection()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = _now_gmt5()
     conn.execute(
         "UPDATE test_sessions SET status = 'expired', completed_at = ? WHERE id = ?",
         (now, session_id),
@@ -299,10 +365,60 @@ def update_session_questions(session_id, questions_data):
     conn.close()
 
 
+def update_pending_session(session_id, test_type, time_limit_minutes, evaluador_cedula=None, evaluador_nombre=None):
+    """Permite editar solo sesiones en estado pending."""
+    conn = get_connection()
+
+    sess = conn.execute(
+        "SELECT id, candidate_id, status FROM test_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+
+    if not sess:
+        conn.close()
+        return False, "La sesión no existe."
+
+    if sess["status"] != "pending":
+        conn.close()
+        return False, "Solo se pueden editar pruebas en estado 'pending'."
+
+    existing = conn.execute(
+        """
+        SELECT id, status
+        FROM test_sessions
+        WHERE candidate_id = ?
+          AND test_type = ?
+          AND status IN ('pending', 'in_progress', 'employee_done')
+          AND id <> ?
+        """,
+        (sess["candidate_id"], test_type, session_id),
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return False, f"Ya existe otra evaluación activa de tipo {test_type.upper()} para este candidato."
+
+    conn.execute(
+        """
+        UPDATE test_sessions
+        SET test_type = ?,
+            time_limit_minutes = ?,
+            evaluador_cedula = ?,
+            evaluador_nombre = ?
+        WHERE id = ?
+        """,
+        (test_type, time_limit_minutes, evaluador_cedula, evaluador_nombre, session_id),
+    )
+
+    conn.commit()
+    conn.close()
+    return True, None
+
+
 def get_all_sessions(test_type=None, status=None):
     conn = get_connection()
     query = """
-        SELECT ts.*, c.cedula, c.name as candidate_name 
+        SELECT ts.*, c.cedula, c.name as candidate_name, c.position
         FROM test_sessions ts 
         JOIN candidates c ON ts.candidate_id = c.id
     """
@@ -330,7 +446,9 @@ def check_session_time(session):
 
     started = datetime.strptime(session["started_at"], "%Y-%m-%d %H:%M:%S")
     deadline = started + timedelta(minutes=session["time_limit_minutes"])
-    remaining = (deadline - datetime.now()).total_seconds()
+    # Comparar con hora GMT-5 (misma zona que started_at) para evitar desfase en servidores UTC
+    now_gmt5 = datetime.now(_TZ_GMT5).replace(tzinfo=None)
+    remaining = (deadline - now_gmt5).total_seconds()
 
     if remaining <= 0:
         expire_test_session(session["id"])
@@ -344,7 +462,8 @@ def get_session_deadline_timestamp(session):
         return None
     started = datetime.strptime(session["started_at"], "%Y-%m-%d %H:%M:%S")
     deadline = started + timedelta(minutes=session["time_limit_minutes"])
-    return deadline.timestamp()
+    # Adjuntar zona GMT-5 para obtener Unix timestamp correcto independiente del servidor
+    return deadline.replace(tzinfo=_TZ_GMT5).timestamp()
 
 
 # =========================================================================

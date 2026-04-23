@@ -823,3 +823,177 @@ DISC_PROFILE_RECOMMENDATIONS = {
         "cuidado_en": ["Roles de innovación disruptiva", "Posiciones de alta presión social"]
     }
 }
+
+# =========================================================================
+# EVALUACIÓN DE DESEMPEÑO — LÍDERES (FO-GH-41)
+# 7 Competencias Organizacionales, escala 1-6
+# =========================================================================
+
+COMPETENCIAS_ORGANIZACIONALES = [
+    {
+        "id": 1,
+        "nombre": "Pensamiento Estratégico",
+        "descripcion": "Desarrolla una visión estructurada sobre el futuro y el ambiente enfrentándose a inconvenientes y situaciones difíciles. Se adapta al contexto de la empresa, muestra el camino a seguir y transforma la compañía.",
+        "niveles": {
+            1: "Reconoce los servicios ofrecidos por la organización. Muestra interés por conocer los cambios y se adapta al contexto actual. Comprende el impacto de su cargo en la organización.",
+            2: "Entiende las prioridades estratégicas desarrolladas por otros. Percibe oportunidades específicas para el cambio a largo plazo dentro de su propia función. Toma decisiones basadas en su propia experiencia personal.",
+            3: "Reconoce las ventajas y desventajas de los servicios y los escala con sus líderes. Alinea los objetivos corporativos en planes de acción y estrategias relevantes.",
+            4: "Consulta circunstancias estratégicas más allá de su área de responsabilidad. Observa el ambiente laboral para proponer iniciativas a largo plazo. Entiende situaciones complejas y hace preguntas que abren nuevas perspectivas.",
+            5: "Crea planes incorporando aspectos competitivos, tendencias y factores externos. Desarrolla nuevos conceptos integrando mercado, competición y tendencias en una visión coherente.",
+            6: "Crea y articula una visión o estrategia para un negocio complejo. Crea una estrategia innovadora que transforme la cultura e incida en la rentabilidad del negocio."
+        }
+    },
+    {
+        "id": 2,
+        "nombre": "Flexibilidad y Agilidad",
+        "descripcion": "De mente abierta, ve lo nuevo como oportunidades. Activamente crea el ambiente apropiado y promueve la necesidad de cambio.",
+        "niveles": {
+            1: "Piensa en términos de maneras actuales de hacer negocio. Confía en su rol basándose en lo que se encuentra establecido.",
+            2: "Entiende oportunidades de cambio y acepta innovaciones menores. Adopta un enfoque cauteloso para cambiar la forma en que se abordan los problemas.",
+            3: "Reconoce la necesidad de tener un ambiente dinámico. Acepta con facilidad los cambios progresivos de su entorno.",
+            4: "Le gusta un ambiente que permita el cambio. Activamente participa en buscar nuevas soluciones. Mantiene la receptividad hacia nuevas ideas.",
+            5: "Acoge y promueve nuevas maneras de pensar, siempre busca nuevas ideas. Aprende haciendo y puede fácilmente cambiar su modo de pensar.",
+            6: "Instala una cultura proactiva y abierta a tomar riesgos, creando un ambiente de innovación sostenible a través de toda la organización."
+        }
+    },
+    {
+        "id": 3,
+        "nombre": "Orientación a Resultados",
+        "descripcion": "Orienta y se organiza a sí mismo y a su equipo con el fin de cumplir objetivos. Se esfuerza por encontrar las mejores prácticas para alcanzar mejores resultados y mayor eficiencia.",
+        "niveles": {
+            1: "Ejecuta instrucciones diarias «al pie de la letra». Logra los resultados requeridos para su cargo.",
+            2: "Organiza su tiempo para alcanzar con calidad los objetivos propuestos. Persiste en solucionar los problemas que se le presentan en su día a día.",
+            3: "Alcanza sus objetivos sin pasos innecesarios. Prioriza sus responsabilidades asegurando el tiempo y la calidad en los resultados.",
+            4: "Establece objetivos claros, desafiantes y medibles para su área. Se enfoca en resultados e identifica desviaciones y formas de progresar.",
+            5: "Actúa tomando riesgos calculados y organiza recursos para cumplir los objetivos. Propone e implementa procesos creativos para un desempeño máximo.",
+            6: "Capacidad de romper la estructura organizacional para anticipar dificultades. Alienta a los subordinados a tomar riesgos."
+        }
+    },
+    {
+        "id": 4,
+        "nombre": "Toma de Decisiones y Evaluación de Riesgos",
+        "descripcion": "Es capaz de decidir rápidamente entre varias alternativas con discernimiento y claridad, considerando todas las consecuencias y riesgos potenciales.",
+        "niveles": {
+            1: "Toma las decisiones cuando surgen dificultades en su día a día. Se deja llevar fundamentalmente por factores racionales. Ejecuta exitosamente las acciones decididas por su líder.",
+            2: "Evalúa los pros, contras y riesgos de los posibles escenarios. Para tomar decisiones requiere de una referencia externa.",
+            3: "Toma decisiones en un ambiente relativamente estable. Interpreta situaciones ambiguas e identifica riesgos potenciales.",
+            4: "Toma e implementa decisiones cuando la información necesaria está disponible. Toma decisiones de forma objetiva consciente de sus emociones.",
+            5: "Fácilmente toma decisiones y puede evaluar las consecuencias prácticas integrando todos los componentes. Personalmente se compromete con sus decisiones.",
+            6: "Toma decisiones en situaciones VICA y confía en su propia intuición. Es persistente y resiliente a las dificultades."
+        }
+    },
+    {
+        "id": 5,
+        "nombre": "Orientación al Cliente",
+        "descripcion": "Los clientes internos y/o externos son su prioridad en todo momento. Se esfuerza por abordar de manera proactiva las preocupaciones y necesidades de los clientes.",
+        "niveles": {
+            1: "Conoce a sus propios clientes internos o externos, respondiendo a sus necesidades. Brinda un servicio oportuno con información adecuada.",
+            2: "Comprometido con un alto nivel de servicio al cliente. Demuestra escucha activa y se comunica claramente con el cliente.",
+            3: "Supervisa, monitorea y mide el servicio al cliente. Desarrolla habilidades de servicio al cliente a todo su equipo.",
+            4: "Genera estrategias para mejorar el servicio. Responde a las quejas y consultas de los clientes de manera apropiada y constructivamente.",
+            5: "Defiende un servicio excelente con soluciones de alta calidad. Comprende y anticipa las necesidades del cliente.",
+            6: "Crea una cultura de servicio al cliente excepcional en toda la organización. Revisa tendencias actuales y futuras para desarrollar estrategias de fidelización."
+        }
+    },
+    {
+        "id": 6,
+        "nombre": "Autoliderazgo y Liderazgo de Personas y Equipos",
+        "descripcion": "Es responsable de sí mismo, de sus acciones y de sus resultados. Inspira un propósito y visión. Crea valores comunes y demuestra habilidades de motivación.",
+        "niveles": {
+            1: "Trabaja interesado en desarrollar constantemente sus competencias. Escucha y recibe de manera positiva cualquier retroalimentación.",
+            2: "Se hace responsable del cumplimiento de sus propios objetivos. Influye positivamente a sus compañeros a través de sus acciones y resultados.",
+            3: "Genera en su equipo un ambiente de trabajo positivo. Brinda retroalimentación permanente a su equipo con metodología adecuada.",
+            4: "Establece metas y objetivos de manera efectiva para sí mismo y su equipo. Guía con su ejemplo mostrando comportamientos y actitudes deseados.",
+            5: "Genera un clima de apertura, confianza y solidaridad. Empodera a su equipo para que sean gestores de resultados y desarrollo.",
+            6: "Guía a los líderes, actuando principalmente como un habilitador del éxito para otros. Construye equipos altamente autónomos y exitosos."
+        }
+    },
+    {
+        "id": 7,
+        "nombre": "Comunicación, Trabajo en Equipo y Transparencia",
+        "descripcion": "Comparte información de manera efectiva. Trabaja en equipo eficientemente para alcanzar los objetivos organizacionales. Posee fuertes estándares éticos.",
+        "niveles": {
+            1: "Escucha de manera activa y empática los mensajes recibidos por su líder y compañeros. Acepta ayuda de los demás y la brinda cuando alguien se lo pide.",
+            2: "Transmite la comunicación dentro de un contexto y resaltando los puntos clave. Coopera con los miembros del equipo para lograr los objetivos colectivos.",
+            3: "Influye a los demás a través de sus palabras y acciones. Expone su punto de vista a través de experiencias propias para generar credibilidad.",
+            4: "Se comunica y expone sus ideas eficientemente, persuadiendo a los demás con argumentos coherentes. Crea relaciones estables y duraderas.",
+            5: "Motiva a los miembros del equipo a pensar por fuera de su área funcional. Logra que las personas naturalmente adopten puntos de vista propios.",
+            6: "Domina el arte de la comunicación escrita, verbal y no-verbal. Actúa como modelo a seguir en coherencia con sus valores y ética."
+        }
+    }
+]
+
+# Niveles requeridos por familia de cargo
+COMPETENCIAS_NIVEL_REQUERIDO = {
+    "ANALISTA":     {"min": 2, "niveles": [2, 2, 2, 2, 2, 2, 2]},
+    "COMERCIAL":    {"min": 2, "niveles": [3, 2, 3, 3, 3, 3, 2]},
+    "COORIDINADOR": {"min": 3, "niveles": [3, 3, 3, 3, 4, 3, 3]},
+    "SUPERVISOR":   {"min": 3, "niveles": [3, 3, 3, 3, 4, 3, 3]},
+    "LIDER":        {"min": 4, "niveles": [4, 4, 4, 4, 4, 5, 4]},
+    "DIRECTOR":     {"min": 5, "niveles": [5, 5, 5, 6, 6, 6, 5]},
+    "GERENTE":      {"min": 5, "niveles": [5, 5, 5, 6, 6, 6, 5]},
+}
+
+DESEMPENO_LIDER_CLASIFICACION_COMP = {
+    "supera":  {"min": 5.0, "label": "🌟 Supera el Nivel Requerido", "color": "#10B981"},
+    "cumple":  {"min": 3.5, "label": "✅ Cumple el Nivel Requerido",  "color": "#3B82F6"},
+    "parcial": {"min": 2.0, "label": "⚠️ Cumple Parcialmente",        "color": "#F59E0B"},
+    "bajo":    {"min": 0.0, "label": "❌ Por Debajo del Requerido",   "color": "#EF4444"},
+}
+
+
+# =========================================================================
+# EVALUACIÓN PERÍODO DE PRUEBA (FO-GH-46)
+# =========================================================================
+
+PERIODO_PRUEBA_ACTUACIONES = [
+    "Actúa acorde con los pilares de la Cultura Hesiana",
+    "Cumple con las normas y reglamentos de la empresa",
+    "Vela por su seguridad e integridad física y la de sus compañeros de trabajo",
+    "Se le facilita cooperar con sus compañeros de trabajo",
+    "Realiza con efectividad las actividades asignadas",
+    "Maneja una comunicación verbal, escrita y corporal de manera asertiva",
+    "Actúa con compromiso y responsabilidad para el logro de los resultados de la dependencia",
+    "Hace uso eficiente de los recursos para realizar su trabajo",
+    "Trabaja en cooperación con las personas para buscar el beneficio común",
+    "Comparte su conocimiento e información con las personas con las que interactúa en el trabajo",
+    "Se adapta a distintas situaciones y personas",
+    "Realiza el trabajo de forma disciplinada y organizada",
+    "Encuentra fácil adaptarse a nuevas situaciones",
+    "Hace buen uso de los recursos para favorecer el logro de los resultados",
+    "Es colaborador y respetuoso con sus superiores",
+    "Demuestra interés y sentido de pertenencia hacia la empresa",
+    "Presenta buenas relaciones con sus compañeros de trabajo",
+    "Mantiene una excelente presentación personal",
+]
+
+PERIODO_PRUEBA_CALIFICACIONES = [
+    "Asistencia y puntualidad",
+    "Interés por el trabajo",
+    "Calidad del trabajo",
+    "Ética y conducta",
+    "Habilidades para el oficio",
+]
+
+PERIODO_PRUEBA_ESCALA_ACTUACIONES = {
+    4: {"label": "Siempre",         "color": "#10B981", "puntos": 4},
+    3: {"label": "Casi Siempre",    "color": "#3B82F6", "puntos": 3},
+    2: {"label": "Algunas Veces",   "color": "#F59E0B", "puntos": 2},
+    1: {"label": "Nunca",           "color": "#EF4444", "puntos": 1},
+}
+
+PERIODO_PRUEBA_ESCALA_CALIFICACIONES = {
+    5: {"label": "Excelente",    "color": "#10B981"},
+    4: {"label": "Bueno",        "color": "#3B82F6"},
+    3: {"label": "Regular",      "color": "#F59E0B"},
+    2: {"label": "Deficiente",   "color": "#EF4444"},
+    1: {"label": "Insuficiente", "color": "#991B1B"},
+}
+
+PERIODO_PRUEBA_CLASIFICACION = {
+    "excelente":  {"min": 3.5, "label": "🌟 Excelente",            "color": "#10B981", "descripcion": "Desempeño sobresaliente durante el período de prueba"},
+    "bueno":      {"min": 2.8, "label": "✅ Bueno",                "color": "#3B82F6", "descripcion": "Buen desempeño, cumple expectativas del período de prueba"},
+    "regular":    {"min": 2.0, "label": "⚠️ Regular",              "color": "#F59E0B", "descripcion": "Desempeño básico, requiere seguimiento y mejora"},
+    "deficiente": {"min": 0.0, "label": "❌ Deficiente",           "color": "#EF4444", "descripcion": "Desempeño insuficiente, no cumple requisitos mínimos"},
+}
+
