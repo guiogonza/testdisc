@@ -27,15 +27,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar archivos de la aplicación (REFACTORIZADO)
+# Copiar archivos de la aplicación
 COPY app.py database.py ./
-# Copiar módulos refactorizados
+# Módulos refactorizados (core)
 COPY constants.py calculations.py analysis.py utils.py ./
-# Copiar archivos JSON
+# Módulos extraídos en la refactorización
+COPY theme.py auth.py charts.py pdfs.py ./
+# Páginas (pages/)
+COPY pages/ ./pages/
+# Archivos JSON de preguntas y descripciones
 COPY questions_es.json questions.json questions_wpi.json questions_eri.json questions_talent_map.json ./
 COPY disc_descriptions_es.json disc_descriptions.json ./
 COPY streangths.json ./
-# Copiar logo
+# Logo
 COPY logo.png ./
 
 # Crear directorio para la base de datos

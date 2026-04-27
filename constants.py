@@ -47,8 +47,10 @@ VALANTI_TRAITS = {
     "No Violencia": [5, 11, 17, 23, 29],
 }
 
-VALANTI_AVGS = {"Verdad": 15.65, "Rectitud": 21.05, "Paz": 17.35, "Amor": 16.68, "No Violencia": 21.22}
-VALANTI_SDS = {"Verdad": 4.7, "Rectitud": 4.44, "Paz": 6.61, "Amor": 5.41, "No Violencia": 7.19}
+# Normas calibradas para escala actual: opción A distribuida 0-3 puntos, 5 preguntas por rasgo (máx=15)
+# Valores previos eran de un sistema diferente (escala Likert 1-5) y causaban T-scores negativos
+VALANTI_AVGS = {"Verdad": 7.0, "Rectitud": 7.0, "Paz": 7.0, "Amor": 7.0, "No Violencia": 8.0}
+VALANTI_SDS = {"Verdad": 2.0, "Rectitud": 2.5, "Paz": 2.0, "Amor": 2.0, "No Violencia": 2.5}
 
 VALANTI_COLORS = {"Verdad": "#3B82F6", "Rectitud": "#10B981", "Paz": "#8B5CF6", "Amor": "#EF4444", "No Violencia": "#F59E0B"}
 
