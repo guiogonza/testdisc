@@ -210,6 +210,13 @@ def get_candidate_by_cedula(cedula):
     return dict(candidate) if candidate else None
 
 
+def get_candidate_by_id(candidate_id):
+    conn = get_connection()
+    candidate = conn.execute("SELECT * FROM candidates WHERE id = ?", (candidate_id,)).fetchone()
+    conn.close()
+    return dict(candidate) if candidate else None
+
+
 def get_all_candidates():
     conn = get_connection()
     candidates = conn.execute("SELECT * FROM candidates ORDER BY created_at DESC").fetchall()
@@ -353,6 +360,36 @@ def expire_test_session(session_id):
     )
     conn.commit()
     conn.close()
+
+
+def reactivate_test_session(session_id, new_time_limit_minutes=None):
+    """Reactiva una sesión expirada y limpia respuestas/resultados previos."""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT status FROM test_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+
+    if not row or row["status"] != "expired":
+        conn.close()
+        return False
+
+    conn.execute("DELETE FROM test_answers WHERE session_id = ?", (session_id,))
+    conn.execute("DELETE FROM test_results WHERE session_id = ?", (session_id,))
+
+    if new_time_limit_minutes:
+        conn.execute(
+            "UPDATE test_sessions SET status = 'pending', started_at = NULL, completed_at = NULL, time_limit_minutes = ? WHERE id = ? AND status = 'expired'",
+            (new_time_limit_minutes, session_id),
+        )
+    else:
+        conn.execute(
+            "UPDATE test_sessions SET status = 'pending', started_at = NULL, completed_at = NULL WHERE id = ? AND status = 'expired'",
+            (session_id,),
+        )
+    conn.commit()
+    conn.close()
+    return True
 
 
 def update_session_questions(session_id, questions_data):

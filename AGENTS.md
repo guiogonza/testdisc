@@ -48,13 +48,43 @@ utils.py            → Carga de JSON, navegación (nav())
 
 **`test_type` válidos:**
 - `disc` — Evaluación DISC de personalidad
-- `valanti` — Valores Universales (5 traits)
+- `valanti` — Valores Universales (5 traits). En negocio suele llamarse "Valenti", pero en código/BD se usa `valanti`.
 - `wpi` — Work Personality Index (6 dimensiones)
 - `eri` — Evaluación de Riesgo e Integridad (6 dimensiones)
 - `talent_map` — Mapeo de Competencias (8 competencias)
 - `desempeno` — Desempeño Operativo (rendimiento 1-5 + potencial 0-3) — **lo completa el admin**
 - `desempeno_lider` — Desempeño Líderes (competencias 1-6 + rendimiento + potencial) — **lo completa el admin**
 - `periodo_prueba` — Evaluación Período de Prueba (actuaciones + calificaciones) — **lo completa el admin**
+
+## Foco: Calificación Valenti (clave `valanti`)
+
+### Flujo real de calificación (no asumir Likert 1-5)
+1. Captura en [pages/candidate.py](pages/candidate.py): `page_valanti_test()`.
+2. Cada pregunta tiene dos frases A/B y se distribuyen **3 puntos** entre ambas (`A + B = 3`).
+3. Se persiste `answer_value` (A, rango 0-3) y `answer_b_value` (B, derivado como `3 - A`).
+4. El cálculo usa solo la serie A acumulada en `responses`.
+
+### Cálculo técnico
+1. Mapeo de rasgos en [constants.py](constants.py): `VALANTI_TRAITS` (índices 1-based).
+2. Suma directa por rasgo en [calculations.py](calculations.py): `calculate_valanti_results(responses)`.
+3. Estandarización a T-score:
+    - `z = (direct[trait] - VALANTI_AVGS[trait]) / VALANTI_SDS[trait]`
+    - `standard[trait] = round(z * 10 + 50)`
+4. Interpretación en [analysis.py](analysis.py): `analyze_valanti_aptitude(standard)`.
+
+### Umbrales de interpretación usados hoy
+- Valor alto: `T >= 55`
+- Valor bajo: `T < 40`
+- Valor crítico: `T < 30`
+- Puntaje de aptitud: `avg_score + 5*altos - 8*bajos - 15*criticos` (acotado a 0-100)
+
+### Reglas para cambios seguros en Valenti/Valanti
+- No renombrar la clave `valanti` en DB, sesiones ni rutas de página sin migración completa.
+- Si cambias escalas de respuesta (actual 0-3 en A), recalibra `VALANTI_AVGS` y `VALANTI_SDS` en [constants.py](constants.py).
+- Mantén alineados cálculo ([calculations.py](calculations.py)) y análisis ([analysis.py](analysis.py)); no ajustar umbrales en un solo lado.
+- Validar siempre el flujo completo: captura candidato -> guardado -> vista admin -> PDF.
+
+Documentación de apoyo (no duplicar aquí): [REFACTORIZACION.md](REFACTORIZACION.md), [README.md](README.md).
 
 ## Tipos de Evaluación
 

@@ -269,8 +269,8 @@ def show_desempeno_results_admin(results, candidate, session):
     with tab1:
         st.markdown("#### Desglose por Objetivo de Rendimiento")
         for obj_id, score in rendimiento_scores.items():
-            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
-            nivel = DESEMPENO_ESCALA_RENDIMIENTO[score]
+            objetivo = DESEMPENO_OBJETIVOS[int(obj_id) - 1]
+            nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(int(score), {"label": "Sin calificar", "color": "#6B7280"})
             
             col_obj1, col_obj2 = st.columns([3, 1])
             with col_obj1:
@@ -285,14 +285,14 @@ def show_desempeno_results_admin(results, candidate, session):
     with tab2:
         st.markdown("#### Desglose por Dimensión de Potencial")
         for dim_id, score in potencial_scores.items():
-            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            dimension = DESEMPENO_DIMENSIONES[int(dim_id) - 1]
             
             col_dim1, col_dim2 = st.columns([3, 1])
             with col_dim1:
                 st.markdown(f"**{dimension['nombre']}**")
                 st.caption(dimension['descripcion'])
                 with st.expander("📄 Ver descripción del nivel asignado"):
-                    st.info(dimension['niveles'][score])
+                    st.info(dimension['niveles'][int(score)])
             with col_dim2:
                 color = DESEMPENO_COLORES_DIMENSIONES.get(dimension['nombre'], "#6B7280")
                 st.markdown(f"<div style='background:{color}22; padding:12px; border-radius:8px; text-align:center;'>"
@@ -590,8 +590,8 @@ def show_desempeno_lider_results_admin(results, candidate, session):
 
     with tab2:
         for obj_id, score in rendimiento_scores.items():
-            objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
-            nivel = DESEMPENO_ESCALA_RENDIMIENTO[score]
+            objetivo = DESEMPENO_OBJETIVOS[int(obj_id) - 1]
+            nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(int(score), {"label": "Sin calificar", "color": "#6B7280"})
             c1, c2 = st.columns([3, 1])
             with c1:
                 st.markdown(f"**{objetivo['titulo']}**")
@@ -604,13 +604,13 @@ def show_desempeno_lider_results_admin(results, candidate, session):
 
     with tab3:
         for dim_id, score in potencial_scores.items():
-            dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+            dimension = DESEMPENO_DIMENSIONES[int(dim_id) - 1]
             c1, c2 = st.columns([3, 1])
             with c1:
                 st.markdown(f"**{dimension['nombre']}**")
                 st.caption(dimension["descripcion"])
                 with st.expander("Ver descripción"):
-                    st.info(dimension["niveles"][score])
+                    st.info(dimension["niveles"][int(score)])
             with c2:
                 color = DESEMPENO_COLORES_DIMENSIONES.get(dimension["nombre"], "#6B7280")
                 st.markdown(f"<div style='background:{color}22; padding:10px; border-radius:8px; text-align:center;'>"

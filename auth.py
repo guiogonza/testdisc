@@ -5,6 +5,8 @@ import base64
 import hmac
 import hashlib
 import os
+import json
+import secrets
 from datetime import datetime, timedelta
 
 import streamlit as st
@@ -12,6 +14,7 @@ import database as db
 
 ADMIN_IDLE_TIMEOUT_MINUTES = 60
 ADMIN_SESSION_SECRET = os.getenv("ADMIN_SESSION_SECRET", "rh-evaluaciones-secret-key")
+RESULT_LINK_SECRET = os.getenv("RESULT_LINK_SECRET", ADMIN_SESSION_SECRET)
 
 
 def _get_admin_token_from_query():
@@ -127,3 +130,75 @@ def _logout_admin():
     st.session_state.pop("admin_session_token", None)
     st.session_state.pop("admin_last_seen_at", None)
     _set_admin_token_in_query(None)
+
+
+def _derive_keystream(secret, nonce, length):
+    """Deriva flujo de bytes pseudoaleatorio para cifrado reversible liviano."""
+    out = bytearray()
+    counter = 0
+    while len(out) < length:
+        block = hashlib.sha256(f"{secret}:{nonce}:{counter}".encode("utf-8")).digest()
+        out.extend(block)
+        counter += 1
+    return bytes(out[:length])
+
+
+def _xor_bytes(data, key_stream):
+    return bytes(a ^ b for a, b in zip(data, key_stream))
+
+
+def _create_result_view_token(session_id, test_type, expires_minutes=1440):
+    """Crea token firmado y cifrado para visualizar resultados por URL."""
+    exp_ts = int((datetime.utcnow() + timedelta(minutes=expires_minutes)).timestamp())
+    payload = {
+        "sid": str(session_id),
+        "tt": str(test_type),
+        "exp": exp_ts,
+        "jti": secrets.token_hex(8),
+    }
+    payload_raw = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    nonce = secrets.token_hex(8)
+    key_stream = _derive_keystream(RESULT_LINK_SECRET, nonce, len(payload_raw))
+    cipher_raw = _xor_bytes(payload_raw, key_stream)
+
+    nonce_b64 = base64.urlsafe_b64encode(nonce.encode("utf-8")).decode("utf-8")
+    cipher_b64 = base64.urlsafe_b64encode(cipher_raw).decode("utf-8")
+    body = f"{nonce_b64}.{cipher_b64}"
+    sig = hmac.new(
+        RESULT_LINK_SECRET.encode("utf-8"),
+        body.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return f"{body}.{sig}"
+
+
+def _parse_result_view_token(token):
+    """Valida y descifra token de visualización. Retorna dict o None."""
+    try:
+        nonce_b64, cipher_b64, sig = token.split(".", 2)
+        body = f"{nonce_b64}.{cipher_b64}"
+        expected_sig = hmac.new(
+            RESULT_LINK_SECRET.encode("utf-8"),
+            body.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+
+        nonce = base64.urlsafe_b64decode(nonce_b64.encode("utf-8")).decode("utf-8")
+        cipher_raw = base64.urlsafe_b64decode(cipher_b64.encode("utf-8"))
+        key_stream = _derive_keystream(RESULT_LINK_SECRET, nonce, len(cipher_raw))
+        payload_raw = _xor_bytes(cipher_raw, key_stream)
+        payload = json.loads(payload_raw.decode("utf-8"))
+
+        if datetime.utcnow().timestamp() > int(payload.get("exp", 0)):
+            return None
+        if not payload.get("sid") or not payload.get("tt"):
+            return None
+        return {
+            "session_id": payload["sid"],
+            "test_type": payload["tt"],
+            "expires_at": int(payload["exp"]),
+        }
+    except Exception:
+        return None

@@ -642,11 +642,11 @@ def create_talent_map_comparison(normalized_scores, job_profile_name, job_profil
 
 def create_desempeno_radar(potencial_scores):
     """Crea radar chart para las 5 dimensiones de potencial."""
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='polar')
     
     dimensiones = [dim["nombre"] for dim in DESEMPENO_DIMENSIONES]
-    valores = [potencial_scores.get(i+1, 0) for i in range(5)]
+    valores = [float(potencial_scores.get(i+1, potencial_scores.get(str(i+1), 0))) for i in range(5)]
     valores_plot = valores + [valores[0]]
     angulos = [n / 5 * 2 * np.pi for n in range(5)]
     angulos_plot = angulos + [angulos[0]]
@@ -676,10 +676,11 @@ def create_desempeno_radar(potencial_scores):
 
 def create_desempeno_bars(rendimiento_scores):
     """Crea gráfico de barras para los 6 objetivos de rendimiento."""
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(10, 8))
     
     objetivos = [obj["titulo"] for obj in DESEMPENO_OBJETIVOS]
-    valores = [rendimiento_scores.get(i+1, 0) for i in range(6)]
+    # Las claves pueden venir como str o int desde la BD
+    valores = [float(rendimiento_scores.get(i+1, rendimiento_scores.get(str(i+1), 0))) for i in range(6)]
     
     colores = []
     for valor in valores:
@@ -699,7 +700,8 @@ def create_desempeno_bars(rendimiento_scores):
                    edgecolor='#1E293B', linewidth=1.5)
     
     for i, (bar, valor) in enumerate(zip(bars, valores)):
-        label = DESEMPENO_ESCALA_RENDIMIENTO[int(valor)]["label"]
+        escala = DESEMPENO_ESCALA_RENDIMIENTO.get(int(valor), {})
+        label = escala.get("label", "Sin calificar")
         ax.text(valor + 0.15, bar.get_y() + bar.get_height()/2, 
                 f'{valor:.1f} - {label}', 
                 va='center', ha='left', fontsize=10, fontweight='bold', color='#1E293B')
@@ -712,7 +714,7 @@ def create_desempeno_bars(rendimiento_scores):
     ax.set_yticks(y_positions)
     ax.set_yticklabels(objetivos, fontsize=11, fontweight='bold', color='#1E293B')
     ax.set_xlabel('Calificación (1-5)', fontsize=12, fontweight='bold', color='#475569')
-    ax.set_xlim(0, 5.5)
+    ax.set_xlim(0, 7.5)
     ax.set_title('Evaluación de Rendimiento\n6 Objetivos de Desempeño', 
                  fontsize=14, fontweight='bold', pad=20, color='#1E293B')
     ax.spines['top'].set_visible(False)
@@ -722,6 +724,6 @@ def create_desempeno_bars(rendimiento_scores):
     ax.set_facecolor('#FAFBFC')
     ax.tick_params(axis='both', colors='#475569')
     ax.grid(axis='x', alpha=0.3, color='#CBD5E1', linestyle='--')
-    ax.legend(loc='lower right', fontsize=9, framealpha=0.9)
+    ax.legend(loc='upper right', bbox_to_anchor=(1, -0.08), ncol=4, fontsize=9, framealpha=0.9)
     plt.tight_layout()
     return fig

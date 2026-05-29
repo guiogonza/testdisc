@@ -1,6 +1,7 @@
 """
 Funciones de generación de reportes PDF para todas las pruebas psicométricas.
 """
+import os
 import matplotlib.pyplot as plt
 from io import BytesIO
 from datetime import datetime, timedelta, timezone as _tz_mod
@@ -26,6 +27,55 @@ _GMT5 = _tz_mod(timedelta(hours=-5))
 
 def _now_gmt5():
     return datetime.now(_GMT5)
+
+
+def _build_hesego_header(codigo, version="02", fecha="30-01-24", titulo="EVALUACIÓN DESEMPEÑO"):
+    """Construye el encabezado institucional HESEGO para los PDFs de desempeño."""
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+    if os.path.exists(logo_path):
+        logo_cell = Image(logo_path, width=110, height=55)
+    else:
+        logo_cell = Paragraph(
+            "<b>HESEGO</b><br/>Ingeniería S.A.S",
+            ParagraphStyle("_HLogo", fontName="Helvetica-Bold", fontSize=10, alignment=1, leading=14),
+        )
+
+    center_style = ParagraphStyle(
+        "_HCenter", fontName="Helvetica-Bold", fontSize=11, alignment=1, leading=16
+    )
+    center_cell = Paragraph(f"FORMATO<br/><br/>{titulo}", center_style)
+
+    right_data = [
+        ["CÓDIGO:", codigo],
+        ["VERSIÓN:", version],
+        ["FECHA:", fecha],
+    ]
+    right_table = Table(right_data, colWidths=[62, 78])
+    right_table.setStyle(TableStyle([
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+        ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ("ALIGN", (0, 0), (0, -1), "LEFT"),
+        ("ALIGN", (1, 0), (1, -1), "LEFT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+    ]))
+
+    header_table = Table([[logo_cell, center_cell, right_table]], colWidths=[130, 252, 140])
+    header_table.setStyle(TableStyle([
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.black),
+        ("LINEAFTER", (0, 0), (1, -1), 0.5, colors.black),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    return [header_table, Spacer(1, 14)]
 
 
 # =========================================================================
@@ -122,29 +172,53 @@ def generate_disc_pdf(candidate, normalized, relative, fig, session_id, complete
         story.append(PageBreak())
         story.append(Paragraph("Resumen Conductual Detallado", styles["Heading1"]))
         story.append(Spacer(1, 8))
+        temperament_style = ParagraphStyle(
+            "TemperamentSummary",
+            parent=styles["Normal"],
+            fontSize=9,
+            leading=12,
+            wordWrap="CJK",
+        )
         if temperament:
             story.append(Paragraph(
-                f"<b>Temperamento:</b> {temperament['label'].capitalize()} — {temperament['description']}",
-                styles["Normal"]
+                f"<b>Temperamento:</b><br/>{temperament['label'].capitalize()} - {temperament['description']}",
+                temperament_style
             ))
             story.append(Spacer(1, 8))
+        summary_label_style = ParagraphStyle(
+            "SummaryLabel",
+            parent=styles["Normal"],
+            fontName="Helvetica-Bold",
+            fontSize=8,
+            leading=11,
+            textColor=colors.HexColor("#1e40af"),
+        )
+        summary_text_style = ParagraphStyle(
+            "SummaryText",
+            parent=styles["Normal"],
+            fontSize=8,
+            leading=11,
+        )
+
         data_rows = [["Dimensión", "Descripción Conductual"]]
         for label, text in mega_summary.items():
-            data_rows.append([label, text])
+            data_rows.append([
+                Paragraph(label, summary_label_style),
+                Paragraph(text, summary_text_style),
+            ])
         t_sum = Table(data_rows, colWidths=[130, 360])
         t_sum.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1e40af")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("FONTSIZE", (0, 0), (-1, 0), 9),
-            ("FONTSIZE", (0, 1), (-1, -1), 8),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#CBD5E1")),
             ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#F8FAFC"), colors.white]),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
             ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
-            ("TEXTCOLOR", (0, 1), (0, -1), colors.HexColor("#1e40af")),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
         ]))
         story.append(t_sum)
 
@@ -844,22 +918,20 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
     
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Title', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor("#1E40AF"), alignment=1, spaceAfter=14))
+    styles.add(ParagraphStyle(name='DTitle', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor("#1E40AF"), alignment=1, spaceAfter=14))
     styles.add(ParagraphStyle(name='SubTitle', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor("#374151"), spaceAfter=10))
-    styles.add(ParagraphStyle(name='Small', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor("#6B7280")))
+    styles.add(ParagraphStyle(name='DSmall', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor("#6B7280")))
     styles.add(ParagraphStyle(name='ListItem', parent=styles['Normal'], fontSize=10, leftIndent=20, spaceAfter=6))
     
     story = []
-    story.append(Spacer(1, 72))
-    story.append(Paragraph("📊 EVALUACIÓN DE DESEMPEÑO", styles['Title']))
-    story.append(Spacer(1, 12))
+    story.extend(_build_hesego_header("FO-GH-40", version="02", fecha="30-01-24"))
     story.append(Paragraph(f"<b>Colaborador Evaluado:</b> {candidate['name']}", styles['Normal']))
     story.append(Paragraph(f"<b>Cédula:</b> {candidate['cedula']}", styles['Normal']))
     story.append(Paragraph(f"<b>Cargo:</b> {candidate.get('position', 'N/A')}", styles['Normal']))
     if evaluador_nombre:
         story.append(Paragraph(f"<b>Evaluador:</b> {evaluador_nombre}", styles['Normal']))
     story.append(Paragraph(f"<b>Fecha de Evaluación:</b> {completed_at or 'N/A'}", styles['Normal']))
-    story.append(Paragraph(f"<b>ID de Sesión:</b> {session_id}", styles['Small']))
+    story.append(Paragraph(f"<b>ID de Sesión:</b> {session_id}", styles['DSmall']))
     story.append(Spacer(1, 24))
     
     if analysis and analysis.get("clasificacion"):
@@ -876,7 +948,7 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
         ]))
         story.append(banner_table)
         story.append(Spacer(1, 6))
-        story.append(Paragraph(f"<i>{clasif['descripcion']}</i>", styles['Small']))
+        story.append(Paragraph(f"<i>{clasif['descripcion']}</i>", styles['DSmall']))
     
     story.append(Spacer(1, 24))
     
@@ -917,10 +989,10 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
     story.append(Paragraph("<b>Detalle por Objetivo:</b>", styles['Normal']))
     story.append(Spacer(1, 6))
     for obj_id, score in rendimiento_scores.items():
-        objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
-        nivel = DESEMPENO_ESCALA_RENDIMIENTO[score]
+        objetivo = DESEMPENO_OBJETIVOS[int(obj_id) - 1]
+        nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(int(score), {"label": "Sin calificar", "color": "#6B7280"})
         story.append(Paragraph(
-            f"<b>{objetivo['titulo']}</b> - {score:.1f}/5.0 ({nivel['label']})",
+            f"<b>{objetivo['titulo']}</b> - {float(score):.1f}/5.0 ({nivel['label']})",
             styles['ListItem']
         ))
     
@@ -939,11 +1011,11 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
     story.append(Paragraph("<b>Detalle por Dimensión:</b>", styles['Normal']))
     story.append(Spacer(1, 6))
     for dim_id, score in potencial_scores.items():
-        dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+        dimension = DESEMPENO_DIMENSIONES[int(dim_id) - 1]
         story.append(Paragraph(f"<b>{dimension['nombre']}</b> - Nivel {score}/3", styles['ListItem']))
         story.append(Paragraph(
-            f"<i>{dimension['niveles'][score]}</i>",
-            ParagraphStyle(name='DimDesc', parent=styles['Small'], leftIndent=30, spaceAfter=8)
+            f"<i>{dimension['niveles'][int(score)]}</i>",
+            ParagraphStyle(name='DimDesc', parent=styles['DSmall'], leftIndent=30, spaceAfter=8)
         ))
     
     story.append(PageBreak())
@@ -1007,9 +1079,36 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
     story.append(Spacer(1, 24))
     story.append(Paragraph(
         f"<i>Documento generado automáticamente el {completed_at or _now_gmt5().strftime('%Y-%m-%d %H:%M:%S')}</i>",
-        styles['Small']
+        styles['DSmall']
     ))
-    
+
+    # Sección de firmas
+    story.append(Spacer(1, 40))
+    empleado_nombre = candidate.get('name', '').upper()
+    jefe_nombre = (evaluador_nombre or '').upper()
+    firma_data = [
+        [
+            Paragraph(f"<b>{empleado_nombre}</b>", ParagraphStyle('_FN', alignment=1, fontSize=10, fontName='Helvetica-Bold')),
+            Spacer(1, 1),
+            Paragraph(f"<b>{jefe_nombre}</b>", ParagraphStyle('_FJ', alignment=1, fontSize=10, fontName='Helvetica-Bold')),
+        ],
+        [
+            Paragraph("Firma Colaborador Evaluado", ParagraphStyle('_FL', alignment=1, fontSize=9, textColor=colors.HexColor("#6B7280"))),
+            Spacer(1, 1),
+            Paragraph("Firma Evaluador / Jefe Inmediato", ParagraphStyle('_FL2', alignment=1, fontSize=9, textColor=colors.HexColor("#6B7280"))),
+        ],
+    ]
+    firma_table = Table(firma_data, colWidths=[220, 60, 220])
+    firma_table.setStyle(TableStyle([
+        ('LINEABOVE', (0, 0), (0, 0), 0.8, colors.black),
+        ('LINEABOVE', (2, 0), (2, 0), 0.8, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(firma_table)
+
     doc.build(story)
     buffer.seek(0)
     return buffer
@@ -1043,9 +1142,7 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     DLItem = styles.get('DLItem', styles['Normal'])
 
     story = []
-    story.append(Spacer(1, 40))
-    story.append(Paragraph("EVALUACIÓN DE DESEMPEÑO — LÍDERES", DLTitle))
-    story.append(Spacer(1, 10))
+    story.extend(_build_hesego_header("FO-GH-41", version="02", fecha="30-01-24"))
 
     info_rows = [
         ["Colaborador:", candidate['name']],
@@ -1133,9 +1230,9 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     story.append(Paragraph("EVALUACIÓN DE RENDIMIENTO", DLSub))
     rend_data = [["Objetivo", "Puntaje", "Nivel"]]
     for obj_id, score in rendimiento_scores.items():
-        objetivo = DESEMPENO_OBJETIVOS[obj_id - 1]
-        nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(score, {})
-        rend_data.append([objetivo["titulo"][:60], f"{score}/5", nivel.get("label", "")])
+        objetivo = DESEMPENO_OBJETIVOS[int(obj_id) - 1]
+        nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(int(score), {})
+        rend_data.append([objetivo["titulo"][:60], f"{score}/5", nivel.get("label", "Sin calificar")])
     rt = Table(rend_data, colWidths=[290, 60, 100])
     rt.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E40AF")),
@@ -1153,7 +1250,7 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     story.append(Paragraph("EVALUACIÓN DE POTENCIAL", DLSub))
     pot_data = [["Dimensión", "Nivel"]]
     for dim_id, score in potencial_scores.items():
-        dimension = DESEMPENO_DIMENSIONES[dim_id - 1]
+        dimension = DESEMPENO_DIMENSIONES[int(dim_id) - 1]
         pot_data.append([dimension["nombre"], f"Nivel {score}/3"])
     pot_t = Table(pot_data, colWidths=[370, 80])
     pot_t.setStyle(TableStyle([
@@ -1179,6 +1276,33 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
         story.append(Paragraph("RECOMENDACIONES", DLSub))
         for recom in analysis["recomendaciones"]:
             story.append(Paragraph(f"• {recom}", DLItem))
+
+    # Sección de firmas
+    story.append(Spacer(1, 40))
+    empleado_nombre = candidate.get('name', '').upper()
+    jefe_nombre = (evaluador_nombre or '').upper()
+    firma_data = [
+        [
+            Paragraph(f"<b>{empleado_nombre}</b>", ParagraphStyle('_LFN', alignment=1, fontSize=10, fontName='Helvetica-Bold')),
+            Spacer(1, 1),
+            Paragraph(f"<b>{jefe_nombre}</b>", ParagraphStyle('_LFJ', alignment=1, fontSize=10, fontName='Helvetica-Bold')),
+        ],
+        [
+            Paragraph("Firma Colaborador Evaluado", ParagraphStyle('_LFL', alignment=1, fontSize=9, textColor=colors.HexColor("#6B7280"))),
+            Spacer(1, 1),
+            Paragraph("Firma Evaluador / Jefe Inmediato", ParagraphStyle('_LFL2', alignment=1, fontSize=9, textColor=colors.HexColor("#6B7280"))),
+        ],
+    ]
+    firma_table = Table(firma_data, colWidths=[220, 60, 220])
+    firma_table.setStyle(TableStyle([
+        ('LINEABOVE', (0, 0), (0, 0), 0.8, colors.black),
+        ('LINEABOVE', (2, 0), (2, 0), 0.8, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(firma_table)
 
     doc.build(story)
     buf.seek(0)
@@ -1211,24 +1335,26 @@ def generate_periodo_prueba_pdf(candidate, actuaciones_scores, calificaciones_sc
     PPItem = styles.get('PPItem', styles['Normal'])
 
     story = []
-    story.append(Spacer(1, 40))
-    story.append(Paragraph("EVALUACIÓN PERÍODO DE PRUEBA", PPTitle))
-    story.append(Spacer(1, 10))
+    story.extend(_build_hesego_header("FO-GH-46", version="01", fecha="05-09-24",
+                                       titulo="EVALUACIÓN PERÍODO DE PRUEBA"))
 
     info_rows = [
-        ["Colaborador:", candidate['name']],
-        ["Cédula:", str(candidate['cedula'])],
-        ["Cargo:", candidate.get('position', 'N/A')],
-        ["Evaluador:", evaluador_nombre or 'N/A'],
-        ["Fecha:", completed_at or 'N/A'],
-        ["ID Sesión:", str(session_id)],
+        ["Fecha de Evaluación:", completed_at or ''],
+        ["Nombre del trabajador:", candidate['name'] + f"  (C.C. {candidate['cedula']})"],
+        ["Cargo:", candidate.get('position', '')],
+        ["Área:", candidate.get('regional', '')],
+        ["Evaluador:", evaluador_nombre or ''],
     ]
-    it = Table(info_rows, colWidths=[130, 360])
+    it = Table(info_rows, colWidths=[150, 352])
     it.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('GRID', (0, 0), (-1, -1), 0.3, colors.HexColor("#E5E7EB")),
-        ('TOPPADDING', (0, 0), (-1, -1), 4), ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('BOX', (0, 0), (-1, -1), 0.8, colors.black),
+        ('LINEBELOW', (0, 0), (-1, -2), 0.5, colors.black),
+        ('LINEAFTER', (0, 0), (0, -1), 0.5, colors.black),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
     ]))
     story.append(it)
     story.append(Spacer(1, 14))
@@ -1322,6 +1448,23 @@ def generate_periodo_prueba_pdf(candidate, actuaciones_scores, calificaciones_sc
         story.append(Paragraph("RECOMENDACIONES", PPSub))
         for recom in analysis["recomendaciones"]:
             story.append(Paragraph(f"• {recom}", PPItem))
+
+    # --- FIRMAS ---
+    story.append(Spacer(1, 30))
+    firma_data = [
+        ["_" * 40, "_" * 40],
+        [f"Evaluador: {evaluador_nombre or ''}", f"Colaborador: {candidate['name']}"],
+    ]
+    firma_table = Table(firma_data, colWidths=[240, 240])
+    firma_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (1, 0), (-1, -1), 'Helvetica'),
+        ('FONTNAME', (0, 1), (-1, 1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(firma_table)
 
     doc.build(story)
     buf.seek(0)

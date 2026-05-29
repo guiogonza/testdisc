@@ -16,11 +16,17 @@ st.markdown("""
     .stApp { max-width: 100% !important; padding: 0 !important; }
     .block-container { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
     .stButton>button { font-weight: bold; }
+    /* Ocultar navegación automática de páginas de Streamlit */
+    [data-testid="stSidebarNav"] { display: none !important; }
+    /* Reducir espacio superior del sidebar */
+    [data-testid="stSidebar"] > div:first-child { padding-top: 1rem !important; }
+    [data-testid="stSidebarContent"] { padding-top: 0.5rem !important; }
     div[data-testid="stMetric"] {
         background: var(--secondary-background-color, #f8fafc);
         padding: 12px;
         border-radius: 10px;
         border: 1px solid rgba(148, 163, 184, 0.35);
+        min-height: 110px;
     }
     div[data-testid="stMetricLabel"],
     div[data-testid="stMetricValue"],
@@ -119,6 +125,7 @@ def page_home():
 # =========================================================================
 from pages.admin import (
     page_admin_login, page_admin_dashboard,
+    page_shared_result_view,
     show_disc_results_admin, show_valanti_results_admin,
     show_wpi_results_admin, show_eri_results_admin,
 )
@@ -146,6 +153,17 @@ from pages.candidate import (
 
 _restore_admin_session()
 
+try:
+    _qp_page = st.query_params.get("page")
+    _qp_rv = st.query_params.get("rv")
+except Exception:
+    _qp_page = None
+    _qp_rv = None
+
+if _qp_page == "shared_result" and _qp_rv:
+    st.session_state["shared_result_token"] = _qp_rv
+    st.session_state["page"] = "shared_result_view"
+
 if "page" not in st.session_state:
     st.session_state.page = "admin_dashboard" if st.session_state.get("admin") else "home"
 else:
@@ -158,6 +176,7 @@ PAGE_MAP = {
     "home": page_home,
     "admin_login": page_admin_login,
     "admin_dashboard": page_admin_dashboard,
+    "shared_result_view": page_shared_result_view,
     "evaluador_login": page_evaluador_login,
     "evaluador_dashboard": page_evaluador_dashboard,
     "candidate_login": page_candidate_login,

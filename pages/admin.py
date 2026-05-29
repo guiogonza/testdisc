@@ -53,10 +53,109 @@ from pdfs import (
     generate_desempeno_lider_pdf, generate_periodo_prueba_pdf,
 )
 from utils import load_disc_questions, load_disc_descriptions, load_wpi_questions, nav
+from pages.desempeno import (
+    show_desempeno_results_admin,
+    show_desempeno_lider_results_admin,
+    show_periodo_prueba_results_admin,
+)
+from pages.talent_map import show_talent_map_results_admin
 from auth import (
     _restore_admin_session, _touch_admin_session,
     _logout_admin, _start_admin_session,
+    _create_result_view_token, _parse_result_view_token,
 )
+
+
+def _build_secure_result_url(session_id, test_type):
+    token = _create_result_view_token(session_id, test_type)
+    return f"?page=shared_result&rv={token}"
+
+
+def page_shared_result_view():
+    st.markdown("## 🔗 Visualización Segura de Resultados")
+
+    rv_token = None
+    try:
+        rv_token = st.query_params.get("rv")
+    except Exception:
+        rv_token = None
+    if not rv_token:
+        rv_token = st.session_state.get("shared_result_token")
+
+    if not rv_token:
+        st.error("❌ Enlace inválido: falta token de visualización.")
+        if st.button("🏠 Ir al inicio", use_container_width=True):
+            nav("home")
+        return
+
+    token_data = _parse_result_view_token(rv_token)
+    if not token_data:
+        st.error("❌ Enlace inválido o vencido.")
+        if st.button("🏠 Ir al inicio", use_container_width=True):
+            nav("home")
+        return
+
+    session_id = token_data["session_id"]
+    expected_test_type = token_data["test_type"]
+    session = db.get_session_by_id(session_id)
+
+    if not session:
+        st.error("❌ No se encontró la evaluación asociada al enlace.")
+        return
+    if session.get("test_type") != expected_test_type:
+        st.error("❌ Enlace no válido para este tipo de evaluación.")
+        return
+    if session.get("status") != "completed":
+        st.warning("⚠️ Esta evaluación aún no está completada.")
+        return
+
+    candidate = db.get_candidate_by_id(session.get("candidate_id"))
+    results = db.get_results(session_id)
+
+    if not candidate or not results:
+        st.warning("⚠️ No hay datos suficientes para mostrar esta evaluación.")
+        return
+
+    st.caption(f"Sesión: {session_id} | Tipo: {session.get('test_type', '').upper()}")
+
+    test_type = session["test_type"]
+    if test_type == "disc":
+        show_disc_results_admin(results, candidate, session)
+    elif test_type == "valanti":
+        show_valanti_results_admin(results, candidate, session)
+    elif test_type == "wpi":
+        show_wpi_results_admin(results, candidate, session)
+    elif test_type == "eri":
+        show_eri_results_admin(results, candidate, session)
+    elif test_type == "talent_map":
+        show_talent_map_results_admin(results, candidate, session)
+    elif test_type == "desempeno":
+        show_desempeno_results_admin(results, candidate, session)
+    elif test_type == "desempeno_lider":
+        show_desempeno_lider_results_admin(results, candidate, session)
+    elif test_type == "periodo_prueba":
+        show_periodo_prueba_results_admin(results, candidate, session)
+    else:
+        st.info("Tipo de evaluación no soportado para esta vista.")
+
+    b1, b2 = st.columns(2)
+    with b1:
+        if st.button("🏠 Ir al inicio", use_container_width=True, key="shared_home"):
+            try:
+                st.query_params.pop("rv", None)
+                st.query_params.pop("page", None)
+            except Exception:
+                pass
+            nav("home")
+    with b2:
+        if st.session_state.get("admin"):
+            if st.button("🛡️ Volver al dashboard", use_container_width=True, key="shared_admin"):
+                try:
+                    st.query_params.pop("rv", None)
+                    st.query_params.pop("page", None)
+                except Exception:
+                    pass
+                nav("admin_dashboard")
 
 def page_admin_login():
     st.markdown("## 🔒 Acceso Administrador RH")
@@ -312,18 +411,74 @@ def page_admin_dashboard():
                             st.caption("Resultados detallados ocultos para acelerar carga.")
                             _dc1, _dc2 = st.columns(2)
                             with _dc1:
-                                if st.button("📊 Ver resultados", key=f"{details_key}_btn", use_container_width=True):
-                                    st.session_state[details_key] = True
-                                    st.session_state.pop(f"{details_key}_focus_pdf", None)
-                                    st.rerun()
+                                _secure_url = _build_secure_result_url(sess["id"], sess["test_type"])
+                                st.link_button("🔗 Visualizar", url=_secure_url, use_container_width=True)
                             with _dc2:
                                 if st.button("📥 Descargar PDF", key=f"{details_key}_pdf_btn", use_container_width=True):
                                     st.session_state[details_key] = True
                                     st.session_state[f"{details_key}_focus_pdf"] = True
                                     st.rerun()
+                        elif st.session_state.get(f"{details_key}_focus_pdf", False):
+                            # Modo descarga directa: solo genera y ofrece el PDF
+                            _res_pdf = db.get_results(sess["id"])
+                            _cand_pdf = db.get_candidate_by_cedula(sess["cedula"])
+                            if _res_pdf and _cand_pdf:
+                                try:
+                                    if sess["test_type"] == "desempeno":
+                                        _radar = create_desempeno_radar(_res_pdf.get("potencial_scores", {}))
+                                        _bars = create_desempeno_bars(_res_pdf.get("rendimiento_scores", {}))
+                                        _pdf_buf = generate_desempeno_pdf(
+                                            candidate=_cand_pdf,
+                                            rendimiento_scores=_res_pdf.get("rendimiento_scores", {}),
+                                            potencial_scores=_res_pdf.get("potencial_scores", {}),
+                                            radar_fig=_radar,
+                                            bars_fig=_bars,
+                                            session_id=sess["id"],
+                                            completed_at=sess.get("completed_at"),
+                                            analysis=_res_pdf.get("analysis", {}),
+                                            evaluador_nombre=_res_pdf.get("evaluador"),
+                                            iniciativas=_res_pdf.get("iniciativas", []),
+                                        )
+                                        st.download_button(
+                                            "📄 Descargar PDF — Desempeño Operativo",
+                                            data=_pdf_buf,
+                                            file_name=f"evaluacion_desempeno_{_cand_pdf['cedula']}_{sess['id']}.pdf",
+                                            mime="application/pdf",
+                                            key=f"dl_pdf_direct_{sess['id']}",
+                                            use_container_width=True,
+                                        )
+                                    elif sess["test_type"] == "desempeno_lider":
+                                        _pdf_buf = generate_desempeno_lider_pdf(
+                                            candidate=_cand_pdf,
+                                            competencias_scores={int(k): v for k, v in _res_pdf.get("competencias_scores", {}).items()},
+                                            rendimiento_scores=_res_pdf.get("rendimiento_scores", {}),
+                                            potencial_scores=_res_pdf.get("potencial_scores", {}),
+                                            session_id=sess["id"],
+                                            completed_at=sess.get("completed_at"),
+                                            analysis=_res_pdf.get("analysis", {}),
+                                            evaluador_nombre=_res_pdf.get("evaluador"),
+                                            nivel_cargo=_res_pdf.get("nivel_cargo"),
+                                            iniciativas=_res_pdf.get("iniciativas", []),
+                                        )
+                                        st.download_button(
+                                            "📄 Descargar PDF — Desempeño Líderes",
+                                            data=_pdf_buf,
+                                            file_name=f"desempeno_lider_{_cand_pdf['cedula']}_{sess['id']}.pdf",
+                                            mime="application/pdf",
+                                            key=f"dl_pdf_direct_{sess['id']}",
+                                            use_container_width=True,
+                                        )
+                                    else:
+                                        st.info("La descarga directa solo está disponible para evaluaciones de desempeño.")
+                                        st.session_state[details_key] = True
+                                        st.session_state.pop(f"{details_key}_focus_pdf", None)
+                                        st.rerun()
+                                except Exception as _epdf:
+                                    st.error(f"Error generando PDF: {_epdf}")
+                            if st.button("← Volver", key=f"{details_key}_back", use_container_width=True):
+                                st.session_state.pop(f"{details_key}_focus_pdf", None)
+                                st.rerun()
                         else:
-                            if st.session_state.get(f"{details_key}_focus_pdf", False):
-                                st.info("📥 El PDF de descarga está disponible al final de esta sección ↓")
                             results = db.get_results(sess["id"])
                             candidate = db.get_candidate_by_cedula(sess["cedula"])
                             if results:
@@ -367,6 +522,41 @@ def page_admin_dashboard():
                             st.session_state["periodo_prueba_session_id"] = sess["id"]
                             nav("periodo_prueba_jefe_eval")
                             st.rerun()
+                    if sess["status"] == "expired":
+                        st.markdown("---")
+                        _reactivar_key = f"show_reactivar_{tab_key}_{sess['id']}"
+                        if st.button(
+                            "🔄 Reactivar prueba expirada",
+                            key=f"{tab_key}_reactivar_btn_{sess['id']}",
+                            use_container_width=True,
+                        ):
+                            st.session_state[_reactivar_key] = not st.session_state.get(_reactivar_key, False)
+                        if st.session_state.get(_reactivar_key, False):
+                            with st.container(border=True):
+                                st.warning("⚠️ Se restablecerá la prueba a estado **pendiente**. El candidato podrá iniciarla de nuevo desde cero.")
+                                with st.form(f"reactivar_{tab_key}_{sess['id']}"):
+                                    _tl_opts = [15, 20, 30, 45, 60, 90]
+                                    _curr_tl = sess.get("time_limit_minutes", 45)
+                                    _new_tl = st.selectbox(
+                                        "Nuevo tiempo límite",
+                                        options=_tl_opts,
+                                        index=_tl_opts.index(_curr_tl) if _curr_tl in _tl_opts else 3,
+                                        format_func=lambda x: f"{x} minutos",
+                                        key=f"reactivar_tl_{tab_key}_{sess['id']}",
+                                    )
+                                    _rc1, _rc2 = st.columns(2)
+                                    _confirmar = _rc1.form_submit_button("✅ Confirmar reactivación", use_container_width=True)
+                                    _cancelar = _rc2.form_submit_button("✖ Cancelar", use_container_width=True)
+                                    if _confirmar:
+                                        _ok_reactivate = db.reactivate_test_session(sess["id"], new_time_limit_minutes=_new_tl)
+                                        st.session_state.pop(_reactivar_key, None)
+                                        if _ok_reactivate:
+                                            st.success(f"✅ Prueba reactivada con {_new_tl} min. El candidato puede iniciarla de nuevo.")
+                                            st.rerun()
+                                        st.error("❌ No fue posible reactivar la sesión (debe estar expirada).")
+                                    if _cancelar:
+                                        st.session_state.pop(_reactivar_key, None)
+                                        st.rerun()
                     if sess["status"] == "pending":
                         st.markdown("---")
                         pending_actions_col, pending_delete_col = st.columns([3, 1])
