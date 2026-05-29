@@ -71,6 +71,134 @@ def _build_secure_result_url(session_id, test_type):
     return f"?page=shared_result&rv={token}"
 
 
+def _as_download_payload(pdf_obj):
+    return pdf_obj.getvalue() if hasattr(pdf_obj, "getvalue") else pdf_obj
+
+
+def _build_direct_pdf(session, candidate, results):
+    """Genera PDF por tipo de prueba sin renderizar resultados en pantalla."""
+    test_type = session.get("test_type")
+    session_id = session.get("id")
+    completed_at = session.get("completed_at")
+
+    if test_type == "disc":
+        normalized = results.get("normalized", {})
+        relative = results.get("relative", {})
+        analysis = analyze_disc_aptitude(normalized, relative)
+        behavioral_styles = calculate_behavioral_styles(normalized)
+        temperament = get_disc_temperament(normalized)
+        mega_summary = generate_disc_mega_summary(normalized)
+        fig = create_disc_plot(normalized)
+        styles_fig = create_behavioral_styles_chart(behavioral_styles)
+        pdf = generate_disc_pdf(
+            candidate,
+            normalized,
+            relative,
+            fig,
+            session_id,
+            completed_at,
+            analysis,
+            behavioral_styles=behavioral_styles,
+            temperament=temperament,
+            mega_summary=mega_summary,
+            styles_fig=styles_fig,
+        )
+        return _as_download_payload(pdf), f"disc_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — DISC"
+
+    if test_type == "valanti":
+        direct = results.get("direct", {})
+        standard = {}
+        for trait in VALANTI_TRAITS:
+            if trait in direct:
+                z = (direct[trait] - VALANTI_AVGS[trait]) / VALANTI_SDS[trait]
+                standard[trait] = round(z * 10 + 50)
+            else:
+                standard[trait] = results.get("standard", {}).get(trait, 50)
+        analysis = analyze_valanti_aptitude(standard)
+        radar_fig = create_valanti_radar(standard)
+        pdf = generate_valanti_pdf(candidate, direct, standard, radar_fig, session_id, completed_at, analysis)
+        return _as_download_payload(pdf), f"valanti_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — VALANTI"
+
+    if test_type == "wpi":
+        raw = results.get("raw", {})
+        normalized = results.get("normalized", {})
+        analysis = analyze_wpi_aptitude(normalized)
+        radar_fig = create_wpi_radar(normalized)
+        pdf = generate_wpi_pdf(candidate, raw, normalized, radar_fig, session_id, completed_at, analysis)
+        return _as_download_payload(pdf), f"wpi_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — WPI"
+
+    if test_type == "eri":
+        raw = results.get("raw", {})
+        normalized = results.get("normalized", {})
+        validity_score = results.get("validity_score", ERI_VALIDITY_QUESTIONS_COUNT)
+        validity_flags = results.get("validity_flags", [])
+        analysis = analyze_eri_aptitude(normalized, validity_score, validity_flags)
+        radar_fig = create_eri_radar(normalized)
+        pdf = generate_eri_pdf(candidate, raw, normalized, radar_fig, session_id, completed_at, analysis, validity_score, validity_flags)
+        return _as_download_payload(pdf), f"eri_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — ERI"
+
+    if test_type == "talent_map":
+        raw = results.get("raw", {})
+        normalized = results.get("normalized", {})
+        analysis = analyze_talent_map_match(normalized, None)
+        radar_fig = create_talent_map_radar(normalized)
+        pdf = generate_talent_map_pdf(candidate, raw, normalized, radar_fig, session_id, completed_at, analysis)
+        return _as_download_payload(pdf), f"talent_map_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — TALENT MAP"
+
+    if test_type == "desempeno":
+        rendimiento_scores = results.get("rendimiento_scores", {})
+        potencial_scores = results.get("potencial_scores", {})
+        analysis = results.get("analysis", {})
+        radar_fig = create_desempeno_radar(potencial_scores)
+        bars_fig = create_desempeno_bars(rendimiento_scores)
+        pdf = generate_desempeno_pdf(
+            candidate=candidate,
+            rendimiento_scores=rendimiento_scores,
+            potencial_scores=potencial_scores,
+            radar_fig=radar_fig,
+            bars_fig=bars_fig,
+            session_id=session_id,
+            completed_at=completed_at,
+            analysis=analysis,
+            evaluador_nombre=results.get("evaluador"),
+            iniciativas=results.get("iniciativas", []),
+        )
+        return _as_download_payload(pdf), f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Desempeño Operativo"
+
+    if test_type == "desempeno_lider":
+        pdf = generate_desempeno_lider_pdf(
+            candidate=candidate,
+            competencias_scores={int(k): v for k, v in results.get("competencias_scores", {}).items()},
+            rendimiento_scores={int(k): v for k, v in results.get("rendimiento_scores", {}).items()},
+            potencial_scores={int(k): v for k, v in results.get("potencial_scores", {}).items()},
+            session_id=session_id,
+            completed_at=completed_at,
+            analysis=results.get("analysis", {}),
+            evaluador_nombre=results.get("evaluador"),
+            nivel_cargo=results.get("nivel_cargo"),
+            iniciativas=results.get("iniciativas", []),
+        )
+        return _as_download_payload(pdf), f"desempeno_lider_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Desempeño Líderes"
+
+    if test_type == "periodo_prueba":
+        pdf = generate_periodo_prueba_pdf(
+            candidate=candidate,
+            actuaciones_scores={int(k): v for k, v in results.get("actuaciones_scores", {}).items()},
+            calificaciones_scores={int(k): v for k, v in results.get("calificaciones_scores", {}).items()},
+            session_id=session_id,
+            completed_at=completed_at,
+            analysis=results.get("analysis", {}),
+            evaluador_nombre=results.get("evaluador"),
+            aprobo=results.get("aprobo", False),
+            llamados_atencion=results.get("llamados_atencion", False),
+            conocimiento_adecuado=results.get("conocimiento_adecuado", True),
+            observaciones=results.get("observaciones"),
+        )
+        return _as_download_payload(pdf), f"periodo_prueba_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Período de Prueba"
+
+    return None, None, None
+
+
 def page_shared_result_view():
     st.markdown("## 🔗 Visualización Segura de Resultados")
 
@@ -424,55 +552,18 @@ def page_admin_dashboard():
                             _cand_pdf = db.get_candidate_by_cedula(sess["cedula"])
                             if _res_pdf and _cand_pdf:
                                 try:
-                                    if sess["test_type"] == "desempeno":
-                                        _radar = create_desempeno_radar(_res_pdf.get("potencial_scores", {}))
-                                        _bars = create_desempeno_bars(_res_pdf.get("rendimiento_scores", {}))
-                                        _pdf_buf = generate_desempeno_pdf(
-                                            candidate=_cand_pdf,
-                                            rendimiento_scores=_res_pdf.get("rendimiento_scores", {}),
-                                            potencial_scores=_res_pdf.get("potencial_scores", {}),
-                                            radar_fig=_radar,
-                                            bars_fig=_bars,
-                                            session_id=sess["id"],
-                                            completed_at=sess.get("completed_at"),
-                                            analysis=_res_pdf.get("analysis", {}),
-                                            evaluador_nombre=_res_pdf.get("evaluador"),
-                                            iniciativas=_res_pdf.get("iniciativas", []),
-                                        )
+                                    _pdf_data, _pdf_name, _pdf_label = _build_direct_pdf(sess, _cand_pdf, _res_pdf)
+                                    if _pdf_data and _pdf_name and _pdf_label:
                                         st.download_button(
-                                            "📄 Descargar PDF — Desempeño Operativo",
-                                            data=_pdf_buf,
-                                            file_name=f"evaluacion_desempeno_{_cand_pdf['cedula']}_{sess['id']}.pdf",
-                                            mime="application/pdf",
-                                            key=f"dl_pdf_direct_{sess['id']}",
-                                            use_container_width=True,
-                                        )
-                                    elif sess["test_type"] == "desempeno_lider":
-                                        _pdf_buf = generate_desempeno_lider_pdf(
-                                            candidate=_cand_pdf,
-                                            competencias_scores={int(k): v for k, v in _res_pdf.get("competencias_scores", {}).items()},
-                                            rendimiento_scores=_res_pdf.get("rendimiento_scores", {}),
-                                            potencial_scores=_res_pdf.get("potencial_scores", {}),
-                                            session_id=sess["id"],
-                                            completed_at=sess.get("completed_at"),
-                                            analysis=_res_pdf.get("analysis", {}),
-                                            evaluador_nombre=_res_pdf.get("evaluador"),
-                                            nivel_cargo=_res_pdf.get("nivel_cargo"),
-                                            iniciativas=_res_pdf.get("iniciativas", []),
-                                        )
-                                        st.download_button(
-                                            "📄 Descargar PDF — Desempeño Líderes",
-                                            data=_pdf_buf,
-                                            file_name=f"desempeno_lider_{_cand_pdf['cedula']}_{sess['id']}.pdf",
+                                            _pdf_label,
+                                            data=_pdf_data,
+                                            file_name=_pdf_name,
                                             mime="application/pdf",
                                             key=f"dl_pdf_direct_{sess['id']}",
                                             use_container_width=True,
                                         )
                                     else:
-                                        st.info("La descarga directa solo está disponible para evaluaciones de desempeño.")
-                                        st.session_state[details_key] = True
-                                        st.session_state.pop(f"{details_key}_focus_pdf", None)
-                                        st.rerun()
+                                        st.error("No fue posible generar PDF para este tipo de evaluación.")
                                 except Exception as _epdf:
                                     st.error(f"Error generando PDF: {_epdf}")
                             if st.button("← Volver", key=f"{details_key}_back", use_container_width=True):
