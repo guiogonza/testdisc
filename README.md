@@ -7,7 +7,9 @@
 - **Personalized DISC profiles**: Discover your unique personality style based on the DISC framework.
 - **Interactive UI**: Powered by Streamlit for easy navigation and a user-friendly experience.
 - **Style descriptions**: Provides detailed descriptions of single and combination styles.
-- **PDF and JSON Export**: Download your results as a PDF or JSON for future reference.
+- **Secure result links**: Admin can open completed evaluations with a signed URL token.
+- **Direct PDF download in shared view**: Shared result view exposes PDF download (JSON hidden).
+- **PDF and JSON Export (admin dashboard)**: Internal admin views keep full export options where applicable.
 
 ## Getting Started
 
@@ -36,7 +38,7 @@
 To run the app locally, use Streamlit:
 
 ```bash
-streamlit run disc_style.py
+streamlit run app.py
 ```
 
 This will start the application and open it in your browser. Follow the prompts to complete the DISC assessment.

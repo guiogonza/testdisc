@@ -7,6 +7,7 @@ import json
 import os
 import math
 import base64
+import html as html_lib
 from io import BytesIO
 from datetime import datetime, timedelta, timezone as _tz_mod
 
@@ -68,11 +69,39 @@ from auth import (
 
 def _build_secure_result_url(session_id, test_type):
     token = _create_result_view_token(session_id, test_type)
+    session_admin_token = st.session_state.get("admin_session_token")
+    try:
+        admin_token = st.query_params.get("admin_token")
+    except Exception:
+        admin_token = None
+
+    if not admin_token and session_admin_token:
+        admin_token = session_admin_token
+
+    if admin_token:
+        return f"?admin_token={admin_token}&page=shared_result&rv={token}"
     return f"?page=shared_result&rv={token}"
 
 
 def _as_download_payload(pdf_obj):
     return pdf_obj.getvalue() if hasattr(pdf_obj, "getvalue") else pdf_obj
+
+
+def _render_direct_pdf_link(label, pdf_data, file_name, key_suffix):
+    """Renderiza un enlace HTML que descarga el PDF inmediatamente al hacer clic."""
+    pdf_b64 = base64.b64encode(pdf_data).decode("ascii")
+    safe_label = html_lib.escape(label)
+    safe_file_name = html_lib.escape(file_name)
+    st.markdown(
+        f"""
+        <div class="direct-pdf-link-wrap st-key-{key_suffix}">
+            <a class="direct-pdf-link" href="data:application/pdf;base64,{pdf_b64}" download="{safe_file_name}">
+                {safe_label}
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _build_direct_pdf(session, candidate, results):
@@ -200,6 +229,30 @@ def _build_direct_pdf(session, candidate, results):
 
 
 def page_shared_result_view():
+    st.markdown(
+        """
+        <style>
+        /* Vista compartida: botones de descarga más claros y consistentes */
+        div[class*="st-key-"][class*="shared_back_results"] button,
+        div[class*="st-key-"][class*="shared_download_bottom"] button {
+            min-height: 42px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Ocultar descargas embebidas del contenido para dejar un único botón inferior */
+        div[class*="st-key-"][class*="pdf_"] {
+            display: none !important;
+        }
+        div[class*="st-key-"][class*="json_"] {
+            display: none !important;
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown("## 🔗 Visualización Segura de Resultados")
 
     rv_token = None
@@ -266,24 +319,44 @@ def page_shared_result_view():
     else:
         st.info("Tipo de evaluación no soportado para esta vista.")
 
+    _pdf_data = None
+    _pdf_name = None
+    try:
+        _pdf_data, _pdf_name, _ = _build_direct_pdf(session, candidate, results)
+    except Exception:
+        _pdf_data, _pdf_name = None, None
+
     b1, b2 = st.columns(2)
     with b1:
-        if st.button("🏠 Ir al inicio", use_container_width=True, key="shared_home"):
+        if st.button("⬅️ Volver a Resultados", use_container_width=True, key="shared_back_results"):
+            _admin_token = None
+            try:
+                _admin_token = st.query_params.get("admin_token")
+            except Exception:
+                _admin_token = None
+            if not _admin_token:
+                _admin_token = st.session_state.get("admin_session_token")
+
             try:
                 st.query_params.pop("rv", None)
                 st.query_params.pop("page", None)
+                if _admin_token:
+                    st.query_params["admin_token"] = _admin_token
             except Exception:
                 pass
-            nav("home")
+            nav("admin_dashboard")
     with b2:
-        if st.session_state.get("admin"):
-            if st.button("🛡️ Volver al dashboard", use_container_width=True, key="shared_admin"):
-                try:
-                    st.query_params.pop("rv", None)
-                    st.query_params.pop("page", None)
-                except Exception:
-                    pass
-                nav("admin_dashboard")
+        if _pdf_data and _pdf_name:
+            st.download_button(
+                "📄 Descargar PDF",
+                data=_pdf_data,
+                file_name=_pdf_name,
+                mime="application/pdf",
+                key="shared_download_bottom",
+                use_container_width=True,
+            )
+        else:
+            st.button("📄 Descargar PDF", use_container_width=True, disabled=True, key="shared_pdf_unavailable")
 
 def page_admin_login():
     st.markdown("## 🔒 Acceso Administrador RH")
@@ -341,6 +414,43 @@ def page_admin_dashboard():
             border-color: #b91c1c;
             background: #fee2e2;
             color: #7f1d1d;
+        }
+        .direct-pdf-link-wrap {
+            width: 100%;
+        }
+        .direct-pdf-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 42px;
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            box-sizing: border-box;
+        }
+        .direct-pdf-link:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+            color: #0f172a;
+            text-decoration: none;
+        }
+        /* Botón Visualizar: estilo neutro (gris) */
+        div[class*="st-key-"][class*="_view_link"] a,
+        div[class*="st-key-"][class*="_view_link"] button {
+            background: #ffffff !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        div[class*="st-key-"][class*="_view_link"] a:hover,
+        div[class*="st-key-"][class*="_view_link"] button:hover {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
         }
         </style>
         """,
@@ -538,14 +648,34 @@ def page_admin_dashboard():
                         if not st.session_state.get(details_key, False):
                             st.caption("Resultados detallados ocultos para acelerar carga.")
                             _dc1, _dc2 = st.columns(2)
+                            _res_pdf = db.get_results(sess["id"])
+                            _cand_pdf = db.get_candidate_by_cedula(sess["cedula"])
                             with _dc1:
                                 _secure_url = _build_secure_result_url(sess["id"], sess["test_type"])
-                                st.link_button("🔗 Visualizar", url=_secure_url, use_container_width=True)
+                                st.link_button(
+                                    "🔗 Visualizar",
+                                    url=_secure_url,
+                                    use_container_width=True,
+                                    key=f"{details_key}_view_link",
+                                    type="secondary",
+                                )
                             with _dc2:
-                                if st.button("📥 Descargar PDF", key=f"{details_key}_pdf_btn", use_container_width=True):
-                                    st.session_state[details_key] = True
-                                    st.session_state[f"{details_key}_focus_pdf"] = True
-                                    st.rerun()
+                                if _res_pdf and _cand_pdf:
+                                    try:
+                                        _pdf_data, _pdf_name, _pdf_label = _build_direct_pdf(sess, _cand_pdf, _res_pdf)
+                                        if _pdf_data and _pdf_name and _pdf_label:
+                                            _render_direct_pdf_link(
+                                                _pdf_label,
+                                                _pdf_data,
+                                                _pdf_name,
+                                                key_suffix=f"{details_key}_direct_pdf",
+                                            )
+                                        else:
+                                            st.button("📥 Descargar PDF", disabled=True, key=f"{details_key}_pdf_disabled", use_container_width=True)
+                                    except Exception:
+                                        st.button("📥 Descargar PDF", disabled=True, key=f"{details_key}_pdf_error", use_container_width=True)
+                                else:
+                                    st.button("📥 Descargar PDF", disabled=True, key=f"{details_key}_pdf_missing", use_container_width=True)
                         elif st.session_state.get(f"{details_key}_focus_pdf", False):
                             # Modo descarga directa: solo genera y ofrece el PDF
                             _res_pdf = db.get_results(sess["id"])
