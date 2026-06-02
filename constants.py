@@ -945,6 +945,12 @@ DESEMPENO_LIDER_CLASIFICACION_COMP = {
 
 
 # =========================================================================
+# FO-GH-17 Evaluacion Desempeno - Medios V.2.
+# Mantiene la estructura de competencias, rendimiento y potencial; el PDF usa
+# encabezado documental propio: codigo FO-GH-17, version 02, fecha 30-01-24.
+DESEMPENO_MEDIOS_COMPETENCIAS = COMPETENCIAS_ORGANIZACIONALES
+DESEMPENO_MEDIOS_OBJETIVOS = DESEMPENO_OBJETIVOS
+
 # EVALUACIÓN PERÍODO DE PRUEBA (FO-GH-46)
 # =========================================================================
 

@@ -3,6 +3,7 @@ import hashlib
 import uuid
 import os
 import json
+import re
 from datetime import datetime, timedelta, timezone
 
 _TZ_GMT5 = timezone(timedelta(hours=-5))
@@ -23,6 +24,36 @@ def get_connection():
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
+
+
+def normalize_cedula(cedula):
+    """Normaliza cédulas para evitar duplicados por puntos, espacios o guiones."""
+    if cedula is None:
+        return ""
+    return re.sub(r"\D+", "", str(cedula)).strip()
+
+
+def is_numeric_cedula(cedula):
+    """Valida que la cédula venga escrita solo con números."""
+    return bool(cedula is not None and str(cedula).strip().isdigit())
+
+
+def _candidate_by_normalized_cedula(conn, cedula):
+    normalized = normalize_cedula(cedula)
+    if not normalized:
+        return None
+    return conn.execute(
+        """
+        SELECT *
+        FROM candidates
+        WHERE REPLACE(REPLACE(REPLACE(REPLACE(TRIM(cedula), '.', ''), ',', ''), '-', ''), ' ', '') = ?
+        ORDER BY
+            CASE WHEN cedula = ? THEN 0 ELSE 1 END,
+            id
+        LIMIT 1
+        """,
+        (normalized, normalized),
+    ).fetchone()
 
 
 def hash_password(password):
@@ -188,7 +219,13 @@ def change_admin_password(admin_id, new_password):
 # =========================================================================
 
 def create_candidate(cedula, name, age, sex, education, position):
+    if not is_numeric_cedula(cedula):
+        return None
+    cedula = normalize_cedula(cedula)
     conn = get_connection()
+    if _candidate_by_normalized_cedula(conn, cedula):
+        conn.close()
+        return None
     try:
         conn.execute(
             "INSERT INTO candidates (cedula, name, age, sex, education, position) VALUES (?, ?, ?, ?, ?, ?)",
@@ -204,8 +241,9 @@ def create_candidate(cedula, name, age, sex, education, position):
 
 
 def get_candidate_by_cedula(cedula):
+    cedula = normalize_cedula(cedula)
     conn = get_connection()
-    candidate = conn.execute("SELECT * FROM candidates WHERE cedula = ?", (cedula,)).fetchone()
+    candidate = _candidate_by_normalized_cedula(conn, cedula)
     conn.close()
     return dict(candidate) if candidate else None
 
@@ -253,6 +291,7 @@ def update_empleado(candidate_id, name, age, sex, education, position,
 # =========================================================================
 
 def create_test_session(candidate_id, test_type, time_limit_minutes, created_by, questions_data=None, evaluador_cedula=None, evaluador_nombre=None):
+    evaluador_cedula = normalize_cedula(evaluador_cedula) if evaluador_cedula else None
     conn = get_connection()
 
     # Check if candidate already has an ACTIVE session for this test type
@@ -329,6 +368,7 @@ def set_employee_done_status(session_id):
 
 
 def get_sessions_for_evaluador(evaluador_cedula):
+    evaluador_cedula = normalize_cedula(evaluador_cedula)
     """Retorna sesiones asignadas al evaluador según flujo:
     - desempeño operativo: el evaluador puede completarla desde pending
     - desempeño líderes / periodo prueba: aparecen cuando el empleado ya completó (employee_done)
@@ -338,11 +378,11 @@ def get_sessions_for_evaluador(evaluador_cedula):
         """SELECT ts.*, c.cedula, c.name as candidate_name
            FROM test_sessions ts
            JOIN candidates c ON ts.candidate_id = c.id
-           WHERE ts.evaluador_cedula = ?
+           WHERE REPLACE(REPLACE(REPLACE(REPLACE(TRIM(ts.evaluador_cedula), '.', ''), ',', ''), '-', ''), ' ', '') = ?
              AND (
                 (ts.test_type = 'desempeno' AND ts.status = 'pending')
                 OR
-                (ts.test_type IN ('desempeno_lider', 'periodo_prueba') AND ts.status = 'employee_done')
+                (ts.test_type IN ('desempeno_lider', 'desempeno_medios', 'periodo_prueba') AND ts.status = 'employee_done')
              )
            ORDER BY ts.created_at DESC""",
         (evaluador_cedula,),
@@ -404,6 +444,7 @@ def update_session_questions(session_id, questions_data):
 
 def update_pending_session(session_id, test_type, time_limit_minutes, evaluador_cedula=None, evaluador_nombre=None):
     """Permite editar solo sesiones en estado pending."""
+    evaluador_cedula = normalize_cedula(evaluador_cedula) if evaluador_cedula else None
     conn = get_connection()
 
     sess = conn.execute(
@@ -644,7 +685,13 @@ def get_empresa_by_id(empresa_id):
 def create_empleado(cedula, name, empresa_codigo, regional, correo, position, 
                    jefe_inmediato, nivel_cargo, invitar="SI", age=None, sex=None, education=None):
     """Crear un empleado con todos los datos del Excel."""
+    if not is_numeric_cedula(cedula):
+        return None
+    cedula = normalize_cedula(cedula)
     conn = get_connection()
+    if _candidate_by_normalized_cedula(conn, cedula):
+        conn.close()
+        return None
     
     # Obtener empresa_id
     empresa = conn.execute("SELECT id FROM empresas WHERE codigo = ?", (empresa_codigo,)).fetchone()

@@ -50,7 +50,7 @@ from charts import (
 from pdfs import (
     generate_disc_pdf, generate_valanti_pdf, generate_wpi_pdf,
     generate_eri_pdf, generate_talent_map_pdf, generate_desempeno_pdf,
-    generate_desempeno_lider_pdf, generate_periodo_prueba_pdf,
+    generate_desempeno_lider_pdf, generate_desempeno_medios_pdf, generate_periodo_prueba_pdf,
 )
 from utils import load_disc_questions, load_disc_descriptions, load_wpi_questions, nav
 from auth import (
@@ -649,17 +649,20 @@ def show_desempeno_lider_results_admin(results, candidate, session):
 
     st.markdown("---")
     col_dl1, col_dl2 = st.columns(2)
+    _is_medios = results.get("test_type") == "desempeno_medios"
+    _file_prefix = "desempeno_medios" if _is_medios else "desempeno_lider"
     with col_dl1:
         st.download_button(
             "📄 Descargar JSON",
             data=json.dumps(results, indent=2, ensure_ascii=False),
-            file_name=f"desempeno_lider_{candidate['cedula']}_{session_id}.json",
+            file_name=f"{_file_prefix}_{candidate['cedula']}_{session_id}.json",
             mime="application/json",
             key=f"json_dl_{session_id}",
         )
     with col_dl2:
         try:
-            _pdf_dl = generate_desempeno_lider_pdf(
+            _pdf_func = generate_desempeno_medios_pdf if _is_medios else generate_desempeno_lider_pdf
+            _pdf_dl = _pdf_func(
                 candidate=candidate,
                 competencias_scores=competencias_scores,
                 rendimiento_scores=rendimiento_scores,
@@ -674,7 +677,7 @@ def show_desempeno_lider_results_admin(results, candidate, session):
             st.download_button(
                 "📑 Descargar PDF",
                 data=_pdf_dl,
-                file_name=f"desempeno_lider_{candidate['cedula']}_{session_id}.pdf",
+                file_name=f"{_file_prefix}_{candidate['cedula']}_{session_id}.pdf",
                 mime="application/pdf",
                 key=f"pdf_dl_{session_id}",
             )
@@ -685,6 +688,13 @@ def show_desempeno_lider_results_admin(results, candidate, session):
 # -------------------------------------------------------------------------
 # ADMIN: EVALUACIÓN PERÍODO DE PRUEBA (FO-GH-46)
 # -------------------------------------------------------------------------
+def show_desempeno_medios_results_admin(results, candidate, session):
+    """Muestra resultados de EvaluaciÃ³n de DesempeÃ±o Medios (FO-GH-17)."""
+    enriched = dict(results)
+    enriched["test_type"] = "desempeno_medios"
+    show_desempeno_lider_results_admin(enriched, candidate, session)
+
+
 def page_periodo_prueba_eval():
     """Página de evaluación de período de prueba (completada por el administrador/evaluador)."""
     session_id = st.session_state.get("periodo_prueba_session_id")

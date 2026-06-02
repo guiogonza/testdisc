@@ -30,6 +30,7 @@ from calculations import (
     calculate_talent_map_results,
     calculate_desempeno_results,
     calculate_desempeno_lider_results,
+    calculate_desempeno_medios_results,
     calculate_periodo_prueba_results,
 )
 from analysis import (
@@ -51,12 +52,13 @@ from charts import (
 from pdfs import (
     generate_disc_pdf, generate_valanti_pdf, generate_wpi_pdf,
     generate_eri_pdf, generate_talent_map_pdf, generate_desempeno_pdf,
-    generate_desempeno_lider_pdf, generate_periodo_prueba_pdf,
+    generate_desempeno_lider_pdf, generate_desempeno_medios_pdf, generate_periodo_prueba_pdf,
 )
 from utils import load_disc_questions, load_disc_descriptions, load_wpi_questions, nav
 from pages.desempeno import (
     show_desempeno_results_admin,
     show_desempeno_lider_results_admin,
+    show_desempeno_medios_results_admin,
     show_periodo_prueba_results_admin,
 )
 from pages.talent_map import show_talent_map_results_admin
@@ -209,6 +211,21 @@ def _build_direct_pdf(session, candidate, results):
         )
         return _as_download_payload(pdf), f"desempeno_lider_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Desempeño Líderes"
 
+    if test_type == "desempeno_medios":
+        pdf = generate_desempeno_medios_pdf(
+            candidate=candidate,
+            competencias_scores={int(k): v for k, v in results.get("competencias_scores", {}).items()},
+            rendimiento_scores={int(k): v for k, v in results.get("rendimiento_scores", {}).items()},
+            potencial_scores={int(k): v for k, v in results.get("potencial_scores", {}).items()},
+            session_id=session_id,
+            completed_at=completed_at,
+            analysis=results.get("analysis", {}),
+            evaluador_nombre=results.get("evaluador"),
+            nivel_cargo=results.get("nivel_cargo"),
+            iniciativas=results.get("iniciativas", []),
+        )
+        return _as_download_payload(pdf), f"desempeno_medios_{candidate['cedula']}_{session_id}.pdf", "Descargar PDF - Desempeno Medios"
+
     if test_type == "periodo_prueba":
         pdf = generate_periodo_prueba_pdf(
             candidate=candidate,
@@ -314,6 +331,8 @@ def page_shared_result_view():
         show_desempeno_results_admin(results, candidate, session)
     elif test_type == "desempeno_lider":
         show_desempeno_lider_results_admin(results, candidate, session)
+    elif test_type == "desempeno_medios":
+        show_desempeno_medios_results_admin(results, candidate, session)
     elif test_type == "periodo_prueba":
         show_periodo_prueba_results_admin(results, candidate, session)
     else:
@@ -470,6 +489,7 @@ def page_admin_dashboard():
         "wpi": "💼 WPI", "eri": "🔐 ERI", "talent_map": "🌟 Talent Map",
         "desempeno": "📊 Desempeño Operativo",
         "desempeno_lider": "📊 Desempeño Líderes",
+        "desempeno_medios": "📊 Desempeño Medios",
         "periodo_prueba": "📋 Período de Prueba",
     }
     _SECTION_OPTIONS = {
@@ -551,7 +571,8 @@ def page_admin_dashboard():
         _TEST_NAME_MAP = {
             "disc": "DISC", "valanti": "VALANTI", "wpi": "WPI", "eri": "ERI",
             "talent_map": "TALENT MAP", "desempeno": "DESEMPEÑO OP.",
-            "desempeno_lider": "DESEMPEÑO LÍD.", "periodo_prueba": "PER. PRUEBA",
+            "desempeno_lider": "DESEMPEÑO LÍD.", "desempeno_medios": "DESEMPEÑO MED.",
+            "periodo_prueba": "PER. PRUEBA",
         }
         _TEST_EMOJI_MAP = {"disc": "🎯", "valanti": "🧭", "wpi": "💼", "eri": "🔐"}
         _STATUS_EMOJI = {"pending": "⏳", "in_progress": "▶️", "completed": "✅", "expired": "⏰", "employee_done": "📝"}
@@ -717,6 +738,8 @@ def page_admin_dashboard():
                                     show_desempeno_results_admin(results, candidate, sess)
                                 elif sess["test_type"] == "desempeno_lider":
                                     show_desempeno_lider_results_admin(results, candidate, sess)
+                                elif sess["test_type"] == "desempeno_medios":
+                                    show_desempeno_medios_results_admin(results, candidate, sess)
                                 elif sess["test_type"] == "periodo_prueba":
                                     show_periodo_prueba_results_admin(results, candidate, sess)
                             else:
@@ -734,6 +757,14 @@ def page_admin_dashboard():
                         if st.button("✏️ Completar como Admin", key=f"{tab_key}_eval_lider_admin_{sess['id']}"):
                             st.session_state["desempeno_lider_session_id"] = sess["id"]
                             nav("desempeno_lider_jefe_eval")
+                            st.rerun()
+                    elif sess["status"] == "pending" and sess["test_type"] == "desempeno_medios":
+                        st.info("⏳ Pendiente. El empleado debe completar su auto-evaluación primero.")
+                    elif sess["status"] == "employee_done" and sess["test_type"] == "desempeno_medios":
+                        st.success("📝 El empleado completó su parte. El jefe asignado debe completar la evaluación.")
+                        if st.button("✏️ Completar como Admin", key=f"{tab_key}_eval_medios_admin_{sess['id']}"):
+                            st.session_state["desempeno_medios_session_id"] = sess["id"]
+                            nav("desempeno_medios_jefe_eval")
                             st.rerun()
                     elif sess["status"] == "pending" and sess["test_type"] == "periodo_prueba":
                         st.info("⏳ Pendiente. El empleado debe completar su auto-evaluación primero.")
@@ -830,7 +861,7 @@ def page_admin_dashboard():
                                     )
                                     save_edit = st.form_submit_button("💾 Guardar cambios")
                                     if save_edit:
-                                        if edit_test_type in ("desempeno", "desempeno_lider", "periodo_prueba") and not edit_jefe_ced.strip():
+                                        if edit_test_type in ("desempeno", "desempeno_lider", "desempeno_medios", "periodo_prueba") and not edit_jefe_ced.strip():
                                             st.error("❌ La cédula del jefe/evaluador es obligatoria para este tipo de prueba.")
                                         else:
                                             ok, err = db.update_pending_session(
@@ -870,27 +901,30 @@ def page_admin_dashboard():
             "eri": "🔐 ERI", "talent_map": "🌟 Talent Map",
             "desempeno": "📊 Desempeño Operativo",
             "desempeno_lider": "📊 Desempeño Líderes",
+            "desempeno_medios": "📊 Desempeño Medios",
             "periodo_prueba": "📋 Período de Prueba",
         }
-        _TIPOS_CON_EVALUADOR = ("desempeno", "desempeno_lider", "periodo_prueba")
+        _TIPOS_CON_EVALUADOR = ("desempeno", "desempeno_lider", "desempeno_medios", "periodo_prueba")
 
         _candidates_all = db.get_all_candidates()
         if not _candidates_all:
             st.warning("No hay candidatos registrados. Ve a **➕ Nuevo Candidato** en el menú para agregar uno.")
         else:
-            _cand_opts = {f"{c['cedula']} — {c['name']}": c for c in _candidates_all}
-            _PLACEHOLDER_CAND = "— Escribe o selecciona un candidato —"
-            _cand_sel = st.selectbox(
+            _cand_options = list(range(len(_candidates_all)))
+
+            def _format_candidate_option(idx):
+                c = _candidates_all[idx]
+                return f"{c['cedula']} — {c['name']}"
+
+            _cand_idx = st.selectbox(
                 "Candidato *",
-                [_PLACEHOLDER_CAND] + list(_cand_opts.keys()),
+                _cand_options,
+                index=None,
                 key="create_cand_sel",
-                placeholder="Busca por cédula o nombre...",
+                format_func=_format_candidate_option,
+                placeholder="Escribe la cédula o el nombre...",
             )
-            if _cand_sel == _PLACEHOLDER_CAND:
-                st.info("Selecciona un candidato para continuar.")
-                _cand = None
-            else:
-                _cand = _cand_opts[_cand_sel]
+            _cand = _candidates_all[_cand_idx] if _cand_idx is not None else None
             if _cand:
                 _empresa_str = _cand.get("empresa_codigo") or ""
                 _regional_str = _cand.get("regional") or ""
@@ -920,7 +954,7 @@ def page_admin_dashboard():
 
             # Lookup automático por cédula — fuera del formulario para reactividad inmediata
             def _on_change_eval_ced_create():
-                _ced_v = st.session_state.get("create_eval_ced", "").strip()
+                _ced_v = db.normalize_cedula(st.session_state.get("create_eval_ced", ""))
                 _found_v = db.get_candidate_by_cedula(_ced_v) if _ced_v else None
                 if _found_v:
                     st.session_state["create_eval_nom"] = _found_v["name"]
@@ -933,7 +967,12 @@ def page_admin_dashboard():
                 placeholder="Ingresa la cédula para buscar automáticamente",
                 on_change=_on_change_eval_ced_create,
             )
-            _jefe_found = db.get_candidate_by_cedula(_eval_ced.strip()) if _eval_ced.strip() else None
+            _eval_ced_raw = _eval_ced.strip()
+            _eval_ced_norm = db.normalize_cedula(_eval_ced_raw)
+            _eval_ced_valid = not _eval_ced_raw or db.is_numeric_cedula(_eval_ced_raw)
+            if _eval_ced_raw and not _eval_ced_valid:
+                st.error("❌ La cédula del evaluador debe contener solo números.")
+            _jefe_found = db.get_candidate_by_cedula(_eval_ced_norm) if _eval_ced_norm else None
             _jefe_ok = True
             if _jefe_found:
                 st.success(f"✅ {_jefe_found['name']} | Cargo: {_jefe_found.get('position', 'N/A')}")
@@ -965,28 +1004,33 @@ def page_admin_dashboard():
                     )
                 _create_submitted = st.form_submit_button("✅ Crear Evaluación", type="primary")
                 if _create_submitted:
-                    _ec_val = st.session_state.get("create_eval_ced", "").strip()
-                    if _test_type in _TIPOS_CON_EVALUADOR and not _ec_val:
-                        st.error("❌ La cédula del Jefe/Evaluador es obligatoria para este tipo de evaluación.")
-                    elif _test_type in _TIPOS_CON_EVALUADOR and not _jefe_ok:
-                        st.error("❌ Debes registrar al jefe como candidato antes de continuar.")
-                    elif _test_type in _pending_types:
-                        st.error(
-                            f"❌ El candidato ya tiene una prueba **{_TEST_LABELS_SHARED.get(_test_type, _test_type.upper())}** pendiente o en curso. "
-                            f"Completa o elimina la evaluación activa antes de crear una nueva."
-                        )
+                    if not _cand:
+                        st.error("❌ Selecciona un candidato antes de crear la evaluación.")
                     else:
-                        _ec_save = _ec_val if _test_type in _TIPOS_CON_EVALUADOR else None
-                        _en_save = _eval_nom if _eval_nom else None
-                        _sid, _serr = db.create_test_session(
-                            _cand["id"], _test_type, _time_limit, admin["id"],
-                            evaluador_cedula=_ec_save, evaluador_nombre=_en_save,
-                        )
-                        if _serr:
-                            st.warning(f"⚠️ {_serr}")
+                        _ec_val = db.normalize_cedula(st.session_state.get("create_eval_ced", ""))
+                        if _test_type in _TIPOS_CON_EVALUADOR and not _ec_val:
+                            st.error("❌ La cédula del Jefe/Evaluador es obligatoria para este tipo de evaluación.")
+                        elif _test_type in _TIPOS_CON_EVALUADOR and not _eval_ced_valid:
+                            st.error("❌ La cédula del Jefe/Evaluador debe contener solo números.")
+                        elif _test_type in _TIPOS_CON_EVALUADOR and not _jefe_ok:
+                            st.error("❌ Debes registrar al jefe como candidato antes de continuar.")
+                        elif _test_type in _pending_types:
+                            st.error(
+                                f"❌ El candidato ya tiene una prueba **{_TEST_LABELS_SHARED.get(_test_type, _test_type.upper())}** pendiente o en curso. "
+                                f"Completa o elimina la evaluación activa antes de crear una nueva."
+                            )
                         else:
-                            _extra = f" | **Evaluador:** {_ec_save}" if _ec_save else ""
-                            st.success(f"✅ Evaluación creada!\n\n**ID:** `{_sid}` | **Tipo:** {_test_type.upper()}{_extra}")
+                            _ec_save = _ec_val if _test_type in _TIPOS_CON_EVALUADOR else None
+                            _en_save = _eval_nom if _eval_nom else None
+                            _sid, _serr = db.create_test_session(
+                                _cand["id"], _test_type, _time_limit, admin["id"],
+                                evaluador_cedula=_ec_save, evaluador_nombre=_en_save,
+                            )
+                            if _serr:
+                                st.warning(f"⚠️ {_serr}")
+                            else:
+                                _extra = f" | **Evaluador:** {_ec_save}" if _ec_save else ""
+                                st.success(f"✅ Evaluación creada!\n\n**ID:** `{_sid}` | **Tipo:** {_test_type.upper()}{_extra}")
 
     # ----- SECCIÓN: Nuevo Candidato -----
     elif _active_section == "new_candidate":
@@ -1074,9 +1118,14 @@ def page_admin_dashboard():
 
         # ── Registro uno a uno ────────────────────────────────────────────
         _nc_cedula = st.text_input("Cédula *", placeholder="Número de identificación", key="nc_cedula_lookup")
-        _nc_existing = db.get_candidate_by_cedula(_nc_cedula.strip()) if _nc_cedula.strip() else None
+        _nc_cedula_raw = _nc_cedula.strip()
+        _nc_cedula_norm = db.normalize_cedula(_nc_cedula_raw)
+        _nc_cedula_valid = not _nc_cedula_raw or db.is_numeric_cedula(_nc_cedula_raw)
+        if _nc_cedula_raw and not _nc_cedula_valid:
+            st.error("❌ La cédula debe contener solo números, sin puntos, espacios ni guiones.")
+        _nc_existing = db.get_candidate_by_cedula(_nc_cedula_norm) if _nc_cedula_norm else None
         if _nc_existing:
-            st.warning(f"⚠️ La cédula **{_nc_cedula.strip()}** ya está registrada como **{_nc_existing['name']}**. Usa 'Crear Evaluación' para asignarle una prueba.")
+            st.warning(f"⚠️ La cédula **{_nc_cedula_norm}** ya está registrada como **{_nc_existing['name']}**. Usa 'Crear Evaluación' para asignarle una prueba.")
         else:
             with st.form("new_candidate_form"):
                 _ncf1, _ncf2 = st.columns(2)
@@ -1097,8 +1146,10 @@ def page_admin_dashboard():
                 _nc_submit = st.form_submit_button("💾 Guardar Candidato", type="primary")
                 if _nc_submit:
                     _nc_errs = []
-                    if not _nc_cedula.strip():
+                    if not _nc_cedula_norm:
                         _nc_errs.append("Cédula")
+                    elif not _nc_cedula_valid:
+                        _nc_errs.append("Cédula solo numérica")
                     if not _nc_name.strip():
                         _nc_errs.append("Apellidos y Nombres")
                     if not _nc_cargo.strip():
@@ -1111,7 +1162,7 @@ def page_admin_dashboard():
                         st.error(f"❌ Campos obligatorios faltantes: {', '.join(_nc_errs)}.")
                     else:
                         _nc_result = db.create_empleado(
-                            cedula=_nc_cedula.strip(),
+                            cedula=_nc_cedula_norm,
                             name=_nc_name.strip(),
                             empresa_codigo=_nc_empresa,
                             regional=_nc_regional,
@@ -1125,7 +1176,7 @@ def page_admin_dashboard():
                             education=_nc_edu.strip() if _nc_edu.strip() else None,
                         )
                         if _nc_result:
-                            st.success(f"✅ Candidato **{_nc_name.strip()}** (CC: {_nc_cedula.strip()}) registrado correctamente.")
+                            st.success(f"✅ Candidato **{_nc_name.strip()}** (CC: {_nc_cedula_norm}) registrado correctamente.")
                         else:
                             st.error("❌ Error al guardar. La cédula puede estar duplicada.")
 
@@ -1150,9 +1201,12 @@ def page_admin_dashboard():
                     st.rerun()
             if _cand_search.strip():
                 _q = _cand_search.strip().lower()
+                _q_ced = db.normalize_cedula(_q)
                 _cands2 = [
                     c for c in _cands2
-                    if _q in c.get("name", "").lower() or _q in str(c.get("cedula", "")).lower()
+                    if _q in c.get("name", "").lower()
+                    or _q in str(c.get("cedula", "")).lower()
+                    or (_q_ced and _q_ced in db.normalize_cedula(c.get("cedula", "")))
                 ]
             st.caption(f"📋 {len(_cands2)} candidato(s) encontrado(s)")
             if not _cands2:
@@ -1348,6 +1402,7 @@ def page_admin_dashboard():
             "disc": "🎯 DISC", "valanti": "🧭 VALANTI", "wpi": "💼 WPI",
             "eri": "🔐 ERI", "talent_map": "🌟 Talent Map",
             "desempeno": "📊 Desempeño Op.", "desempeno_lider": "📊 Desempeño Líd.",
+            "desempeno_medios": "📊 Desempeño Med.",
             "periodo_prueba": "📋 Per. Prueba",
         }
         from collections import Counter, defaultdict
@@ -1725,6 +1780,7 @@ def page_admin_dashboard():
                 ("1020304050","disc","30","",""),
                 ("1020304051","wpi","30","",""),
                 ("1020304052","desempeno_lider","60","9876543210","María Rodríguez"),
+                ("1020304054","desempeno_medios","60","9876543210","María Rodríguez"),
                 ("1020304053","periodo_prueba","60","9876543210","María Rodríguez"),
             ]
             for ri, vals in enumerate(ejemplos):
@@ -1734,7 +1790,7 @@ def page_admin_dashboard():
                     c.font = Font(italic=True, size=10, color="2F5496")
                     c.alignment = Alignment(horizontal="left", vertical="center")
                     c.border = _bulk_border()
-            tipos = "disc,valanti,wpi,eri,talent_map,desempeno,desempeno_lider,periodo_prueba"
+            tipos = "disc,valanti,wpi,eri,talent_map,desempeno,desempeno_lider,desempeno_medios,periodo_prueba"
             dv = DataValidation(type="list", formula1=f'"{tipos}"', allow_blank=False, showDropDown=False)
             dv.sqref = "B2:B501"
             ws.add_data_validation(dv)
@@ -1801,6 +1857,10 @@ def page_admin_dashboard():
                             continue
                         try:
                             _cedula = str(int(_cedula)) if isinstance(_cedula, float) else str(_cedula).strip()
+                            if not db.is_numeric_cedula(_cedula):
+                                _err_c.append(f"Fila {_ri}: CEDULA debe contener solo números.")
+                                continue
+                            _cedula = db.normalize_cedula(_cedula)
                             _res = db.create_empleado(
                                 cedula=_cedula,
                                 name=str(_nombre).strip(),
@@ -1834,7 +1894,7 @@ def page_admin_dashboard():
         _TIEMPOS_DEFAULT = {
             "disc": 30, "valanti": 30, "wpi": 30,
             "eri": 20, "talent_map": 25,
-            "desempeno": 60, "desempeno_lider": 60, "periodo_prueba": 60,
+            "desempeno": 60, "desempeno_lider": 60, "desempeno_medios": 60, "periodo_prueba": 60,
         }
         _TIPOS_VALIDOS = set(_TIEMPOS_DEFAULT.keys())
         _uploaded_tests = st.file_uploader(
@@ -1868,6 +1928,10 @@ def page_admin_dashboard():
                             continue
                         try:
                             _ced_t = str(int(_ced_t)) if isinstance(_ced_t, float) else str(_ced_t).strip()
+                            if not db.is_numeric_cedula(_ced_t):
+                                _err_t.append(f"Fila {_ri}: CEDULA_CANDIDATO debe contener solo números.")
+                                continue
+                            _ced_t = db.normalize_cedula(_ced_t)
                             _tipo = str(_tipo).strip().lower()
                             if _tipo not in _TIPOS_VALIDOS:
                                 _err_t.append(f"Fila {_ri}: tipo '{_tipo}' no válido. Opciones: {', '.join(_TIPOS_VALIDOS)}")
@@ -1883,9 +1947,16 @@ def page_admin_dashboard():
                                 _err_t.append(f"Fila {_ri}: tiempo {_tl} fuera de rango (5–180 min).")
                                 continue
                             # Evaluador
-                            _ec = str(_eval_ced_bulk).strip() if _eval_ced_bulk else None
+                            if _eval_ced_bulk:
+                                _ec_raw = str(int(_eval_ced_bulk)) if isinstance(_eval_ced_bulk, float) else str(_eval_ced_bulk).strip()
+                                if not db.is_numeric_cedula(_ec_raw):
+                                    _err_t.append(f"Fila {_ri}: CEDULA_EVALUADOR debe contener solo números.")
+                                    continue
+                                _ec = db.normalize_cedula(_ec_raw)
+                            else:
+                                _ec = None
                             _en = str(_eval_nom_bulk).strip() if _eval_nom_bulk else None
-                            if _tipo in ("desempeno", "desempeno_lider", "periodo_prueba") and not _ec:
+                            if _tipo in ("desempeno", "desempeno_lider", "desempeno_medios", "periodo_prueba") and not _ec:
                                 _err_t.append(f"Fila {_ri} ({_ced_t}): '{_tipo}' requiere CEDULA_EVALUADOR.")
                                 continue
                             # Lookup automático del nombre del evaluador si no fue especificado

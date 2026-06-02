@@ -74,7 +74,7 @@ def page_candidate_login():
             if not cedula.strip():
                 st.error("Por favor ingresa tu cédula.")
             else:
-                candidate = db.get_candidate_by_cedula(cedula.strip())
+                candidate = db.get_candidate_by_cedula(cedula)
                 if not candidate:
                     st.error("❌ No se encontró un candidato con esa cédula. Contacta a Recursos Humanos.")
                 else:
@@ -140,6 +140,9 @@ def page_candidate_select_test():
         elif sess["test_type"] == "desempeno_lider":
             test_emoji = "📊"
             test_name = "Auto-Evaluación de Competencias (Desempeño Líderes)"
+        elif sess["test_type"] == "desempeno_medios":
+            test_emoji = "📊"
+            test_name = "Auto-Evaluación de Competencias (Desempeño Medios)"
         elif sess["test_type"] == "periodo_prueba":
             test_emoji = "📋"
             test_name = "Auto-Evaluación Período de Prueba"
@@ -186,6 +189,8 @@ def page_candidate_select_test():
                         nav("talent_map_test")
                     elif sess["test_type"] == "desempeno_lider":
                         nav("desempeno_lider_employee_eval")
+                    elif sess["test_type"] == "desempeno_medios":
+                        nav("desempeno_medios_employee_eval")
                     elif sess["test_type"] == "periodo_prueba":
                         nav("periodo_prueba_employee_eval")
                     st.rerun()

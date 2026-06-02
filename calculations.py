@@ -744,7 +744,7 @@ def calculate_desempeno_results(rendimiento_scores, potencial_scores, iniciativa
 # =========================================================================
 
 def calculate_desempeno_lider_results(competencias_scores, rendimiento_scores, potencial_scores,
-                                      nivel_cargo=None, iniciativas=None):
+                                      nivel_cargo=None, iniciativas=None, competencias_catalog=None):
     """
     Calcula resultados de evaluación de desempeño para líderes.
     competencias_scores: {comp_id (1-7): nivel (1-6)}
@@ -758,6 +758,7 @@ def calculate_desempeno_lider_results(competencias_scores, rendimiento_scores, p
         DESEMPENO_OBJETIVOS, DESEMPENO_ESCALA_RENDIMIENTO,
         DESEMPENO_DIMENSIONES, DESEMPENO_CLASIFICACION,
     )
+    competencias_catalog = competencias_catalog or COMPETENCIAS_ORGANIZACIONALES
 
     # --- Competencias ---
     promedio_competencias = sum(competencias_scores.values()) / len(competencias_scores) if competencias_scores else 0
@@ -765,7 +766,7 @@ def calculate_desempeno_lider_results(competencias_scores, rendimiento_scores, p
     nivel_requerido_info = COMPETENCIAS_NIVEL_REQUERIDO.get(nivel_cargo.upper() if nivel_cargo else "", None)
     brechas_competencias = []
     fortalezas_competencias = []
-    for comp in COMPETENCIAS_ORGANIZACIONALES:
+    for comp in competencias_catalog:
         cid = comp["id"]
         score = competencias_scores.get(cid, 0)
         req = nivel_requerido_info["niveles"][cid - 1] if nivel_requerido_info else None
@@ -857,6 +858,19 @@ def calculate_desempeno_lider_results(competencias_scores, rendimiento_scores, p
         "iniciativas": iniciativas if iniciativas else [],
         "nivel_cargo": nivel_cargo,
     }
+
+
+def calculate_desempeno_medios_results(competencias_scores, rendimiento_scores, potencial_scores,
+                                       nivel_cargo=None, iniciativas=None):
+    """Calcula resultados de Evaluación de Desempeño Medios (FO-GH-17)."""
+    return calculate_desempeno_lider_results(
+        competencias_scores=competencias_scores,
+        rendimiento_scores=rendimiento_scores,
+        potencial_scores=potencial_scores,
+        nivel_cargo=nivel_cargo,
+        iniciativas=iniciativas,
+        competencias_catalog=DESEMPENO_MEDIOS_COMPETENCIAS,
+    )
 
 
 # =========================================================================

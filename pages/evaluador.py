@@ -29,6 +29,7 @@ from calculations import (
     calculate_talent_map_results,
     calculate_desempeno_results,
     calculate_desempeno_lider_results,
+    calculate_desempeno_medios_results,
     calculate_periodo_prueba_results,
 )
 from analysis import (
@@ -50,7 +51,7 @@ from charts import (
 from pdfs import (
     generate_disc_pdf, generate_valanti_pdf, generate_wpi_pdf,
     generate_eri_pdf, generate_talent_map_pdf, generate_desempeno_pdf,
-    generate_desempeno_lider_pdf, generate_periodo_prueba_pdf,
+    generate_desempeno_lider_pdf, generate_desempeno_medios_pdf, generate_periodo_prueba_pdf,
 )
 from utils import load_disc_questions, load_disc_descriptions, load_wpi_questions, nav
 from auth import (
@@ -69,7 +70,7 @@ def page_evaluador_login():
         cedula = st.text_input("Tu Cédula", placeholder="Número de cédula del evaluador/jefe")
         submitted = st.form_submit_button("🔑 Ingresar")
         if submitted:
-            cedula = cedula.strip()
+            cedula = db.normalize_cedula(cedula)
             if not cedula:
                 st.error("Ingresa tu cédula.")
             else:
@@ -120,6 +121,7 @@ def page_evaluador_dashboard():
         test_label = {
             "desempeno": "📈 Evaluación de Desempeño — Operativo",
             "desempeno_lider": "📊 Evaluación de Desempeño — Líderes",
+            "desempeno_medios": "📊 Evaluación de Desempeño - Medios",
             "periodo_prueba": "📋 Evaluación Período de Prueba",
         }.get(sess["test_type"], sess["test_type"])
 
@@ -144,6 +146,8 @@ def page_evaluador_dashboard():
                         nav("desempeno_eval")
                     elif sess["test_type"] == "desempeno_lider":
                         nav("desempeno_lider_jefe_eval")
+                    elif sess["test_type"] == "desempeno_medios":
+                        nav("desempeno_medios_jefe_eval")
                     elif sess["test_type"] == "periodo_prueba":
                         nav("periodo_prueba_jefe_eval")
                     st.rerun()
@@ -219,6 +223,66 @@ def page_desempeno_lider_employee_eval():
 # -------------------------------------------------------------------------
 # CANDIDATO: AUTO-EVALUACIÓN PERÍODO DE PRUEBA
 # -------------------------------------------------------------------------
+def page_desempeno_medios_employee_eval():
+    """Auto-evaluación del empleado para Desempeño Medios (FO-GH-17)."""
+    session = st.session_state.get("test_session")
+    candidate = st.session_state.get("candidate")
+
+    if not session or not candidate:
+        nav("candidate_login")
+        st.rerun()
+        return
+
+    session_id = session["id"]
+    nivel_cargo = candidate.get("nivel_cargo", "ANALISTA") or "ANALISTA"
+
+    st.markdown("## 📊 Auto-Evaluación de Competencias - Medios")
+    st.markdown(f"**Candidato:** {candidate['name']}")
+    st.info("Evalúa con honestidad el nivel que consideras que has alcanzado en cada competencia organizacional.")
+    st.markdown("---")
+
+    with st.form("employee_competencias_medios_form"):
+        st.markdown("### Competencias Organizacionales - Autoevaluación")
+        st.markdown("Selecciona el nivel que mejor describe tu desempeño actual:")
+
+        nivel_req_info = COMPETENCIAS_NIVEL_REQUERIDO.get(nivel_cargo.upper(), None)
+        competencias_scores = {}
+
+        for comp in DESEMPENO_MEDIOS_COMPETENCIAS:
+            req = nivel_req_info["niveles"][comp["id"] - 1] if nivel_req_info else None
+            req_text = f" _(Nivel requerido para tu cargo: {req})_" if req else ""
+            st.markdown(f"**{comp['nombre']}**{req_text}")
+            st.caption(comp["descripcion"])
+            nivel_sel = st.radio(
+                f"Nivel medios {comp['nombre']}",
+                options=[1, 2, 3, 4, 5, 6],
+                format_func=lambda x, c=comp: f"Nivel {x} - {c['niveles'][x][:80]}...",
+                horizontal=True,
+                key=f"emp_med_comp_{comp['id']}",
+                label_visibility="collapsed",
+                index=2,
+            )
+            competencias_scores[comp["id"]] = nivel_sel
+            with st.expander("Ver descripción completa de este nivel"):
+                st.info(comp["niveles"][nivel_sel])
+            st.markdown("---")
+
+        submitted = st.form_submit_button("✅ Enviar Auto-Evaluación", use_container_width=True, type="primary")
+
+        if submitted:
+            partial_results = {
+                "employee_self": {
+                    "competencias_scores": {str(k): v for k, v in competencias_scores.items()},
+                    "nivel_cargo": nivel_cargo,
+                }
+            }
+            db.save_results(session_id, partial_results)
+            db.set_employee_done_status(session_id)
+            st.session_state.pop("test_session", None)
+            nav("candidate_done")
+            st.rerun()
+
+
 def page_periodo_prueba_employee_eval():
     """Auto-evaluación del empleado para Período de Prueba (18 actuaciones)."""
     session = st.session_state.get("test_session")
@@ -438,6 +502,150 @@ def page_desempeno_lider_jefe_eval():
 # -------------------------------------------------------------------------
 # JEFE: EVALUACIÓN PERÍODO DE PRUEBA (con referencia auto-eval empleado)
 # -------------------------------------------------------------------------
+def page_desempeno_medios_jefe_eval():
+    """Evaluación del jefe para Desempeño Medios (FO-GH-17)."""
+    session_id = st.session_state.get("evaluador_session_id") or st.session_state.get("desempeno_medios_session_id")
+    evaluador = st.session_state.get("evaluador")
+    admin = st.session_state.get("admin")
+
+    if not session_id:
+        st.error("No se encontró una sesión de evaluación activa.")
+        return
+
+    session = db.get_session_by_id(session_id)
+    if not session:
+        st.error("Sesión no válida.")
+        return
+
+    candidate = db.get_candidate_by_cedula(
+        db.get_connection().execute("SELECT cedula FROM candidates WHERE id = ?", (session["candidate_id"],)).fetchone()["cedula"]
+    )
+    evaluador_nombre = (evaluador.get("name") if evaluador else None) or (admin.get("name") if admin else "Evaluador")
+    nivel_cargo = candidate.get("nivel_cargo", "ANALISTA") or "ANALISTA"
+
+    existing_results = db.get_results(session_id) or {}
+    employee_self = existing_results.get("employee_self", {})
+    emp_comp_scores = {int(k): v for k, v in employee_self.get("competencias_scores", {}).items()}
+
+    if evaluador:
+        if st.button("⬅️ Volver al Dashboard del Evaluador"):
+            st.session_state.pop("evaluador_session_id", None)
+            nav("evaluador_dashboard")
+            st.rerun()
+    elif admin:
+        if st.button("⬅️ Volver al Dashboard Admin"):
+            st.session_state.pop("desempeno_medios_session_id", None)
+            nav("admin_dashboard")
+            st.rerun()
+
+    st.markdown("## 📊 Evaluación de Desempeño - Medios (FO-GH-17)")
+    st.markdown(f"**Colaborador:** {candidate['name']} (Cédula: {candidate['cedula']})")
+    st.markdown(f"**Cargo:** {candidate.get('position', 'N/A')} | **Nivel:** {nivel_cargo}")
+    st.markdown(f"**Evaluador:** {evaluador_nombre}")
+
+    if emp_comp_scores:
+        with st.expander("📋 Ver Auto-Evaluación del Empleado (Referencia)", expanded=False):
+            for comp in DESEMPENO_MEDIOS_COMPETENCIAS:
+                emp_score = emp_comp_scores.get(comp["id"])
+                if emp_score:
+                    st.markdown(f"- **{comp['nombre']}**: Nivel {emp_score}")
+    st.markdown("---")
+
+    with st.form("evaluacion_desempeno_medios_jefe_form"):
+        st.markdown("### Sección 1: Evaluación de Competencias Organizacionales")
+        nivel_req_info = COMPETENCIAS_NIVEL_REQUERIDO.get(nivel_cargo.upper(), None)
+        competencias_scores = {}
+        for comp in DESEMPENO_MEDIOS_COMPETENCIAS:
+            req = nivel_req_info["niveles"][comp["id"] - 1] if nivel_req_info else None
+            req_text = f" _(Requerido: Nivel {req})_" if req else ""
+            emp_score = emp_comp_scores.get(comp["id"])
+            emp_ref = f" | _Auto-eval empleado: Nivel {emp_score}_" if emp_score else ""
+            st.markdown(f"**{comp['nombre']}**{req_text}{emp_ref}")
+            st.caption(comp["descripcion"])
+            nivel_sel = st.radio(
+                f"Nivel medios jefe {comp['nombre']}",
+                options=[1, 2, 3, 4, 5, 6],
+                format_func=lambda x, c=comp: f"Nivel {x} - {c['niveles'][x][:80]}...",
+                horizontal=True,
+                key=f"jefe_med_comp_{comp['id']}",
+                label_visibility="collapsed",
+                index=2,
+            )
+            competencias_scores[comp["id"]] = nivel_sel
+            st.markdown("---")
+
+        st.markdown("### Sección 2: Evaluación de Rendimiento")
+        st.markdown("**5** = Sobresaliente | **4** = Supera | **3** = Cumple | **2** = Debajo | **1** = Insatisfactorio")
+        rendimiento_scores = {}
+        for obj in DESEMPENO_MEDIOS_OBJETIVOS:
+            st.markdown(f"**{obj['titulo']}**")
+            st.caption(obj["descripcion"])
+            rendimiento_scores[obj["id"]] = st.select_slider(
+                f"Calificación medios objetivo {obj['id']}",
+                options=[1, 2, 3, 4, 5],
+                value=3,
+                format_func=lambda x: DESEMPENO_ESCALA_RENDIMIENTO[x]["label"],
+                key=f"jefe_med_rend_{obj['id']}",
+                label_visibility="collapsed",
+            )
+            st.markdown("---")
+
+        st.markdown("### Sección 3: Evaluación de Potencial")
+        potencial_scores = {}
+        for dim in DESEMPENO_DIMENSIONES:
+            st.markdown(f"**{dim['nombre']}**")
+            st.caption(dim["descripcion"])
+            nivel_sel = st.radio(
+                f"Nivel medios potencial {dim['nombre']}",
+                options=[3, 2, 1, 0],
+                format_func=lambda x, d=dim: f"Nivel {x}: {d['niveles'][x][:80]}...",
+                key=f"jefe_med_pot_{dim['id']}",
+                label_visibility="collapsed",
+            )
+            potencial_scores[dim["id"]] = nivel_sel
+            st.markdown("---")
+
+        st.markdown("### Iniciativas de Mejora")
+        n_iniciativas = st.selectbox("Número de iniciativas", [0, 1, 2, 3], index=1, key="n_init_jefe_medios")
+        iniciativas = []
+        for i in range(n_iniciativas):
+            ini = st.text_area(f"Iniciativa {i+1}", key=f"ini_jefe_medios_{i}", height=80)
+            if ini.strip():
+                iniciativas.append(ini.strip())
+
+        submitted = st.form_submit_button("✅ Guardar Evaluación FO-GH-17", use_container_width=True, type="primary")
+
+        if submitted:
+            results_calc = calculate_desempeno_medios_results(
+                competencias_scores=competencias_scores,
+                rendimiento_scores=rendimiento_scores,
+                potencial_scores=potencial_scores,
+                nivel_cargo=nivel_cargo,
+                iniciativas=iniciativas,
+            )
+            results_to_save = {
+                "test_type": "desempeno_medios",
+                "evaluador": evaluador_nombre,
+                "nivel_cargo": nivel_cargo,
+                "competencias_scores": {str(k): v for k, v in competencias_scores.items()},
+                "rendimiento_scores": {str(k): v for k, v in rendimiento_scores.items()},
+                "potencial_scores": {str(k): v for k, v in potencial_scores.items()},
+                "iniciativas": iniciativas,
+                "analysis": results_calc,
+                "employee_self": employee_self,
+            }
+            db.save_results(session_id, results_to_save)
+            db.complete_test_session(session_id)
+            st.success("✅ Evaluación de desempeño medios guardada exitosamente.")
+            st.session_state.pop("evaluador_session_id", None)
+            st.session_state.pop("desempeno_medios_session_id", None)
+            if evaluador:
+                nav("evaluador_dashboard")
+            else:
+                nav("admin_dashboard")
+            st.rerun()
+
+
 def page_periodo_prueba_jefe_eval():
     """Evaluación del jefe para Período de Prueba — muestra auto-evaluación del empleado como referencia."""
     session_id = st.session_state.get("evaluador_session_id") or st.session_state.get("periodo_prueba_session_id")

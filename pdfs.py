@@ -1120,7 +1120,9 @@ def generate_desempeno_pdf(candidate, rendimiento_scores, potencial_scores, rada
 
 def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_scores, potencial_scores,
                                   session_id, completed_at=None, analysis=None, evaluador_nombre=None,
-                                  nivel_cargo=None, iniciativas=None):
+                                  nivel_cargo=None, iniciativas=None, formato_codigo="FO-GH-41",
+                                  formato_version="02", formato_fecha="30-01-24",
+                                  formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O"):
     """Genera PDF de Evaluación de Desempeño para Líderes."""
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
@@ -1142,7 +1144,12 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     DLItem = styles.get('DLItem', styles['Normal'])
 
     story = []
-    story.extend(_build_hesego_header("FO-GH-41", version="02", fecha="30-01-24"))
+    story.extend(_build_hesego_header(
+        formato_codigo,
+        version=formato_version,
+        fecha=formato_fecha,
+        titulo=formato_titulo,
+    ))
 
     info_rows = [
         ["Colaborador:", candidate['name']],
@@ -1307,6 +1314,28 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     doc.build(story)
     buf.seek(0)
     return buf
+
+
+def generate_desempeno_medios_pdf(candidate, competencias_scores, rendimiento_scores, potencial_scores,
+                                  session_id, completed_at=None, analysis=None, evaluador_nombre=None,
+                                  nivel_cargo=None, iniciativas=None):
+    """Genera PDF de EvaluaciÃ³n de DesempeÃ±o Medios (FO-GH-17 V.2)."""
+    return generate_desempeno_lider_pdf(
+        candidate=candidate,
+        competencias_scores=competencias_scores,
+        rendimiento_scores=rendimiento_scores,
+        potencial_scores=potencial_scores,
+        session_id=session_id,
+        completed_at=completed_at,
+        analysis=analysis,
+        evaluador_nombre=evaluador_nombre,
+        nivel_cargo=nivel_cargo,
+        iniciativas=iniciativas,
+        formato_codigo="FO-GH-17",
+        formato_version="02",
+        formato_fecha="30-01-24",
+        formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O",
+    )
 
 
 # =========================================================================
