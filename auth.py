@@ -26,12 +26,9 @@ def _get_admin_token_from_query():
 
 
 def _set_admin_token_in_query(token):
-    """Escribe o elimina el token admin en query params preservando los demás parámetros."""
+    """Elimina el token admin de la URL; la sesión admin vive en session_state."""
     try:
-        if token:
-            st.query_params["admin_token"] = token
-        else:
-            st.query_params.pop("admin_token", None)
+        st.query_params.pop("admin_token", None)
     except Exception:
         pass
 
@@ -76,7 +73,7 @@ def _get_admin_by_id(admin_id):
 
 
 def _start_admin_session(admin):
-    """Inicia sesión admin con token de 60 minutos renovable por actividad."""
+    """Inicia sesión admin con token interno de 60 minutos renovable por actividad."""
     token = _create_admin_session_token(admin["id"])
     st.session_state["admin"] = admin
     st.session_state["admin_session_token"] = token
@@ -85,7 +82,7 @@ def _start_admin_session(admin):
 
 
 def _touch_admin_session():
-    """Renueva ventana de inactividad cuando hay uso de la app."""
+    """Renueva ventana de inactividad cuando hay uso de la app sin exponer token en URL."""
     admin = st.session_state.get("admin")
     if not admin:
         return
@@ -97,7 +94,7 @@ def _touch_admin_session():
 
 
 def _restore_admin_session():
-    """Restaura admin desde token en URL si la sesión aún no expiró."""
+    """Restaura admin desde session_state; acepta tokens antiguos en URL y los limpia."""
     if st.session_state.get("admin"):
         if not st.session_state.get("admin_session_token"):
             _start_admin_session(st.session_state["admin"])

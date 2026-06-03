@@ -71,17 +71,6 @@ from auth import (
 
 def _build_secure_result_url(session_id, test_type):
     token = _create_result_view_token(session_id, test_type)
-    session_admin_token = st.session_state.get("admin_session_token")
-    try:
-        admin_token = st.query_params.get("admin_token")
-    except Exception:
-        admin_token = None
-
-    if not admin_token and session_admin_token:
-        admin_token = session_admin_token
-
-    if admin_token:
-        return f"?admin_token={admin_token}&page=shared_result&rv={token}"
     return f"?page=shared_result&rv={token}"
 
 
@@ -358,19 +347,10 @@ def page_shared_result_view():
     b1, b2 = st.columns(2)
     with b1:
         if st.button("⬅️ Volver a Resultados", use_container_width=True, key="shared_back_results"):
-            _admin_token = None
-            try:
-                _admin_token = st.query_params.get("admin_token")
-            except Exception:
-                _admin_token = None
-            if not _admin_token:
-                _admin_token = st.session_state.get("admin_session_token")
-
             try:
                 st.query_params.pop("rv", None)
                 st.query_params.pop("page", None)
-                if _admin_token:
-                    st.query_params["admin_token"] = _admin_token
+                st.query_params.pop("admin_token", None)
             except Exception:
                 pass
             nav("admin_dashboard")
