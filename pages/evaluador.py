@@ -458,9 +458,8 @@ def page_desempeno_lider_jefe_eval():
 
         # ---- INICIATIVAS ----
         st.markdown("### 🚀 Iniciativas de Mejora")
-        n_iniciativas = st.selectbox("Número de iniciativas", [0, 1, 2, 3], index=1, key="n_init_jefe_lider")
         iniciativas = []
-        for i in range(n_iniciativas):
+        for i in range(5):
             ini = st.text_area(f"Iniciativa {i+1}", key=f"ini_jefe_lider_{i}", height=80)
             if ini.strip():
                 iniciativas.append(ini.strip())
@@ -606,9 +605,8 @@ def page_desempeno_medios_jefe_eval():
             st.markdown("---")
 
         st.markdown("### Iniciativas de Mejora")
-        n_iniciativas = st.selectbox("Número de iniciativas", [0, 1, 2, 3], index=1, key="n_init_jefe_medios")
         iniciativas = []
-        for i in range(n_iniciativas):
+        for i in range(5):
             ini = st.text_area(f"Iniciativa {i+1}", key=f"ini_jefe_medios_{i}", height=80)
             if ini.strip():
                 iniciativas.append(ini.strip())

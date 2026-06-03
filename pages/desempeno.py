@@ -145,13 +145,19 @@ dor)."""
             st.markdown("---")
         
         st.markdown("### 💡 SECCIÓN 3: Iniciativas de Mejora (Opcional)")
-        st.markdown("Si el desempeño lo requiere, defina hasta 3 iniciativas de mejora:")
+        st.markdown("Si el desempeño lo requiere, defina hasta 5 iniciativas de mejora:")
         
         iniciativa_1 = st.text_area("Iniciativa 1", placeholder="Descripción de la primera iniciativa...", key="init_1")
         iniciativa_2 = st.text_area("Iniciativa 2", placeholder="Descripción de la segunda iniciativa...", key="init_2")
         iniciativa_3 = st.text_area("Iniciativa 3", placeholder="Descripción de la tercera iniciativa...", key="init_3")
+        iniciativa_4 = st.text_area("Iniciativa 4", placeholder="Descripción de la cuarta iniciativa...", key="init_4")
+        iniciativa_5 = st.text_area("Iniciativa 5", placeholder="Descripción de la quinta iniciativa...", key="init_5")
         
-        iniciativas = [ini for ini in [iniciativa_1, iniciativa_2, iniciativa_3] if ini and ini.strip()]
+        iniciativas = [
+            ini.strip()
+            for ini in [iniciativa_1, iniciativa_2, iniciativa_3, iniciativa_4, iniciativa_5]
+            if ini and ini.strip()
+        ]
         
         submitted = st.form_submit_button("✅ Completar Evaluación y Calcular Resultados", type="primary")
         
@@ -483,9 +489,8 @@ def page_desempeno_lider_eval():
 
         # ---- INICIATIVAS ----
         st.markdown("### 🚀 Iniciativas de Mejora")
-        n_iniciativas = st.selectbox("Número de iniciativas", [0, 1, 2, 3], index=1, key="n_init_lider")
         iniciativas = []
-        for i in range(n_iniciativas):
+        for i in range(5):
             ini = st.text_area(f"Iniciativa {i+1}", key=f"ini_lider_{i}", height=80)
             if ini.strip():
                 iniciativas.append(ini.strip())
