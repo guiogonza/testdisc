@@ -46,6 +46,7 @@ from charts import (
     create_talent_map_radar, create_talent_map_bars,
     create_talent_map_comparison,
     create_desempeno_radar, create_desempeno_bars,
+    create_desempeno_competencias_chart, create_desempeno_potential_matrix,
 )
 from pdfs import (
     generate_disc_pdf, generate_valanti_pdf, generate_wpi_pdf,
@@ -537,6 +538,8 @@ def show_desempeno_lider_results_admin(results, candidate, session):
     rendimiento_scores = {int(k): v for k, v in results.get("rendimiento_scores", {}).items()}
     potencial_scores = {int(k): v for k, v in results.get("potencial_scores", {}).items()}
     iniciativas = results.get("iniciativas", [])
+    employee_self = results.get("employee_self", {})
+    employee_competencias = {int(k): v for k, v in employee_self.get("competencias_scores", {}).items()}
     evaluador = results.get("evaluador", "N/A")
     nivel_cargo = results.get("nivel_cargo", "N/A")
     session_id = session["id"] if isinstance(session, dict) else session
@@ -561,6 +564,21 @@ def show_desempeno_lider_results_admin(results, candidate, session):
     col2.metric("🎯 Rendimiento", f"{analysis.get('promedio_rendimiento', 0):.2f}/5.00")
     col3.metric("⭐ Potencial", f"{analysis.get('promedio_potencial', 0):.2f}/3.00")
     col4.metric("📊 Global", f"{analysis.get('puntaje_global', 0):.2f}/5.00")
+
+    st.markdown("---")
+    graph_col1, graph_col2 = st.columns([2, 1])
+    with graph_col1:
+        comp_fig = create_desempeno_competencias_chart(
+            competencias_scores,
+            nivel_cargo=nivel_cargo,
+            employee_scores=employee_competencias,
+        )
+        st.pyplot(comp_fig)
+        plt.close(comp_fig)
+    with graph_col2:
+        matrix_fig = create_desempeno_potential_matrix(analysis)
+        st.pyplot(matrix_fig)
+        plt.close(matrix_fig)
 
     st.markdown("---")
 
@@ -678,6 +696,7 @@ def show_desempeno_lider_results_admin(results, candidate, session):
                 evaluador_nombre=evaluador,
                 nivel_cargo=nivel_cargo,
                 iniciativas=iniciativas,
+                employee_scores=employee_competencias,
             )
             st.download_button(
                 "📑 Descargar PDF",

@@ -727,3 +727,85 @@ def create_desempeno_bars(rendimiento_scores):
     ax.legend(loc='upper right', bbox_to_anchor=(1, -0.08), ncol=4, fontsize=9, framealpha=0.9)
     plt.tight_layout()
     return fig
+
+
+def create_desempeno_competencias_chart(competencias_scores, nivel_cargo=None, employee_scores=None):
+    """Crea gráfico lineal de competencias para desempeño líderes/medios."""
+    competencias = COMPETENCIAS_ORGANIZACIONALES
+    labels = [comp["nombre"].upper() for comp in competencias]
+    valores = [float(competencias_scores.get(comp["id"], competencias_scores.get(str(comp["id"]), 0))) for comp in competencias]
+    employee_scores = employee_scores or {}
+    auto_vals = [
+        float(employee_scores.get(comp["id"], employee_scores.get(str(comp["id"]), 0)))
+        for comp in competencias
+    ]
+    req_info = COMPETENCIAS_NIVEL_REQUERIDO.get((nivel_cargo or "").upper())
+    req_vals = req_info["niveles"] if req_info else [0] * len(competencias)
+
+    fig, ax = plt.subplots(figsize=(13, 4.2))
+    x = np.arange(len(labels))
+
+    if any(auto_vals):
+        ax.plot(x, auto_vals, marker="o", linewidth=2, color="#3B82F6", label="AUTOEVALUACION")
+    ax.plot(x, valores, marker="o", linewidth=2.5, color="#F97316", label="EVALUACION JEFE")
+    if any(req_vals):
+        ax.plot(x, req_vals, marker="o", linewidth=2.5, color="#5B8C21", label="NIVEL DE COMPETENCIA")
+
+    for xi, val in zip(x, valores):
+        ax.text(xi, val + 0.12, f"{val:.0f}", ha="center", va="bottom", fontsize=9, color="#374151")
+
+    ax.set_title("EVALUACION DE COMPETENCIAS", fontsize=15, color="#4B5563", pad=14)
+    ax.set_ylim(0, 6.4)
+    ax.set_yticks(np.arange(0, 7, 1))
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=8, rotation=0, ha="center")
+    ax.grid(axis="y", color="#D1D5DB", linestyle="-", linewidth=0.8, alpha=0.8)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color("#D1D5DB")
+    ax.spines["bottom"].set_color("#D1D5DB")
+    ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), frameon=False, fontsize=9)
+    fig.patch.set_facecolor("white")
+    plt.tight_layout()
+    return fig
+
+
+def create_desempeno_potential_matrix(analysis):
+    """Crea matriz desempeño vs potencial para desempeño líderes/medios."""
+    rendimiento = float(analysis.get("promedio_rendimiento", 0) or 0)
+    potencial = float(analysis.get("promedio_potencial", 0) or 0)
+
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    ax.set_xlim(0, 5)
+    ax.set_ylim(0, 3)
+    ax.set_xticks([0, 1, 2, 3, 4, 5])
+    ax.set_yticks([0, 1, 2, 3])
+    ax.grid(True, color="#D1D5DB", linewidth=0.8)
+
+    ax.scatter([rendimiento], [potencial], s=220, color="#3F6422", edgecolor="white", linewidth=1.5, zorder=3)
+    ax.text(
+        min(rendimiento + 0.12, 4.75),
+        min(potencial + 0.08, 2.85),
+        f"{rendimiento:.2f} ; {potencial:.2f}",
+        fontsize=10,
+        color="#374151",
+        va="center",
+    )
+
+    ax.set_xlabel("DESEMPENO", fontsize=11, color="#374151", labelpad=14)
+    ax.set_ylabel("POTENCIAL", fontsize=11, color="#1E3A8A", labelpad=16)
+    ax.set_xticklabels([
+        "-",
+        "1,00\nInsatisfactorio",
+        "2,00\nDebajo de las\nexpectativas",
+        "3,00\nCumple las\nexpectativas",
+        "4,00\nSupera las\nexpectativas",
+        "5,00\nSobresaliente",
+    ], fontsize=8)
+    ax.set_yticklabels(["-", "1,00\nBajo", "2,00\nMedio", "3,00\nAlto"], fontsize=8)
+
+    for spine in ax.spines.values():
+        spine.set_color("#CBD5E1")
+    fig.patch.set_facecolor("white")
+    plt.tight_layout()
+    return fig

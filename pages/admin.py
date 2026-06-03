@@ -197,6 +197,10 @@ def _build_direct_pdf(session, candidate, results):
         return _as_download_payload(pdf), f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Desempeño Operativo"
 
     if test_type == "desempeno_lider":
+        employee_scores = {
+            int(k): v
+            for k, v in results.get("employee_self", {}).get("competencias_scores", {}).items()
+        }
         pdf = generate_desempeno_lider_pdf(
             candidate=candidate,
             competencias_scores={int(k): v for k, v in results.get("competencias_scores", {}).items()},
@@ -208,10 +212,15 @@ def _build_direct_pdf(session, candidate, results):
             evaluador_nombre=results.get("evaluador"),
             nivel_cargo=results.get("nivel_cargo"),
             iniciativas=results.get("iniciativas", []),
+            employee_scores=employee_scores,
         )
         return _as_download_payload(pdf), f"desempeno_lider_{candidate['cedula']}_{session_id}.pdf", "📄 Descargar PDF — Desempeño Líderes"
 
     if test_type == "desempeno_medios":
+        employee_scores = {
+            int(k): v
+            for k, v in results.get("employee_self", {}).get("competencias_scores", {}).items()
+        }
         pdf = generate_desempeno_medios_pdf(
             candidate=candidate,
             competencias_scores={int(k): v for k, v in results.get("competencias_scores", {}).items()},
@@ -223,6 +232,7 @@ def _build_direct_pdf(session, candidate, results):
             evaluador_nombre=results.get("evaluador"),
             nivel_cargo=results.get("nivel_cargo"),
             iniciativas=results.get("iniciativas", []),
+            employee_scores=employee_scores,
         )
         return _as_download_payload(pdf), f"desempeno_medios_{candidate['cedula']}_{session_id}.pdf", "Descargar PDF - Desempeno Medios"
 

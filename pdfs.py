@@ -1122,7 +1122,7 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
                                   session_id, completed_at=None, analysis=None, evaluador_nombre=None,
                                   nivel_cargo=None, iniciativas=None, formato_codigo="FO-GH-41",
                                   formato_version="02", formato_fecha="30-01-24",
-                                  formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O"):
+                                  formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O", employee_scores=None):
     """Genera PDF de Evaluación de Desempeño para Líderes."""
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
@@ -1207,6 +1207,37 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
             ('TOPPADDING', (0, 0), (-1, -1), 6), ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ]))
         story.append(pt)
+
+        try:
+            from charts import create_desempeno_competencias_chart, create_desempeno_potential_matrix
+
+            story.append(Spacer(1, 12))
+            comp_fig = create_desempeno_competencias_chart(
+                competencias_scores,
+                nivel_cargo=nivel_cargo,
+                employee_scores=employee_scores,
+            )
+            comp_buffer = BytesIO()
+            comp_fig.savefig(comp_buffer, format="png", dpi=150, bbox_inches="tight")
+            comp_buffer.seek(0)
+            story.append(Image(comp_buffer, width=500, height=165))
+            plt.close(comp_fig)
+
+            story.append(Spacer(1, 12))
+            matrix_fig = create_desempeno_potential_matrix(analysis)
+            matrix_buffer = BytesIO()
+            matrix_fig.savefig(matrix_buffer, format="png", dpi=150, bbox_inches="tight")
+            matrix_buffer.seek(0)
+            story.append(Image(matrix_buffer, width=310, height=180))
+            plt.close(matrix_fig)
+
+            story.append(Spacer(1, 8))
+            story.append(Paragraph("<b>La Escala de Potencial:</b>", DLSmall))
+            story.append(Paragraph("<b>Alto Potencial:</b> está listo para tomar una posición superior.", DLSmall))
+            story.append(Paragraph("<b>Potencial Medio:</b> puede tomar una posición superior a mediano plazo (2 a 3 años), está listo para tomar una posición lateral (pares).", DLSmall))
+            story.append(Paragraph("<b>Potencial Limitado:</b> puede tomar una posición superior a largo plazo (4 a 5 años) y solo puede consolidar su ajuste con el rol actual.", DLSmall))
+        except Exception:
+            pass
 
     story.append(PageBreak())
     story.append(Paragraph("COMPETENCIAS ORGANIZACIONALES", DLSub))
@@ -1318,7 +1349,7 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
 
 def generate_desempeno_medios_pdf(candidate, competencias_scores, rendimiento_scores, potencial_scores,
                                   session_id, completed_at=None, analysis=None, evaluador_nombre=None,
-                                  nivel_cargo=None, iniciativas=None):
+                                  nivel_cargo=None, iniciativas=None, employee_scores=None):
     """Genera PDF de EvaluaciÃ³n de DesempeÃ±o Medios (FO-GH-17 V.2)."""
     return generate_desempeno_lider_pdf(
         candidate=candidate,
@@ -1331,6 +1362,7 @@ def generate_desempeno_medios_pdf(candidate, competencias_scores, rendimiento_sc
         evaluador_nombre=evaluador_nombre,
         nivel_cargo=nivel_cargo,
         iniciativas=iniciativas,
+        employee_scores=employee_scores,
         formato_codigo="FO-GH-17",
         formato_version="02",
         formato_fecha="30-01-24",
