@@ -87,6 +87,8 @@ server {
     # (_stcore = runtime JS/WS, static = recursos estáticos)
     location ~ ^/(_stcore|static|media|component)(/.*)?$ {
         proxy_pass http://127.0.0.1:8505;
+        proxy_hide_header Cache-Control;
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

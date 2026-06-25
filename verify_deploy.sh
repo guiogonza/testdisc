@@ -83,7 +83,7 @@ echo "  RESUMEN DE VERIFICACIÓN"
 echo "=========================================="
 echo ""
 echo -e "${GREEN}URL de acceso:${NC}"
-echo "http://evaluaciones.164.68.118.86.nip.io/"
+echo "https://evaluaciones.164.68.118.86.nip.io/evaluacionesrh"
 echo ""
 
 echo -e "${GREEN}Comandos útiles:${NC}"
@@ -92,15 +92,15 @@ echo "Reiniciar: docker-compose restart"
 echo "Estado: docker ps | grep evaluaciones"
 echo ""
 
-# Test final HTTP
-echo "Realizando test HTTP..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8505)
+# Test final HTTPS
+echo "Realizando test HTTPS..."
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://evaluaciones.164.68.118.86.nip.io/evaluacionesrh)
 if [ "$HTTP_CODE" = "200" ]; then
-    echo -e "${GREEN}✓${NC} Aplicación respondió con HTTP $HTTP_CODE"
+    echo -e "${GREEN}✓${NC} Aplicación respondió con HTTPS $HTTP_CODE"
     echo ""
     echo -e "${GREEN}✓✓✓ DESPLIEGUE EXITOSO ✓✓✓${NC}"
 else
-    echo -e "${RED}✗${NC} Aplicación respondió con HTTP $HTTP_CODE"
+    echo -e "${RED}✗${NC} Aplicación respondió con HTTPS $HTTP_CODE"
     echo -e "${RED}Revisar logs para más detalles${NC}"
 fi
 

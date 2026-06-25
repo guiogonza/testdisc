@@ -137,6 +137,7 @@ from pages.desempeno import (
 )
 from pages.evaluador import (
     page_evaluador_login, page_evaluador_dashboard,
+    page_evaluador_result_view,
     page_desempeno_lider_employee_eval, page_periodo_prueba_employee_eval,
     page_desempeno_medios_employee_eval, page_desempeno_lider_jefe_eval,
     page_desempeno_medios_jefe_eval, page_periodo_prueba_jefe_eval,
@@ -180,6 +181,7 @@ PAGE_MAP = {
     "shared_result_view": page_shared_result_view,
     "evaluador_login": page_evaluador_login,
     "evaluador_dashboard": page_evaluador_dashboard,
+    "evaluador_result_view": page_evaluador_result_view,
     "candidate_login": page_candidate_login,
     "candidate_select_test": page_candidate_select_test,
     "disc_test": page_disc_test,

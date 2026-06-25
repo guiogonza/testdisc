@@ -133,7 +133,7 @@ dor)."""
                 options=[3, 2, 1, 0],
                 format_func=lambda x: f"Nivel {x}",
                 key=f"pot_{dim['id']}",
-                horizontal=True,
+                horizontal=False,
                 label_visibility="collapsed"
             )
             
@@ -199,7 +199,7 @@ dor)."""
         st.rerun()
 
 
-def show_desempeno_results_admin(results, candidate, session):
+def show_desempeno_results_admin(results, candidate, session, show_json_download=True):
     """Muestra resultados de Evaluación de Desempeño en el panel de administración."""
     
     rendimiento_scores = results.get("rendimiento_scores", {})
@@ -360,7 +360,11 @@ def show_desempeno_results_admin(results, candidate, session):
     # Descargar PDF y JSON
     st.markdown("### 📥 Descargar Resultados")
     
-    col1, col2 = st.columns(2)
+    if show_json_download:
+        col1, col2 = st.columns(2)
+    else:
+        col1 = st.container()
+        col2 = None
     
     # Regenerar gráficos para PDF
     radar_fig_pdf = create_desempeno_radar(potencial_scores)
@@ -388,14 +392,15 @@ def show_desempeno_results_admin(results, candidate, session):
             key=f"pdf_desempeno_{session_id}"
         )
     
-    with col2:
-        st.download_button(
-            "📄 Descargar JSON",
-            data=json.dumps(results, indent=2, ensure_ascii=False),
-            file_name=f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.json",
-            mime="application/json",
-            key=f"json_desempeno_{session_id}"
-        )
+    if show_json_download:
+        with col2:
+            st.download_button(
+                "📄 Descargar JSON",
+                data=json.dumps(results, indent=2, ensure_ascii=False),
+                file_name=f"evaluacion_desempeno_{candidate['cedula']}_{session_id}.json",
+                mime="application/json",
+                key=f"json_desempeno_{session_id}"
+            )
 
 
 # -------------------------------------------------------------------------
@@ -447,7 +452,7 @@ def page_desempeno_lider_eval():
                 f"Nivel {comp['nombre']}",
                 options=[1, 2, 3, 4, 5, 6],
                 format_func=lambda x, c=comp: f"Nivel {x} — {c['niveles'][x][:80]}...",
-                horizontal=True,
+                horizontal=False,
                 key=f"comp_{comp['id']}",
                 label_visibility="collapsed",
             )
@@ -531,7 +536,7 @@ def page_desempeno_lider_eval():
 
 
 
-def show_desempeno_lider_results_admin(results, candidate, session):
+def show_desempeno_lider_results_admin(results, candidate, session, show_json_download=True):
     """Muestra resultados de la evaluación de desempeño para líderes."""
     analysis = results.get("analysis", {})
     competencias_scores = {int(k): v for k, v in results.get("competencias_scores", {}).items()}
@@ -671,17 +676,22 @@ def show_desempeno_lider_results_admin(results, candidate, session):
             st.info("No se definieron iniciativas.")
 
     st.markdown("---")
-    col_dl1, col_dl2 = st.columns(2)
+    if show_json_download:
+        col_dl1, col_dl2 = st.columns(2)
+    else:
+        col_dl1 = None
+        col_dl2 = st.container()
     _is_medios = results.get("test_type") == "desempeno_medios"
     _file_prefix = "desempeno_medios" if _is_medios else "desempeno_lider"
-    with col_dl1:
-        st.download_button(
-            "📄 Descargar JSON",
-            data=json.dumps(results, indent=2, ensure_ascii=False),
-            file_name=f"{_file_prefix}_{candidate['cedula']}_{session_id}.json",
-            mime="application/json",
-            key=f"json_dl_{session_id}",
-        )
+    if show_json_download:
+        with col_dl1:
+            st.download_button(
+                "📄 Descargar JSON",
+                data=json.dumps(results, indent=2, ensure_ascii=False),
+                file_name=f"{_file_prefix}_{candidate['cedula']}_{session_id}.json",
+                mime="application/json",
+                key=f"json_dl_{session_id}",
+            )
     with col_dl2:
         try:
             _pdf_func = generate_desempeno_medios_pdf if _is_medios else generate_desempeno_lider_pdf
@@ -712,11 +722,11 @@ def show_desempeno_lider_results_admin(results, candidate, session):
 # -------------------------------------------------------------------------
 # ADMIN: EVALUACIÓN PERÍODO DE PRUEBA (FO-GH-46)
 # -------------------------------------------------------------------------
-def show_desempeno_medios_results_admin(results, candidate, session):
+def show_desempeno_medios_results_admin(results, candidate, session, show_json_download=True):
     """Muestra resultados de EvaluaciÃ³n de DesempeÃ±o Medios (FO-GH-17)."""
     enriched = dict(results)
     enriched["test_type"] = "desempeno_medios"
-    show_desempeno_lider_results_admin(enriched, candidate, session)
+    show_desempeno_lider_results_admin(enriched, candidate, session, show_json_download=show_json_download)
 
 
 def page_periodo_prueba_eval():
@@ -842,7 +852,7 @@ def page_periodo_prueba_eval():
         st.rerun()
 
 
-def show_periodo_prueba_results_admin(results, candidate, session):
+def show_periodo_prueba_results_admin(results, candidate, session, show_json_download=True):
     """Muestra resultados de la evaluación de período de prueba en el panel de administración."""
     analysis = results.get("analysis", {})
     evaluador = results.get("evaluador", "N/A")
@@ -942,15 +952,20 @@ def show_periodo_prueba_results_admin(results, candidate, session):
                 st.warning(f"• {item['nombre']}")
 
     st.markdown("---")
-    _col_pp1, _col_pp2 = st.columns(2)
-    with _col_pp1:
-        st.download_button(
-            "📄 Descargar JSON",
-            data=json.dumps(results, indent=2, ensure_ascii=False),
-            file_name=f"periodo_prueba_{candidate['cedula']}_{session_id}.json",
-            mime="application/json",
-            key=f"json_pp_{session_id}",
-        )
+    if show_json_download:
+        _col_pp1, _col_pp2 = st.columns(2)
+    else:
+        _col_pp1 = None
+        _col_pp2 = st.container()
+    if show_json_download:
+        with _col_pp1:
+            st.download_button(
+                "📄 Descargar JSON",
+                data=json.dumps(results, indent=2, ensure_ascii=False),
+                file_name=f"periodo_prueba_{candidate['cedula']}_{session_id}.json",
+                mime="application/json",
+                key=f"json_pp_{session_id}",
+            )
     with _col_pp2:
         try:
             _pdf_pp = generate_periodo_prueba_pdf(

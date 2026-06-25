@@ -1,6 +1,24 @@
+# HTTPS final para evaluaciones.164.68.118.86.nip.io
+# Requiere certificado Let's Encrypt emitido con:
+# certbot certonly --nginx -d evaluaciones.164.68.118.86.nip.io
+
 server {
     listen 80;
     server_name evaluaciones.164.68.118.86.nip.io;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name evaluaciones.164.68.118.86.nip.io;
+
+    ssl_certificate /etc/letsencrypt/live/evaluaciones.164.68.118.86.nip.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/evaluaciones.164.68.118.86.nip.io/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
 
     client_max_body_size 50M;
 
@@ -16,7 +34,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto https;
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
     }
@@ -31,7 +49,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto https;
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
     }
@@ -45,7 +63,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto https;
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
     }

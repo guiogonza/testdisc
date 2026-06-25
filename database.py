@@ -391,6 +391,24 @@ def get_sessions_for_evaluador(evaluador_cedula):
     return [dict(s) for s in sessions]
 
 
+def get_completed_sessions_for_evaluador(evaluador_cedula):
+    """Retorna evaluaciones completadas por/asignadas al evaluador."""
+    evaluador_cedula = normalize_cedula(evaluador_cedula)
+    conn = get_connection()
+    sessions = conn.execute(
+        """SELECT ts.*, c.cedula, c.name as candidate_name, c.position
+           FROM test_sessions ts
+           JOIN candidates c ON ts.candidate_id = c.id
+           WHERE REPLACE(REPLACE(REPLACE(REPLACE(TRIM(ts.evaluador_cedula), '.', ''), ',', ''), '-', ''), ' ', '') = ?
+             AND ts.status = 'completed'
+             AND ts.test_type IN ('desempeno', 'desempeno_lider', 'desempeno_medios', 'periodo_prueba')
+           ORDER BY COALESCE(ts.completed_at, ts.created_at) DESC""",
+        (evaluador_cedula,),
+    ).fetchall()
+    conn.close()
+    return [dict(s) for s in sessions]
+
+
 def expire_test_session(session_id):
     conn = get_connection()
     now = _now_gmt5()

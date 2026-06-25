@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 from io import BytesIO
 from datetime import datetime, timedelta, timezone as _tz_mod
+from xml.sax.saxutils import escape
 
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -27,6 +28,10 @@ _GMT5 = _tz_mod(timedelta(hours=-5))
 
 def _now_gmt5():
     return datetime.now(_GMT5)
+
+
+def _pdf_cell(value, style):
+    return Paragraph(escape(str(value or "")), style)
 
 
 def _build_hesego_header(codigo, version="02", fecha="30-01-24", titulo="EVALUACIÓN DESEMPEÑO"):
@@ -1122,7 +1127,7 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
                                   session_id, completed_at=None, analysis=None, evaluador_nombre=None,
                                   nivel_cargo=None, iniciativas=None, formato_codigo="FO-GH-41",
                                   formato_version="02", formato_fecha="30-01-24",
-                                  formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O", employee_scores=None):
+                                  formato_titulo="EVALUACIÓN DESEMPEÑO", employee_scores=None):
     """Genera PDF de Evaluación de Desempeño para Líderes."""
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
@@ -1266,17 +1271,33 @@ def generate_desempeno_lider_pdf(candidate, competencias_scores, rendimiento_sco
     story.append(Spacer(1, 12))
 
     story.append(Paragraph("EVALUACIÓN DE RENDIMIENTO", DLSub))
-    rend_data = [["Objetivo", "Puntaje", "Nivel"]]
+    rend_cell = ParagraphStyle("DLTableCell", parent=DLSmall, fontSize=8.2, leading=10)
+    rend_cell_center = ParagraphStyle("DLTableCellCenter", parent=rend_cell, alignment=1)
+    rend_header = ParagraphStyle(
+        "DLTableHeader", parent=rend_cell_center, fontName="Helvetica-Bold", textColor=colors.white
+    )
+    rend_data = [
+        [
+            _pdf_cell("Objetivo", rend_header),
+            _pdf_cell("Puntaje", rend_header),
+            _pdf_cell("Nivel", rend_header),
+        ]
+    ]
     for obj_id, score in rendimiento_scores.items():
         objetivo = DESEMPENO_OBJETIVOS[int(obj_id) - 1]
         nivel = DESEMPENO_ESCALA_RENDIMIENTO.get(int(score), {})
-        rend_data.append([objetivo["titulo"][:60], f"{score}/5", nivel.get("label", "Sin calificar")])
-    rt = Table(rend_data, colWidths=[290, 60, 100])
+        rend_data.append([
+            _pdf_cell(objetivo["titulo"], rend_cell),
+            _pdf_cell(f"{score}/5", rend_cell_center),
+            _pdf_cell(nivel.get("label", "Sin calificar"), rend_cell),
+        ])
+    rt = Table(rend_data, colWidths=[245, 55, 150], repeatRows=1)
     rt.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1E40AF")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('FONTSIZE', (0, 0), (-1, -1), 8.2),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
         ('GRID', (0, 0), (-1, -1), 0.4, colors.HexColor("#D1D5DB")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F3F4F6")]),
@@ -1366,7 +1387,7 @@ def generate_desempeno_medios_pdf(candidate, competencias_scores, rendimiento_sc
         formato_codigo="FO-GH-17",
         formato_version="02",
         formato_fecha="30-01-24",
-        formato_titulo="EVALUACIÃ“N DESEMPEÃ‘O",
+        formato_titulo="EVALUACIÓN DESEMPEÑO",
     )
 
 

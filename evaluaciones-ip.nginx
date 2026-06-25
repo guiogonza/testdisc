@@ -2,9 +2,10 @@
 # URL: http://164.68.118.86/evaluacionesrh
 #
 # Estrategia:
-#   - Reescribe /evaluacionesrh/* → /* antes de pasar al upstream (Streamlit en :8505)
-#   - Proxy adicional para los paths internos de Streamlit (_stcore, static, media)
-#     para que el navegador pueda cargar JS/WebSocket desde la URL con IP.
+#   - Streamlit corre con STREAMLIT_SERVER_BASE_URL_PATH=evaluacionesrh, por lo
+#     que genera todas sus rutas (HTML, JS, _stcore, websocket) bajo /evaluacionesrh/.
+#   - El prefijo /evaluacionesrh/ se conserva tal cual al reenviar a Streamlit
+#     (sin reescritura), para que coincida con su baseUrlPath.
 
 server {
     listen 80;
@@ -14,18 +15,11 @@ server {
 
     # Redirigir raíz al prefijo de la aplicación
     location = / {
-        return 302 /evaluacionesrh/;
+        return 302 /evaluacionesrh;
     }
 
     # Normalizar /evaluacionesrh sin slash final
     location = /evaluacionesrh {
-        return 301 /evaluacionesrh/;
-    }
-
-    # ── Aplicación principal ───────────────────────────────────────────────────
-    # Reescribe /evaluacionesrh/<path> → /<path> antes de llegar a Streamlit
-    location /evaluacionesrh/ {
-        rewrite ^/evaluacionesrh/(.*)$ /$1 break;
         proxy_pass http://127.0.0.1:8505;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -38,11 +32,26 @@ server {
         proxy_send_timeout 86400;
     }
 
-    # ── Paths internos de Streamlit ────────────────────────────────────────────
-    # El HTML generado por Streamlit referencia /_stcore/, /static/, etc. con
-    # rutas absolutas. Hay que proxearlas también para que el navegador las
-    # resuelva sobre la IP sin prefijo.
-    location ~ ^/(_stcore|static|media|component)(/.*)?$ {
+    # ── Aplicación principal ───────────────────────────────────────────────────
+    # Conserva el prefijo /evaluacionesrh/ al reenviar a Streamlit, ya que su
+    # baseUrlPath espera recibir las peticiones con ese mismo prefijo.
+    location ~ ^/(static|_stcore|media|component|favicon\.png)(/.*)?$ {
+        proxy_pass http://127.0.0.1:8505;
+        proxy_hide_header Cache-Control;
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    location /evaluacionesrh/ {
+        rewrite ^/evaluacionesrh/(.*)$ /$1 break;
         proxy_pass http://127.0.0.1:8505;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -50,6 +59,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_read_timeout 86400;
         proxy_send_timeout 86400;
     }

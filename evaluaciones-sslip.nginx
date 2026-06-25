@@ -4,7 +4,40 @@ server {
 
     client_max_body_size 50M;
 
-    location / {
+    location = / {
+        return 302 /evaluacionesrh;
+    }
+
+    location = /evaluacionesrh {
+        proxy_pass http://127.0.0.1:8505;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    location ~ ^/(static|_stcore|media|component|favicon\.png)(/.*)?$ {
+        proxy_pass http://127.0.0.1:8505;
+        proxy_hide_header Cache-Control;
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+        proxy_send_timeout 86400;
+    }
+
+    location /evaluacionesrh/ {
+        rewrite ^/evaluacionesrh/(.*)$ /$1 break;
         proxy_pass http://127.0.0.1:8505;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;

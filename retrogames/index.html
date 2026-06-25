@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🕹️ Retro Games Arcade</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card-bg: #13131e;
+    --accent: #ff6b35;
+    --accent2: #ffd700;
+    --nes: #e74c3c;
+    --snes: #9b59b6;
+    --coop: #27ae60;
+    --versus: #e74c3c;
+    --turns: #3498db;
+    --text: #e8e8f0;
+    --muted: #6a6a8a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    min-height: 100vh;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  header {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+    border-bottom: 3px solid var(--accent);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(255,107,53,0.03) 40px,
+      rgba(255,107,53,0.03) 41px
+    );
+  }
+  header h1 {
+    font-size: clamp(18px, 4vw, 36px);
+    color: var(--accent2);
+    text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent2);
+    letter-spacing: 4px;
+    position: relative;
+  }
+  header p {
+    font-size: 8px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    position: relative;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid #222;
+  }
+
+  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .filter-btn {
+    font-family: inherit;
+    font-size: 8px;
+    padding: 8px 14px;
+    border: 2px solid #333;
+    background: #13131e;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { border-color: var(--accent2); color: var(--accent2); background: rgba(255,215,0,0.08); }
+  .filter-btn.nes  { --c: var(--nes); }
+  .filter-btn.snes { --c: var(--snes); }
+  .filter-btn.nes.active  { border-color: var(--nes);  color: var(--nes);  background: rgba(231,76,60,0.1); }
+  .filter-btn.snes.active { border-color: var(--snes); color: var(--snes); background: rgba(155,89,182,0.1); }
+  .filter-btn.coop.active    { border-color: var(--coop);    color: var(--coop); background: rgba(39,174,96,0.1); }
+  .filter-btn.versus.active  { border-color: var(--versus);  color: var(--versus); background: rgba(231,76,60,0.1); }
+  .filter-btn.turns.active   { border-color: var(--turns);   color: var(--turns); background: rgba(52,152,219,0.1); }
+
+  .sep { width: 2px; height: 30px; background: #222; }
+
+  #search {
+    font-family: inherit;
+    font-size: 9px;
+    padding: 8px 14px;
+    border: 2px solid #333;
+    background: #13131e;
+    color: var(--text);
+    outline: none;
+    width: 200px;
+    letter-spacing: 1px;
+  }
+  #search:focus { border-color: var(--accent); }
+
+  .count {
+    font-size: 8px;
+    color: var(--muted);
+    padding: 4px 10px;
+    border: 1px solid #222;
+  }
+
+  main {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 2px solid #1e1e30;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255,107,53,0.3);
+  }
+  .card.hidden { display: none; }
+
+  .card-thumb {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    background: #0d0d18;
+    image-rendering: pixelated;
+  }
+  .card-thumb-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: linear-gradient(135deg, #0d0d18, #1a1a2e);
+    color: #333;
+  }
+
+  .card-info {
+    padding: 10px 8px;
+    border-top: 1px solid #1e1e30;
+  }
+  .card-title {
+    font-size: 7px;
+    color: var(--text);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag {
+    font-size: 6px;
+    padding: 2px 5px;
+    border: 1px solid;
+    letter-spacing: 0.5px;
+  }
+  .tag.nes    { border-color: var(--nes);    color: var(--nes); }
+  .tag.snes   { border-color: var(--snes);   color: var(--snes); }
+  .tag.coop   { border-color: var(--coop);   color: var(--coop); }
+  .tag.versus { border-color: var(--versus); color: var(--versus); }
+  .tag.turns  { border-color: var(--turns);  color: var(--turns); }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,107,53,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .card:hover .play-overlay { opacity: 1; }
+
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 2;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 7px;
+    color: var(--muted);
+    border-top: 1px solid #111;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕹️ RETRO ARCADE</h1>
+  <p>NES · SNES · CO-OP · VERSUS · CLÁSICOS</p>
+</header>
+
+<div class="controls">
+  <div class="filter-group" id="platform-filters">
+    <button class="filter-btn active" data-platform="all">TODOS</button>
+    <button class="filter-btn nes" data-platform="nes">NES</button>
+    <button class="filter-btn snes" data-platform="snes">SNES</button>
+  </div>
+  <div class="sep"></div>
+  <div class="filter-group" id="mode-filters">
+    <button class="filter-btn active" data-mode="all">TODOS</button>
+    <button class="filter-btn coop" data-mode="coop">CO-OP</button>
+    <button class="filter-btn versus" data-mode="versus">VS</button>
+    <button class="filter-btn turns" data-mode="turns">POR TURNOS</button>
+  </div>
+  <div class="sep"></div>
+  <input type="text" id="search" placeholder="BUSCAR..." oninput="applyFilters()">
+  <div class="count" id="count">0 JUEGOS</div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>INSERT COIN TO PLAY · PRESS START</footer>
+
+<script>
+const GAMES = [
+  // NES CO-OP
+  { title: "Contra", platform: "nes", mode: "coop", rom: "roms/nes/coop/Contra (USA).nes", thumb: "thumbnails/nes/Named_Titles/Contra (USA).png" },
+  { title: "Battletoads", platform: "nes", mode: "coop", rom: "roms/nes/coop/Battletoads (USA).nes", thumb: "thumbnails/nes/Named_Titles/Battletoads (USA).png" },
+  { title: "Battletoads-DD", platform: "nes", mode: "coop", rom: "roms/nes/coop/Battletoads-Double Dragon (USA).nes", thumb: "thumbnails/nes/Named_Titles/Battletoads-Double Dragon (USA).png" },
+  { title: "Bubble Bobble", platform: "nes", mode: "coop", rom: "roms/nes/coop/Bubble Bobble (USA).nes", thumb: "thumbnails/nes/Named_Titles/Bubble Bobble (USA).png" },
+  { title: "Chip 'n Dale 1", platform: "nes", mode: "coop", rom: "roms/nes/coop/Chip 'n Dale - Rescue Rangers (USA).nes", thumb: "thumbnails/nes/Named_Titles/Chip 'n Dale - Rescue Rangers (USA).png" },
+  { title: "Chip 'n Dale 2", platform: "nes", mode: "coop", rom: "roms/nes/coop/Chip 'n Dale - Rescue Rangers 2 (USA).nes", thumb: "thumbnails/nes/Named_Titles/Chip 'n Dale - Rescue Rangers 2 (USA).png" },
+  { title: "Contra Force", platform: "nes", mode: "coop", rom: "roms/nes/coop/Contra Force (USA).nes", thumb: "thumbnails/nes/Named_Titles/Contra Force (USA).png" },
+  { title: "Double Dragon III", platform: "nes", mode: "coop", rom: "roms/nes/coop/Double Dragon III - The Sacred Stones (U) [!].nes", thumb: "thumbnails/nes/Named_Titles/Double Dragon III - The Sacred Stones (USA).png" },
+  { title: "Downtown Nekketsu", platform: "nes", mode: "coop", rom: "roms/nes/coop/Downtown Special - Kunio-kun no Jidaigeki Da yo Zenin Shuugou! (Japan).nes", thumb: null },
+  { title: "Ice Climber", platform: "nes", mode: "coop", rom: "roms/nes/coop/Ice Climber (Japan) (En).nes", thumb: "thumbnails/nes/Named_Titles/Ice Climber (Japan) (En).png" },
+  { title: "Jackal", platform: "nes", mode: "coop", rom: "roms/nes/coop/Jackal (USA).nes", thumb: "thumbnails/nes/Named_Titles/Jackal (USA).png" },
+  { title: "River City Ransom", platform: "nes", mode: "coop", rom: "roms/nes/coop/River City Ransom (USA).nes", thumb: "thumbnails/nes/Named_Titles/River City Ransom (USA).png" },
+  { title: "Smash TV", platform: "nes", mode: "coop", rom: "roms/nes/coop/Smash T.V. (USA).nes", thumb: "thumbnails/nes/Named_Titles/Smash T.V. (USA).png" },
+  { title: "TMNT II Arcade", platform: "nes", mode: "coop", rom: "roms/nes/coop/Teenage Mutant Ninja Turtles II - The Arcade Game (USA).nes", thumb: "thumbnails/nes/Named_Titles/Teenage Mutant Ninja Turtles II - The Arcade Game (USA).png" },
+  { title: "TMNT III Manhattan", platform: "nes", mode: "coop", rom: "roms/nes/coop/Teenage Mutant Ninja Turtles III - The Manhattan Project (USA).nes", thumb: "thumbnails/nes/Named_Titles/Teenage Mutant Ninja Turtles III - The Manhattan Project (USA).png" },
+  { title: "Battle City", platform: "nes", mode: "coop", rom: "roms/nes/coop/BattleCity (Japan).nes", thumb: "thumbnails/nes/Named_Titles/BattleCity (Japan).png" },
+  // NES TAKE TURNS
+  { title: "Arkanoid", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Arkanoid (USA).nes", thumb: "thumbnails/nes/Named_Titles/Arkanoid (USA).png" },
+  { title: "Dig Dug", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Dig Dug (Japan).nes", thumb: "thumbnails/nes/Named_Titles/Dig Dug (Japan).png" },
+  { title: "Double Dragon", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Double Dragon (USA).nes", thumb: "thumbnails/nes/Named_Titles/Double Dragon (USA).png" },
+  { title: "Galaga", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Galaga - Demons of Death (U) [!].nes", thumb: "thumbnails/nes/Named_Titles/Galaga - Demons of Death (USA).png" },
+  { title: "Pac-Man", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Pac-Man (USA) (Namco).nes", thumb: "thumbnails/nes/Named_Titles/Pac-Man (USA) (Namco).png" },
+  { title: "Super Mario Bros", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Super Mario Bros. (World).nes", thumb: "thumbnails/nes/Named_Titles/Super Mario Bros. (World).png" },
+  { title: "Super Mario Bros 3", platform: "nes", mode: "turns", rom: "roms/nes/take turns/Super Mario Bros. 3 (USA).nes", thumb: "thumbnails/nes/Named_Titles/Super Mario Bros. 3 (USA).png" },
+  // NES VERSUS
+  { title: "Eliminator Boat Duel", platform: "nes", mode: "versus", rom: "roms/nes/versus/Eliminator Boat Duel (USA).nes", thumb: "thumbnails/nes/Named_Titles/Eliminator Boat Duel (USA).png" },
+  { title: "Side Pocket", platform: "nes", mode: "versus", rom: "roms/nes/versus/Side Pocket (USA).nes", thumb: "thumbnails/nes/Named_Titles/Side Pocket (USA).png" },
+  { title: "TMNT Tournament Fighters", platform: "nes", mode: "versus", rom: "roms/nes/versus/Teenage Mutant Ninja Turtles - Tournament Fighters (USA).nes", thumb: "thumbnails/nes/Named_Titles/Teenage Mutant Ninja Turtles - Tournament Fighters (USA).png" },
+  { title: "Tetris", platform: "nes", mode: "versus", rom: "roms/nes/versus/Tetris (USA) (Tengen) (Unl).nes", thumb: "thumbnails/nes/Named_Titles/Tetris (USA) (Tengen) (Unl).png" },
+  // SNES
+  { title: "Aero Fighters", platform: "snes", mode: "coop", rom: "roms/snes/Aero Fighters (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Aero Fighters (USA).png" },
+  { title: "Asterix & Obelix", platform: "snes", mode: "coop", rom: "roms/snes/Asterix & Obelix (Europe) (En,Fr,De,Es).sfc", thumb: "thumbnails/snes/Named_Titles/Asterix _ Obelix (Europe) (En,Fr,De,Es).png" },
+  { title: "Battletoads-DD", platform: "snes", mode: "coop", rom: "roms/snes/Battletoads-Double Dragon (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Battletoads-Double Dragon (USA).png" },
+  { title: "Battletoads Battlemaniacs", platform: "snes", mode: "coop", rom: "roms/snes/Battletoads in Battlemaniacs (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Battletoads in Battlemaniacs (USA).png" },
+  { title: "Sailor Moon R", platform: "snes", mode: "coop", rom: "roms/snes/Bishoujo Senshi Sailor Moon R (J).smc", thumb: "thumbnails/snes/Named_Titles/Bishoujo Senshi Sailor Moon R (Japan).png" },
+  { title: "Captain Commando", platform: "snes", mode: "coop", rom: "roms/snes/Captain Commando (E) [!].smc", thumb: "thumbnails/snes/Named_Titles/Captain Commando (Europe).png" },
+  { title: "Combatribes", platform: "snes", mode: "coop", rom: "roms/snes/Combatribes, The (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Combatribes, The (USA).png" },
+  { title: "Contra III", platform: "snes", mode: "coop", rom: "roms/snes/Contra III - The Alien Wars (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Contra III - The Alien Wars (USA).png" },
+  { title: "Darius Twin", platform: "snes", mode: "coop", rom: "roms/snes/Darius Twin (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Darius Twin (USA).png" },
+  { title: "Donkey Kong Country", platform: "snes", mode: "coop", rom: "roms/snes/Donkey Kong Country (U) (V1.1) [!].smc", thumb: "thumbnails/snes/Named_Titles/Donkey Kong Country (USA) (Rev 1).png" },
+  { title: "Donkey Kong Country 2", platform: "snes", mode: "coop", rom: "roms/snes/Donkey Kong Country 2 - Diddy's Kong Quest (U) (V1.1) [!].smc", thumb: "thumbnails/snes/Named_Titles/Donkey Kong Country 2 - Diddy's Kong Quest (USA) (En,Fr) (Rev 1).png" },
+  { title: "Donkey Kong Country 3", platform: "snes", mode: "coop", rom: "roms/snes/Donkey Kong Country 3 - Dixie Kong's Double Trouble (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Donkey Kong Country 3 - Dixie Kong's Double Trouble! (USA) (En,Fr).png" },
+  { title: "Doom Troopers", platform: "snes", mode: "coop", rom: "roms/snes/Doom Troopers (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Doom Troopers - Mutant Chronicles (USA).png" },
+  { title: "Final Fight 2", platform: "snes", mode: "coop", rom: "roms/snes/Final Fight 2 (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Final Fight 2 (USA).png" },
+  { title: "Final Fight 3", platform: "snes", mode: "coop", rom: "roms/snes/Final Fight 3 (U).smc", thumb: "thumbnails/snes/Named_Titles/Final Fight 3 (USA).png" },
+  { title: "Firepower 2000", platform: "snes", mode: "coop", rom: "roms/snes/Firepower 2000 (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Firepower 2000 (USA).png" },
+  { title: "FireStriker", platform: "snes", mode: "coop", rom: "roms/snes/FireStriker (USA).sfc", thumb: "thumbnails/snes/Named_Titles/FireStriker (USA).png" },
+  { title: "Ghoul Patrol", platform: "snes", mode: "coop", rom: "roms/snes/Ghoul Patrol (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Ghoul Patrol (USA).png" },
+  { title: "Goof Troop", platform: "snes", mode: "coop", rom: "roms/snes/Goof Troop (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Goof Troop (USA).png" },
+  { title: "Iron Commando", platform: "snes", mode: "coop", rom: "roms/snes/Iron Commando - Koutetsu no Senshi (J).smc", thumb: "thumbnails/snes/Named_Titles/Iron Commando - Koutetsu no Senshi (Japan).png" },
+  { title: "Joe & Mac", platform: "snes", mode: "coop", rom: "roms/snes/Joe & Mac (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Joe _ Mac (USA).png" },
+  { title: "Joe & Mac 2", platform: "snes", mode: "coop", rom: "roms/snes/Joe & Mac 2 - Lost in the Tropics (U).smc", thumb: "thumbnails/snes/Named_Titles/Joe _ Mac 2 - Lost in the Tropics (USA).png" },
+  { title: "Jurassic Park 2", platform: "snes", mode: "coop", rom: "roms/snes/Jurassic Park Part 2 - The Chaos Continues (USA) (En,Fr,De,It).sfc", thumb: "thumbnails/snes/Named_Titles/Jurassic Park Part 2 - The Chaos Continues (USA) (En,Fr,De,It).png" },
+  { title: "King of Dragons", platform: "snes", mode: "coop", rom: "roms/snes/King of Dragons, The (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/King of Dragons (USA).png" },
+  { title: "Kirby Super Star", platform: "snes", mode: "coop", rom: "roms/snes/Kirby Super Star (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Kirby Super Star (USA).png" },
+  { title: "Kirby's Dream Land 3", platform: "snes", mode: "coop", rom: "roms/snes/Kirby's Dream Land 3 (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Kirby's Dream Land 3 (USA).png" },
+  { title: "Knights of the Round", platform: "snes", mode: "coop", rom: "roms/snes/Knights of the Round (U).smc", thumb: "thumbnails/snes/Named_Titles/Knights of the Round (USA).png" },
+  { title: "Legend of Mystical Ninja", platform: "snes", mode: "coop", rom: "roms/snes/Legend of the Mystical Ninja, The (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Legend of the Mystical Ninja, The (USA).png" },
+  { title: "Legend", platform: "snes", mode: "coop", rom: "roms/snes/Legend (U) (718).smc", thumb: "thumbnails/snes/Named_Titles/Legend (USA).png" },
+  { title: "Lost Vikings", platform: "snes", mode: "coop", rom: "roms/snes/Lost Vikings, The (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Lost Vikings, The (USA).png" },
+  { title: "MMPR Fighting Edition", platform: "snes", mode: "versus", rom: "roms/snes/Mighty Morphin Power Rangers - The Fighting Edition (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Mighty Morphin Power Rangers - The Fighting Edition (USA).png" },
+  { title: "MMPR The Movie", platform: "snes", mode: "coop", rom: "roms/snes/Mighty Morphin Power Rangers - The Movie (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Mighty Morphin Power Rangers - The Movie (USA).png" },
+  { title: "Mighty Morphin PR", platform: "snes", mode: "coop", rom: "roms/snes/Mighty Morphin Power Rangers (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Mighty Morphin Power Rangers (USA).png" },
+  { title: "Pirates of Dark Water", platform: "snes", mode: "coop", rom: "roms/snes/Pirates of Dark Water, The (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Pirates of Dark Water, The (USA).png" },
+  { title: "Pocky & Rocky", platform: "snes", mode: "coop", rom: "roms/snes/Pocky & Rocky (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Pocky _ Rocky (USA).png" },
+  { title: "Pocky & Rocky 2", platform: "snes", mode: "coop", rom: "roms/snes/Pocky & Rocky 2 (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Pocky _ Rocky 2 (USA).png" },
+  { title: "Pop'n TwinBee", platform: "snes", mode: "coop", rom: "roms/snes/Pop'n TwinBee (Europe).sfc", thumb: "thumbnails/snes/Named_Titles/Pop'n TwinBee (Europe).png" },
+  { title: "Raiden Trad", platform: "snes", mode: "coop", rom: "roms/snes/Raiden Trad (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Raiden Trad (USA).png" },
+  { title: "Run Saber", platform: "snes", mode: "coop", rom: "roms/snes/Run Saber (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Run Saber (USA).png" },
+  { title: "Rushing Beat Ran", platform: "snes", mode: "coop", rom: "roms/snes/Rushing Beat Ran (J) [!].smc", thumb: "thumbnails/snes/Named_Titles/Rushing Beat Ran - Fukusei Toshi (Japan).png" },
+  { title: "Saturday Night Slam Masters", platform: "snes", mode: "versus", rom: "roms/snes/Saturday Night Slam Masters (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Saturday Night Slam Masters (USA).png" },
+  { title: "Soldiers of Fortune", platform: "snes", mode: "coop", rom: "roms/snes/Soldiers of Fortune (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Soldiers of Fortune (USA).png" },
+  { title: "Sonic Blast Man II", platform: "snes", mode: "coop", rom: "roms/snes/Sonic Blast Man II (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Sonic Blast Man II (USA).png" },
+  { title: "Spider-Man & Venom", platform: "snes", mode: "coop", rom: "roms/snes/Spider-Man & Venom - Separation Anxiety (U).smc", thumb: "thumbnails/snes/Named_Titles/Venom - Spider-Man - Separation Anxiety (USA).png" },
+  { title: "Strike Gunner STG", platform: "snes", mode: "coop", rom: "roms/snes/Strike Gunner S.T.G (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Strike Gunner S.T.G (USA).png" },
+  { title: "Sunset Riders", platform: "snes", mode: "coop", rom: "roms/snes/Sunset Riders (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Sunset Riders (USA).png" },
+  { title: "Super Bomberman 3", platform: "snes", mode: "coop", rom: "roms/snes/Super Bomberman 3 (Europe).sfc", thumb: "thumbnails/snes/Named_Titles/Super Bomberman 3 (Europe).png" },
+  { title: "Super Double Dragon", platform: "snes", mode: "coop", rom: "roms/snes/Super Double Dragon (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Super Double Dragon (USA).png" },
+  { title: "Super Smash TV", platform: "snes", mode: "coop", rom: "roms/snes/Super Smash T.V. (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Super Smash T.V. (USA).png" },
+  { title: "TMNT IV Turtles in Time", platform: "snes", mode: "coop", rom: "roms/snes/Teenage Mutant Ninja Turtles IV - Turtles in Time (U) [!].smc", thumb: "thumbnails/snes/Named_Titles/Teenage Mutant Ninja Turtles IV - Turtles in Time (USA).png" },
+  { title: "Wild Guns", platform: "snes", mode: "versus", rom: "roms/snes/Wild Guns (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Wild Guns (USA).png" },
+  { title: "Zombies Ate My Neighbors", platform: "snes", mode: "coop", rom: "roms/snes/Zombies Ate My Neighbors (USA).sfc", thumb: "thumbnails/snes/Named_Titles/Zombies Ate My Neighbors (USA).png" },
+];
+
+const PLATFORM_ICONS = { nes: '🔴', snes: '🟣' };
+const MODE_LABELS = { coop: 'CO-OP', versus: 'VS', turns: 'TURNOS' };
+const THUMB_BASE = '/retrogames/';
+
+let activePlatform = 'all', activeMode = 'all';
+
+function buildGrid(games) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if (!games.length) {
+    grid.innerHTML = '<div class="empty">NO SE ENCONTRARON JUEGOS<br><span style="font-size:9px;color:#333">INTENTA OTRO FILTRO</span></div>';
+    document.getElementById('count').textContent = '0 JUEGOS';
+    return;
+  }
+  games.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const core = g.platform === 'nes' ? 'nes' : 'snes9x';
+    const playUrl = `play.html?rom=${encodeURIComponent(g.rom)}&core=${core}&name=${encodeURIComponent(g.title)}`;
+    const thumbUrl = g.thumb ? THUMB_BASE + g.thumb : null;
+
+    card.innerHTML = `
+      ${thumbUrl
+        ? `<img class="card-thumb" src="${thumbUrl}" alt="${g.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ''}
+      <div class="card-thumb-placeholder" style="${thumbUrl ? 'display:none' : ''}">🎮</div>
+      <div class="play-overlay">▶ JUGAR</div>
+      <div class="card-info">
+        <div class="card-title">${g.title}</div>
+        <div class="tags">
+          <span class="tag ${g.platform}">${PLATFORM_ICONS[g.platform]} ${g.platform.toUpperCase()}</span>
+          <span class="tag ${g.mode}">${MODE_LABELS[g.mode]}</span>
+        </div>
+      </div>
+    `;
+    card.onclick = () => window.location.href = playUrl;
+    grid.appendChild(card);
+  });
+  document.getElementById('count').textContent = `${games.length} JUEGOS`;
+}
+
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = GAMES.filter(g => {
+    const matchPlatform = activePlatform === 'all' || g.platform === activePlatform;
+    const matchMode = activeMode === 'all' || g.mode === activeMode;
+    const matchSearch = !q || g.title.toLowerCase().includes(q);
+    return matchPlatform && matchMode && matchSearch;
+  });
+  buildGrid(filtered);
+}
+
+document.getElementById('platform-filters').addEventListener('click', e => {
+  const btn = e.target.closest('[data-platform]');
+  if (!btn) return;
+  activePlatform = btn.dataset.platform;
+  document.querySelectorAll('[data-platform]').forEach(b => b.classList.toggle('active', b === btn));
+  applyFilters();
+});
+
+document.getElementById('mode-filters').addEventListener('click', e => {
+  const btn = e.target.closest('[data-mode]');
+  if (!btn) return;
+  activeMode = btn.dataset.mode;
+  document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b === btn));
+  applyFilters();
+});
+
+// Init
+applyFilters();
+</script>
+</body>
+</html>

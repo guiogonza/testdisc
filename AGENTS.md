@@ -23,12 +23,16 @@ python demo_modulos.py
 ## Arquitectura
 
 ```
-app.py              → UI Streamlit + generación de PDFs (>5000 líneas)
-database.py         → Capa de datos: SQLite raw SQL, todas las operaciones CRUD
+app.py              → UI Streamlit + páginas principales + generación de PDFs
+database.py         → Capa de datos: SQLite raw SQL, todas las operaciones CRUD + migraciones
 constants.py        → Constantes de todas las evaluaciones (preguntas, escalas, descripciones)
 calculations.py     → Funciones de cálculo psicométrico por tipo de test
 analysis.py         → Análisis e interpretación de resultados (aptitud, fortalezas, alertas)
-utils.py            → Carga de JSON, navegación (nav())
+charts.py           → Gráficos matplotlib/plotly por tipo de test (barras, radar, comparación)
+pdfs.py             → Generación de reportes PDF con ReportLab para todas las pruebas
+auth.py             → Autenticación admin, tokens HMAC, sesiones con idle timeout (60 min)
+theme.py            → Tema visual + selector claro/oscuro en sidebar
+utils.py            → Carga de archivos JSON, navegación (nav())
 ```
 
 ## Base de Datos
@@ -42,7 +46,7 @@ utils.py            → Carga de JSON, navegación (nav())
 | `admins` | Usuarios admin (`role`: admin/superadmin, password SHA256) |
 | `empresas` | Multi-tenant: empresas del grupo |
 | `candidates` | Empleados/candidatos con datos demográficos y de cargo |
-| `test_sessions` | Sesiones de evaluación por candidato (`test_type`, `status`, `questions_data` JSON) |
+| `test_sessions` | Sesiones de evaluación por candidato (`test_type`, `status`, `questions_data` JSON, `evaluador_cedula`, `evaluador_nombre`) |
 | `test_answers` | Respuestas individuales por pregunta |
 | `test_results` | Resultado completo serializado como JSON |
 
@@ -53,8 +57,9 @@ utils.py            → Carga de JSON, navegación (nav())
 - `eri` — Evaluación de Riesgo e Integridad (6 dimensiones)
 - `talent_map` — Mapeo de Competencias (8 competencias)
 - `desempeno` — Desempeño Operativo (rendimiento 1-5 + potencial 0-3) — **lo completa el admin**
-- `desempeno_lider` — Desempeño Líderes (competencias 1-6 + rendimiento + potencial) — **lo completa el admin**
-- `periodo_prueba` — Evaluación Período de Prueba (actuaciones + calificaciones) — **lo completa el admin**
+- `desempeno_lider` — Desempeño Líderes (competencias 1-6 + rendimiento + potencial) — **flujo dual: employee_eval → jefe_eval**
+- `desempeno_medios` — Desempeño Mandos Medios (competencias 1-6 + rendimiento + potencial) — **flujo dual: employee_eval → jefe_eval**
+- `periodo_prueba` — Evaluación Período de Prueba (actuaciones + calificaciones) — **flujo dual: employee_eval → jefe_eval**
 
 ## Foco: Calificación Valenti (clave `valanti`)
 
@@ -92,9 +97,16 @@ Documentación de apoyo (no duplicar aquí): [REFACTORIZACION.md](REFACTORIZACIO
 `disc`, `valanti`, `wpi`, `eri`, `talent_map`
 
 ### Evaluaciones completadas por el administrador/evaluador
-`desempeno`, `desempeno_lider`, `periodo_prueba`
+`desempeno` — solo admin
 
-> En `page_candidate_select_test()`, las evaluaciones de tipo admin se excluyen del flujo del candidato.
+### Evaluaciones con flujo dual (autoevaluación + jefe)
+`desempeno_lider`, `desempeno_medios`, `periodo_prueba`
+
+El flujo dual usa dos páginas del evaluador:
+1. `_employee_eval` — El empleado se autoevalúa (status pasa a `employee_done`)
+2. `_jefe_eval` — El jefe completa la evaluación final (status pasa a `completed`)
+
+> En `page_candidate_select_test()`, las evaluaciones de tipo admin/evaluador se excluyen del flujo del candidato.
 
 ## Patrones de Código
 
@@ -146,6 +158,7 @@ st.rerun()            # Siempre llamar después de nav()
 | `questions_wpi.json` | WPI |
 | `questions_eri.json` | ERI |
 | `questions_talent_map.json` | Talent Map |
+| `streangths.json` | Fortalezas/Debilidades por estilo DISC |
 
 Las evaluaciones de desempeño usan ítems fijos definidos directamente en `constants.py`.
 
@@ -183,12 +196,19 @@ Las competencias son: Pensamiento Estratégico, Flexibilidad y Agilidad, Orienta
 ## Notas de Deployment
 
 - Dev: `streamlit run app.py` (puerto 8501)
-- Prod: Docker + Nginx (ver [DOCKER.md](DOCKER.md) y [DESPLIEGUE_PRODUCCION.md](DESPLIEGUE_PRODUCCION.md))
-- La BD debe estar en volumen Docker para persistencia
+- Prod: Docker + Nginx reverso con HTTPS (ver [DOCKER.md](DOCKER.md) y [DESPLIEGUE_PRODUCCION.md](DESPLIEGUE_PRODUCCION.md))
+- **Flujo real de deploy:** `scp` al servidor → `docker cp` al contenedor → `docker restart` si es necesario. Ver detalles en deploy.md del repo memory.
+- La BD debe estar en volumen Docker (`./data:/app/data`) para persistencia
+- `docker-compose restart` NO actualiza código (usa imagen cacheada); siempre usar `docker cp`
+- Base URL path en prod: `/evaluacionesrh` (configurado en `STREAMLIT_SERVER_BASE_URL_PATH`)
+- Health check: `curl http://localhost:8501/evaluacionesrh/_stcore/health`
+- Zona horaria: `TZ=America/Bogota` en compose + `datetime.now(timezone(timedelta(hours=-5)))` en código
 
 ## Pitfalls Conocidos
 
 - `PRAGMA foreign_keys = ON` se activa en cada conexión en `database.py`
-- Las evaluaciones de tipo "admin" (`desempeno`, `desempeno_lider`, `periodo_prueba`) deben filtrarse en `page_candidate_select_test()` 
+- Las evaluaciones de tipo "admin" (`desempeno`, `desempeno_lider`, `desempeno_medios`, `periodo_prueba`) deben filtrarse en `page_candidate_select_test()` 
+- El flujo dual (`employee_eval` → `jefe_eval`) depende del status `employee_done` en `test_sessions`; si no se completa la autoevaluación, el jefe no puede evaluar
 - Streamlit recarga el script completo en cada interacción — usar `st.session_state` para preservar estado
 - `st.rerun()` siempre después de `nav()` para que el cambio de página tome efecto
+- `docker-compose restart` NO actualiza el código (usa imagen cacheada); usar `docker cp` + `docker restart`

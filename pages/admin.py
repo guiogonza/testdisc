@@ -473,7 +473,6 @@ def page_admin_dashboard():
     _sessions_by_cedula = {}
     for _s in _all_raw:
         _sessions_by_cedula.setdefault(_s["cedula"], []).append(_s)
-    _cand_names = sorted(set(s["candidate_name"] for s in _all_raw)) if _all_raw else []
     _FILTER_LABELS = {
         "Todos": "📋 Todos", "disc": "🎯 DISC", "valanti": "🧭 VALANTI",
         "wpi": "💼 WPI", "eri": "🔐 ERI", "talent_map": "🌟 Talent Map",
@@ -510,29 +509,10 @@ def page_admin_dashboard():
         )
 
         _filter_type = "Todos"
-        _filter_cand = "Todos"
+        _filter_cand = ""
         _sort_opt = "Fecha (reciente)"
-        if _active_section in ("results", "pending"):
-            st.markdown("---")
-            st.markdown("### 🔎 Filtros")
-            _filter_type = st.selectbox(
-                "Filtrar por tipo",
-                list(_FILTER_LABELS.keys()),
-                key="filter_type",
-                format_func=lambda x: _FILTER_LABELS.get(x, x),
-            )
-            _filter_cand = st.selectbox(
-                "Filtrar por candidato",
-                ["Todos"] + _cand_names,
-                key="filter_candidate",
-            )
-            _sort_opt = st.selectbox(
-                "Ordenar por",
-                ["Fecha (reciente)", "Fecha (antigua)", "Candidato A-Z", "Candidato Z-A", "Tipo prueba"],
-                key="sort_option",
-            )
 
-    _ft = _filter_type if _filter_type != "Todos" else None
+    _ft = None
     _EDITABLE_TEST_TYPES = [k for k in _FILTER_LABELS.keys() if k != "Todos"]
 
     def _get_sort_date(s):
@@ -942,37 +922,24 @@ def page_admin_dashboard():
             st.markdown("---")
             st.markdown("**👤 Jefe / Evaluador** _(requerido para Desempeño y Período de Prueba)_")
 
-            # Lookup automático por cédula — fuera del formulario para reactividad inmediata
-            def _on_change_eval_ced_create():
-                _ced_v = db.normalize_cedula(st.session_state.get("create_eval_ced", ""))
-                _found_v = db.get_candidate_by_cedula(_ced_v) if _ced_v else None
-                if _found_v:
-                    st.session_state["create_eval_nom"] = _found_v["name"]
-                else:
-                    st.session_state["create_eval_nom"] = ""
+            _jefe_options_list = sorted(_all_candidates, key=lambda c: c.get("name", "").lower())
+            _jefe_display_opts = [""] + [f"{c['name']}  •  {c['cedula']}" for c in _jefe_options_list]
+            _jefe_data_map = {f"{c['name']}  •  {c['cedula']}": c for c in _jefe_options_list}
 
-            _eval_ced = st.text_input(
-                "Cédula del Jefe / Evaluador",
-                key="create_eval_ced",
-                placeholder="Ingresa la cédula para buscar automáticamente",
-                on_change=_on_change_eval_ced_create,
+            _jefe_sel = st.selectbox(
+                "Buscar jefe / evaluador",
+                options=_jefe_display_opts,
+                key="create_eval_jefe_unico",
+                placeholder="Escribe nombre o cédula para filtrar...",
             )
-            _eval_ced_raw = _eval_ced.strip()
-            _eval_ced_norm = db.normalize_cedula(_eval_ced_raw)
-            _eval_ced_valid = not _eval_ced_raw or db.is_numeric_cedula(_eval_ced_raw)
-            if _eval_ced_raw and not _eval_ced_valid:
-                st.error("❌ La cédula del evaluador debe contener solo números.")
-            _jefe_found = db.get_candidate_by_cedula(_eval_ced_norm) if _eval_ced_norm else None
+
+            _jefe_found = _jefe_data_map.get(_jefe_sel)
+            _eval_ced_norm = str(_jefe_found["cedula"]) if _jefe_found else ""
+            _eval_nom = _jefe_found["name"] if _jefe_found else ""
             _jefe_ok = True
             if _jefe_found:
-                st.success(f"✅ {_jefe_found['name']} | Cargo: {_jefe_found.get('position', 'N/A')}")
-                _eval_nom = _jefe_found["name"]
-            elif _eval_ced.strip():
-                st.error("❌ Cédula no registrada. Regístralo primero en la sección **👥 Candidatos** antes de asignarlo como evaluador.")
-                _jefe_ok = False
-                _eval_nom = ""
-            else:
-                _eval_nom = ""
+                st.success(f"✅ {_jefe_found['name']} | Cédula: {_jefe_found['cedula']} | Cargo: {_jefe_found.get('position', 'N/A')}")
+
 
             st.markdown("---")
             with st.form("create_eval_form"):
@@ -997,11 +964,9 @@ def page_admin_dashboard():
                     if not _cand:
                         st.error("❌ Selecciona un candidato antes de crear la evaluación.")
                     else:
-                        _ec_val = db.normalize_cedula(st.session_state.get("create_eval_ced", ""))
+                        _ec_val = _eval_ced_norm
                         if _test_type in _TIPOS_CON_EVALUADOR and not _ec_val:
-                            st.error("❌ La cédula del Jefe/Evaluador es obligatoria para este tipo de evaluación.")
-                        elif _test_type in _TIPOS_CON_EVALUADOR and not _eval_ced_valid:
-                            st.error("❌ La cédula del Jefe/Evaluador debe contener solo números.")
+                            st.error("❌ El Jefe/Evaluador es obligatorio para este tipo de evaluación.")
                         elif _test_type in _TIPOS_CON_EVALUADOR and not _jefe_ok:
                             st.error("❌ Debes registrar al jefe como candidato antes de continuar.")
                         elif _test_type in _pending_types:
@@ -1380,10 +1345,20 @@ def page_admin_dashboard():
 
         # ── KPIs principales ──────────────────────────────────────────────
         _k1, _k2, _k3, _k4 = st.columns(4)
-        _k1.metric("📋 Total Evaluaciones", _total)
-        _k2.metric("✅ Completadas", len(_all_completed), f"{_pct_done}% del total")
-        _k3.metric("⏳ Pendientes / En curso", len(_all_pending))
-        _k4.metric("👥 Candidatos activos", len(set(s["candidate_id"] for s in _all_raw)))
+        def _kpi_card(col, icon, label, value, sub=None):
+            _sub_html = f"<div style='font-size:12px;color:#10B981;margin-top:4px'>{sub}</div>" if sub else "<div style='font-size:12px;min-height:20px'></div>"
+            col.markdown(
+                f"""<div style='border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;min-height:110px;'>
+                <div style='font-size:13px;color:#64748b;margin-bottom:6px'>{icon} {label}</div>
+                <div style='font-size:32px;font-weight:700;line-height:1'>{value}</div>
+                {_sub_html}
+                </div>""",
+                unsafe_allow_html=True,
+            )
+        _kpi_card(_k1, "📋", "Total Evaluaciones", _total)
+        _kpi_card(_k2, "✅", "Completadas", len(_all_completed), f"↑ {_pct_done}% del total")
+        _kpi_card(_k3, "⏳", "Pendientes / En curso", len(_all_pending))
+        _kpi_card(_k4, "👥", "Candidatos activos", len({s["candidate_id"] for s in _all_raw}))
 
         st.markdown("---")
 
@@ -1657,24 +1632,68 @@ def page_admin_dashboard():
     # ----- SECCIÓN: Resultados -----
     elif _active_section == "results":
         st.markdown("### Resultados de Evaluaciones")
+        _fc1, _fc2, _fc3 = st.columns([1.5, 2, 1.5])
+        with _fc1:
+            _filter_type = _fc1.selectbox(
+                "Tipo de prueba",
+                list(_FILTER_LABELS.keys()),
+                key="filter_type",
+                format_func=lambda x: _FILTER_LABELS.get(x, x),
+            )
+        with _fc2:
+            _filter_cand = _fc2.text_input(
+                "Buscar candidato",
+                key="filter_candidate_search",
+                placeholder="Nombre o cédula...",
+            ).strip()
+        with _fc3:
+            _sort_opt = _fc3.selectbox(
+                "Ordenar por",
+                ["Fecha (reciente)", "Fecha (antigua)", "Candidato A-Z", "Candidato Z-A", "Tipo prueba"],
+                key="sort_option",
+            )
+        _ft = _filter_type if _filter_type != "Todos" else None
         _res3 = [
             s for s in _all_raw
             if (_ft is None or s["test_type"] == _ft) and s["status"] in ("completed", "expired")
         ]
-        if _filter_cand != "Todos":
-            _res3 = [s for s in _res3 if s["candidate_name"] == _filter_cand]
+        if _filter_cand:
+            _fc_lower = _filter_cand.lower()
+            _res3 = [s for s in _res3 if _fc_lower in s["candidate_name"].lower() or _fc_lower in str(s.get("cedula", ""))]
         _sort_sessions(_res3)
         _render_sessions_list(_res3, "res")
 
     # ----- SECCIÓN: Pruebas Pendientes -----
     elif _active_section == "pending":
         st.markdown("### Pruebas Pendientes")
+        _pc1, _pc2, _pc3 = st.columns([1.5, 2, 1.5])
+        with _pc1:
+            _filter_type = _pc1.selectbox(
+                "Tipo de prueba",
+                list(_FILTER_LABELS.keys()),
+                key="filter_type_pend",
+                format_func=lambda x: _FILTER_LABELS.get(x, x),
+            )
+        with _pc2:
+            _filter_cand = _pc2.text_input(
+                "Buscar candidato",
+                key="filter_candidate_search_pend",
+                placeholder="Nombre o cédula...",
+            ).strip()
+        with _pc3:
+            _sort_opt = _pc3.selectbox(
+                "Ordenar por",
+                ["Fecha (reciente)", "Fecha (antigua)", "Candidato A-Z", "Candidato Z-A", "Tipo prueba"],
+                key="sort_option_pend",
+            )
+        _ft = _filter_type if _filter_type != "Todos" else None
         _pend4 = [
             s for s in _all_raw
             if (_ft is None or s["test_type"] == _ft) and s["status"] in ("pending", "in_progress", "employee_done")
         ]
-        if _filter_cand != "Todos":
-            _pend4 = [s for s in _pend4 if s["candidate_name"] == _filter_cand]
+        if _filter_cand:
+            _fc_lower = _filter_cand.lower()
+            _pend4 = [s for s in _pend4 if _fc_lower in s["candidate_name"].lower() or _fc_lower in str(s.get("cedula", ""))]
         _sort_sessions(_pend4)
         _render_sessions_list(_pend4, "pend")
 

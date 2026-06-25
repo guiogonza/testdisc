@@ -107,51 +107,138 @@ def page_evaluador_dashboard():
         st.rerun()
 
     sessions = db.get_sessions_for_evaluador(evaluador["cedula"])
+    completed_sessions = db.get_completed_sessions_for_evaluador(evaluador["cedula"])
+
+    test_labels = {
+        "desempeno": "📈 Evaluación de Desempeño — Operativo",
+        "desempeno_lider": "📊 Evaluación de Desempeño — Líderes",
+        "desempeno_medios": "📊 Evaluación de Desempeño - Medios",
+        "periodo_prueba": "📋 Evaluación Período de Prueba",
+    }
 
     if not sessions:
         st.info("📋 No tienes evaluaciones pendientes de tu parte en este momento.")
         st.caption("Las evaluaciones aparecerán aquí una vez que el empleado complete su auto-evaluación. Vuelve más tarde.")
+    else:
+        st.success("✅ Tienes evaluaciones asignadas para completar.")
+        st.markdown(f"### Evaluaciones Pendientes de tu Parte ({len(sessions)})")
+        st.markdown("---")
+
+        for sess in sessions:
+            test_label = test_labels.get(sess["test_type"], sess["test_type"])
+
+            with st.container():
+                c1, c2, c3 = st.columns([4, 1, 1])
+                with c1:
+                    st.markdown(f"### {test_label}")
+                    st.markdown(f"**Empleado:** {sess['candidate_name']} | **Cédula:** {sess['cedula']}")
+                    st.caption(f"ID: {sess['id']} | Creado: {sess.get('created_at', 'N/A')[:10]}")
+                with c2:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    if sess["test_type"] == "desempeno":
+                        st.info("Pendiente ⏳")
+                    else:
+                        st.success("Listo ✅")
+                with c3:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    if st.button("✏️ Completar mi Evaluación", key=f"ev_{sess['id']}", use_container_width=True):
+                        st.session_state["evaluador_session_id"] = sess["id"]
+                        if sess["test_type"] == "desempeno":
+                            st.session_state["desempeno_session_id"] = sess["id"]
+                            nav("desempeno_eval")
+                        elif sess["test_type"] == "desempeno_lider":
+                            nav("desempeno_lider_jefe_eval")
+                        elif sess["test_type"] == "desempeno_medios":
+                            nav("desempeno_medios_jefe_eval")
+                        elif sess["test_type"] == "periodo_prueba":
+                            nav("periodo_prueba_jefe_eval")
+                        st.rerun()
+                st.markdown("---")
+
+    st.markdown("### Evaluaciones que has realizado como jefe")
+    if not completed_sessions:
+        st.caption("Aún no tienes evaluaciones completadas como jefe/evaluador.")
         return
 
-    st.success("✅ Tienes evaluaciones asignadas para completar.")
-    st.markdown(f"### Evaluaciones Pendientes de tu Parte ({len(sessions)})")
-    st.markdown("---")
-
-    for sess in sessions:
-        test_label = {
-            "desempeno": "📈 Evaluación de Desempeño — Operativo",
-            "desempeno_lider": "📊 Evaluación de Desempeño — Líderes",
-            "desempeno_medios": "📊 Evaluación de Desempeño - Medios",
-            "periodo_prueba": "📋 Evaluación Período de Prueba",
-        }.get(sess["test_type"], sess["test_type"])
-
+    for sess in completed_sessions:
+        test_label = test_labels.get(sess["test_type"], sess["test_type"])
+        completed_at = sess.get("completed_at") or sess.get("created_at") or ""
         with st.container():
-            c1, c2, c3 = st.columns([4, 1, 1])
+            c1, c2 = st.columns([4, 1])
             with c1:
-                st.markdown(f"### {test_label}")
+                st.markdown(f"**{test_label}**")
                 st.markdown(f"**Empleado:** {sess['candidate_name']} | **Cédula:** {sess['cedula']}")
-                st.caption(f"ID: {sess['id']} | Creado: {sess.get('created_at', 'N/A')[:10]}")
+                st.caption(f"ID: {sess['id']} | Completada: {completed_at}")
             with c2:
-                st.markdown("<br>", unsafe_allow_html=True)
-                if sess["test_type"] == "desempeno":
-                    st.info("Pendiente ⏳")
-                else:
-                    st.success("Listo ✅")
-            with c3:
-                st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("✏️ Completar mi Evaluación", key=f"ev_{sess['id']}", use_container_width=True):
-                    st.session_state["evaluador_session_id"] = sess["id"]
-                    if sess["test_type"] == "desempeno":
-                        st.session_state["desempeno_session_id"] = sess["id"]
-                        nav("desempeno_eval")
-                    elif sess["test_type"] == "desempeno_lider":
-                        nav("desempeno_lider_jefe_eval")
-                    elif sess["test_type"] == "desempeno_medios":
-                        nav("desempeno_medios_jefe_eval")
-                    elif sess["test_type"] == "periodo_prueba":
-                        nav("periodo_prueba_jefe_eval")
-                    st.rerun()
+                st.success("Completada ✅")
+
+            if st.button("Ver resultados", key=f"eval_hist_view_{sess['id']}", use_container_width=True):
+                st.session_state["evaluador_result_session_id"] = sess["id"]
+                nav("evaluador_result_view")
+                st.rerun()
             st.markdown("---")
+
+
+def page_evaluador_result_view():
+    evaluador = st.session_state.get("evaluador")
+    session_id = st.session_state.get("evaluador_result_session_id")
+    if not evaluador:
+        nav("evaluador_login")
+        st.rerun()
+        return
+    if not session_id:
+        nav("evaluador_dashboard")
+        st.rerun()
+        return
+
+    session = db.get_session_by_id(session_id)
+    if not session:
+        st.error("No se encontró la evaluación.")
+        if st.button("Volver al panel"):
+            nav("evaluador_dashboard")
+            st.rerun()
+        return
+
+    if db.normalize_cedula(session.get("evaluador_cedula")) != db.normalize_cedula(evaluador.get("cedula")):
+        st.error("No tienes permiso para ver esta evaluación.")
+        if st.button("Volver al panel"):
+            nav("evaluador_dashboard")
+            st.rerun()
+        return
+
+    if session.get("status") != "completed":
+        st.warning("Esta evaluación aún no está completada.")
+        if st.button("Volver al panel"):
+            nav("evaluador_dashboard")
+            st.rerun()
+        return
+
+    if st.button("⬅️ Volver al panel del evaluador"):
+        st.session_state.pop("evaluador_result_session_id", None)
+        nav("evaluador_dashboard")
+        st.rerun()
+
+    candidate = db.get_candidate_by_id(session["candidate_id"])
+    results = db.get_results(session_id) or {}
+
+    from pages.desempeno import (
+        show_desempeno_results_admin,
+        show_desempeno_lider_results_admin,
+        show_desempeno_medios_results_admin,
+        show_periodo_prueba_results_admin,
+    )
+
+    test_type = session.get("test_type")
+    if test_type == "desempeno":
+        show_desempeno_results_admin(results, candidate, session, show_json_download=False)
+    elif test_type == "desempeno_lider":
+        show_desempeno_lider_results_admin(results, candidate, session, show_json_download=False)
+    elif test_type == "desempeno_medios":
+        show_desempeno_medios_results_admin(results, candidate, session, show_json_download=False)
+    elif test_type == "periodo_prueba":
+        show_periodo_prueba_results_admin(results, candidate, session, show_json_download=False)
+    else:
+        st.error(f"Tipo de evaluación no soportado: {test_type}")
 
 
 # -------------------------------------------------------------------------
@@ -190,15 +277,13 @@ def page_desempeno_lider_employee_eval():
             nivel_sel = st.radio(
                 f"Nivel {comp['nombre']}",
                 options=[1, 2, 3, 4, 5, 6],
-                format_func=lambda x, c=comp: f"Nivel {x} — {c['niveles'][x][:80]}...",
-                horizontal=True,
+                format_func=lambda x, c=comp: f"Nivel {x} — {c['niveles'][x]}",
+                horizontal=False,
                 key=f"emp_comp_{comp['id']}",
                 label_visibility="collapsed",
                 index=2,
             )
             competencias_scores[comp["id"]] = nivel_sel
-            with st.expander("Ver descripción completa de este nivel"):
-                st.info(comp["niveles"][nivel_sel])
             st.markdown("---")
 
         submitted = st.form_submit_button("✅ Enviar Auto-Evaluación", use_container_width=True, type="primary")
@@ -256,15 +341,13 @@ def page_desempeno_medios_employee_eval():
             nivel_sel = st.radio(
                 f"Nivel medios {comp['nombre']}",
                 options=[1, 2, 3, 4, 5, 6],
-                format_func=lambda x, c=comp: f"Nivel {x} - {c['niveles'][x][:80]}...",
-                horizontal=True,
+                format_func=lambda x, c=comp: f"Nivel {x} - {c['niveles'][x]}",
+                horizontal=False,
                 key=f"emp_med_comp_{comp['id']}",
                 label_visibility="collapsed",
                 index=2,
             )
             competencias_scores[comp["id"]] = nivel_sel
-            with st.expander("Ver descripción completa de este nivel"):
-                st.info(comp["niveles"][nivel_sel])
             st.markdown("---")
 
         submitted = st.form_submit_button("✅ Enviar Auto-Evaluación", use_container_width=True, type="primary")
@@ -413,8 +496,8 @@ def page_desempeno_lider_jefe_eval():
             nivel_sel = st.radio(
                 f"Nivel {comp['nombre']}",
                 options=[1, 2, 3, 4, 5, 6],
-                format_func=lambda x, c=comp: f"Nivel {x} — {c['niveles'][x][:80]}...",
-                horizontal=True,
+                format_func=lambda x, c=comp: f"Nivel {x} — {c['niveles'][x]}",
+                horizontal=False,
                 key=f"jefe_comp_{comp['id']}",
                 label_visibility="collapsed",
                 index=2,
@@ -565,7 +648,7 @@ def page_desempeno_medios_jefe_eval():
                 f"Nivel medios jefe {comp['nombre']}",
                 options=[1, 2, 3, 4, 5, 6],
                 format_func=lambda x, c=comp: f"Nivel {x} - {c['niveles'][x][:80]}...",
-                horizontal=True,
+                horizontal=False,
                 key=f"jefe_med_comp_{comp['id']}",
                 label_visibility="collapsed",
                 index=2,

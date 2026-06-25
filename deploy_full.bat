@@ -71,6 +71,10 @@ REM Config para dominio nip.io (ya existente — HTTP plano)
 scp -i %SSH_KEY% evaluaciones-plain-http.nginx ^
     %SERVER%:/etc/nginx/sites-available/evaluaciones-nipio.conf
 
+REM Config final HTTPS para dominio nip.io
+scp -i %SSH_KEY% evaluaciones-nipio-https.nginx ^
+    %SERVER%:/etc/nginx/sites-available/evaluaciones-nipio-https.conf
+
 REM Config NUEVA para IP con prefijo /evaluacionesrh
 scp -i %SSH_KEY% evaluaciones-ip.nginx ^
     %SERVER%:/etc/nginx/sites-available/evaluaciones-ip.conf
@@ -93,6 +97,23 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 echo       Nginx recargado OK
+echo.
+
+echo       Verificando certificado HTTPS para nip.io...
+ssh -i %SSH_KEY% %SERVER% "^
+    if [ ! -f /etc/letsencrypt/live/evaluaciones.164.68.118.86.nip.io/fullchain.pem ]; then ^
+      apt-get update && apt-get install -y certbot python3-certbot-nginx && ^
+      certbot certonly --nginx --non-interactive --agree-tos --register-unsafely-without-email -d evaluaciones.164.68.118.86.nip.io; ^
+    fi && ^
+    ln -sf /etc/nginx/sites-available/evaluaciones-nipio-https.conf /etc/nginx/sites-enabled/evaluaciones-nipio.conf && ^
+    nginx -t && systemctl reload nginx ^
+"
+if %errorlevel% neq 0 (
+    echo [ERROR] Fallo al configurar HTTPS. Revisar DNS, puerto 80/443 y certbot.
+    pause
+    exit /b 1
+)
+echo       HTTPS activo OK
 echo.
 
 REM ── 5. Reconstruir contenedor Docker ─────────────────────────
@@ -130,7 +151,7 @@ echo ============================================================
 echo   DESPLIEGUE COMPLETADO
 echo ============================================================
 echo.
-echo   Subdominio:  http://evaluaciones.164.68.118.86.nip.io/
+echo   Subdominio:  https://evaluaciones.164.68.118.86.nip.io/evaluacionesrh
 echo   Por IP/ruta: http://164.68.118.86/evaluacionesrh
 echo.
 echo   Logs en tiempo real:
