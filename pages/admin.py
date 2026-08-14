@@ -522,6 +522,16 @@ def page_admin_dashboard():
         except:
             return datetime.min
 
+    def _session_date(s):
+        d = _get_sort_date(s)
+        return d.date() if d != datetime.min else None
+
+    def _session_periodo(s):
+        d = _session_date(s)
+        return (1 if d.month <= 6 else 2) if d else None
+
+    _PERIODO_LABELS = {1: "🟦 Periodo 1 (Ene-Jun)", 2: "🟧 Periodo 2 (Jul-Dic)"}
+
     def _sort_sessions(lst):
         if _sort_opt == "Fecha (reciente)":
             lst.sort(key=_get_sort_date, reverse=True)
@@ -561,17 +571,18 @@ def page_admin_dashboard():
             if col == "CÉDULA": return str(s["cedula"])
             if col == "ID": return s.get("id", 0)
             if col == "FECHA": return _get_sort_date(s)
+            if col == "PERIODO": return _session_periodo(s) or 0
             return ""
 
         sessions = sorted(sessions, key=lambda s: _col_val_sort(s, _curr_col), reverse=(_curr_dir == "desc"))
 
-        _W = [0.35, 2.4, 1.6, 1.5, 1.05, 1.65, 0.45]
+        _W = [0.35, 2.4, 1.6, 1.5, 1.05, 1.65, 1.1, 0.45]
         st.caption(f"📊 {len(sessions)} evaluación(es) encontrada(s)")
         # Cabecera con ordenamiento por columna
         _hdr = st.columns(_W)
         _hdr[0].markdown("<div style='height:30px'></div>", unsafe_allow_html=True)
-        _hdr[6].markdown("<div style='height:30px'></div>", unsafe_allow_html=True)
-        for _hcol_idx, _hcol_name in [(1, "CANDIDATO"), (2, "PRUEBA"), (3, "CÉDULA"), (4, "ID"), (5, "FECHA")]:
+        _hdr[7].markdown("<div style='height:30px'></div>", unsafe_allow_html=True)
+        for _hcol_idx, _hcol_name in [(1, "CANDIDATO"), (2, "PRUEBA"), (3, "CÉDULA"), (4, "ID"), (5, "FECHA"), (6, "PERIODO")]:
             _arrow = " ↓" if (_curr_col == _hcol_name and _curr_dir == "desc") else (
                      " ↑" if _curr_col == _hcol_name else " ↕")
             if _hdr[_hcol_idx].button(
@@ -598,6 +609,8 @@ def page_admin_dashboard():
                     fecha_str = datetime.strptime(_date_ref, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M")
                 except:
                     fecha_str = str(_date_ref)
+            _periodo_n = _session_periodo(sess)
+            periodo_str = ("🟦 P1" if _periodo_n == 1 else "🟧 P2") if _periodo_n else "—"
             toggle_key = f"show_detail_{tab_key}_{sess['id']}"
             is_open = st.session_state.get(toggle_key, False)
             # Fila de la tabla
@@ -608,7 +621,8 @@ def page_admin_dashboard():
             rc[3].markdown(f"<div style='font-size:12px;font-family:monospace;padding-top:6px'>{sess['cedula']}</div>", unsafe_allow_html=True)
             rc[4].markdown(f"<div style='font-size:12px;font-family:monospace;padding-top:6px'>{sess['id']}</div>", unsafe_allow_html=True)
             rc[5].markdown(f"<div style='font-size:12px;padding-top:6px'>{fecha_str}</div>", unsafe_allow_html=True)
-            if rc[6].button("▲" if is_open else "▼", key=f"tog_{tab_key}_{sess['id']}", use_container_width=True):
+            rc[6].markdown(f"<div style='font-size:12px;padding-top:6px'>{periodo_str}</div>", unsafe_allow_html=True)
+            if rc[7].button("▲" if is_open else "▼", key=f"tog_{tab_key}_{sess['id']}", use_container_width=True):
                 st.session_state[toggle_key] = not is_open
                 st.rerun()
             if is_open:
@@ -1381,21 +1395,31 @@ def page_admin_dashboard():
             except:
                 pass
 
-        _min_date = min(_all_dates) if _all_dates else datetime.today().date()
-        _max_date = max(_all_dates) if _all_dates else datetime.today().date()
-
         # Cargos disponibles
         _all_cargos = sorted(set(
             (s.get("position") or "Sin cargo").strip() or "Sin cargo"
             for s in _all_completed
         ))
 
+        # Años disponibles
+        _years_avail_dash = sorted({d.year for d in _all_dates}, reverse=True) if _all_dates else [datetime.today().year]
+
         with st.expander("🔎 Filtros del Dashboard", expanded=False):
-            _filt_col1, _filt_col2, _filt_col3 = st.columns(3)
+            _filt_col1, _filt_col2, _filt_col3, _filt_col4 = st.columns(4)
             with _filt_col1:
-                _f_desde = st.date_input("Desde", value=_min_date, key="db_f_desde")
-                _f_hasta = st.date_input("Hasta", value=_max_date, key="db_f_hasta")
+                _f_anio = st.selectbox(
+                    "Año",
+                    options=["Todos"] + _years_avail_dash,
+                    key="db_f_anio",
+                )
             with _filt_col2:
+                _f_periodo = st.selectbox(
+                    "Periodo",
+                    options=["Todos", 1, 2],
+                    format_func=lambda x: "Todos" if x == "Todos" else _PERIODO_LABELS[x],
+                    key="db_f_periodo",
+                )
+            with _filt_col3:
                 _f_tipos = st.multiselect(
                     "Tipo de prueba",
                     options=list(_TEST_LABELS.keys()),
@@ -1403,7 +1427,7 @@ def page_admin_dashboard():
                     format_func=lambda x: _TEST_LABELS.get(x, x),
                     key="db_f_tipos",
                 )
-            with _filt_col3:
+            with _filt_col4:
                 _f_cargos = st.multiselect(
                     "Cargo",
                     options=_all_cargos,
@@ -1420,9 +1444,11 @@ def page_admin_dashboard():
                 return None
 
         _comp_filt = _all_completed
-        if _f_desde or _f_hasta:
+        if _f_anio != "Todos":
+            _comp_filt = [s for s in _comp_filt if _dash_date(s) and _dash_date(s).year == _f_anio]
+        if _f_periodo != "Todos":
             _comp_filt = [s for s in _comp_filt
-                          if _dash_date(s) and _f_desde <= _dash_date(s) <= _f_hasta]
+                          if _dash_date(s) and (1 if _dash_date(s).month <= 6 else 2) == _f_periodo]
         if _f_tipos:
             _comp_filt = [s for s in _comp_filt if s["test_type"] in _f_tipos]
         if _f_cargos:
@@ -1632,7 +1658,10 @@ def page_admin_dashboard():
     # ----- SECCIÓN: Resultados -----
     elif _active_section == "results":
         st.markdown("### Resultados de Evaluaciones")
-        _fc1, _fc2, _fc3 = st.columns([1.5, 2, 1.5])
+        _years_avail_res = sorted({
+            _session_date(s).year for s in _all_raw if _session_date(s)
+        }, reverse=True)
+        _fc1, _fc2, _fc3, _fc4, _fc5 = st.columns([1.3, 1.7, 0.9, 1.3, 1.3])
         with _fc1:
             _filter_type = _fc1.selectbox(
                 "Tipo de prueba",
@@ -1647,7 +1676,20 @@ def page_admin_dashboard():
                 placeholder="Nombre o cédula...",
             ).strip()
         with _fc3:
-            _sort_opt = _fc3.selectbox(
+            _filter_year = _fc3.selectbox(
+                "Año",
+                ["Todos"] + _years_avail_res,
+                key="filter_year",
+            )
+        with _fc4:
+            _filter_periodo = _fc4.selectbox(
+                "Periodo",
+                ["Todos", 1, 2],
+                key="filter_periodo",
+                format_func=lambda x: "Todos" if x == "Todos" else _PERIODO_LABELS[x],
+            )
+        with _fc5:
+            _sort_opt = _fc5.selectbox(
                 "Ordenar por",
                 ["Fecha (reciente)", "Fecha (antigua)", "Candidato A-Z", "Candidato Z-A", "Tipo prueba"],
                 key="sort_option",
@@ -1660,6 +1702,10 @@ def page_admin_dashboard():
         if _filter_cand:
             _fc_lower = _filter_cand.lower()
             _res3 = [s for s in _res3 if _fc_lower in s["candidate_name"].lower() or _fc_lower in str(s.get("cedula", ""))]
+        if _filter_year != "Todos":
+            _res3 = [s for s in _res3 if _session_date(s) and _session_date(s).year == _filter_year]
+        if _filter_periodo != "Todos":
+            _res3 = [s for s in _res3 if _session_periodo(s) == _filter_periodo]
         _sort_sessions(_res3)
         _render_sessions_list(_res3, "res")
 
